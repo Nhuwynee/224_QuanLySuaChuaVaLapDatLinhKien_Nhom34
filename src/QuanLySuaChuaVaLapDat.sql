@@ -164,7 +164,7 @@ CREATE TABLE DanhGia (
     idDonDichVu CHAR(7) FOREIGN KEY REFERENCES DonDichVu(idDonDichVu),
     danhGiaNhanVien INT CHECK (danhGiaNhanVien BETWEEN 1 AND 5),
     danhGiaDichVu INT CHECK (danhGiaDichVu BETWEEN 1 AND 5),
-    gopY TEXT
+    gopY NTEXT
 );
 
 ------------------------- INSERT
@@ -728,3 +728,34 @@ VALUES
 
 select * from [User]
 select * from DonDichVu
+
+INSERT INTO HinhAnh (idHinhAnh,idCTDH, anh, loaiHinhAnh)
+VALUES 
+('HA00001', 'CT001', 'bao_hanh_1.jpg', N'Bảo hành'),
+('HA00002', 'CT002', 'thiet_bi_1.jpg', N'Thiết bị linh kiện'),
+('HA00003', 'CT003', 'bao_hanh_2.jpg', N'Bảo hành'),
+('HA00004', 'CT004', 'khach_hang_1.jpg', N'Thiêt bị Linh kiện'),
+('HA00005', 'CT005', 'bao_hanh_3.jpg', N'Bảo hành'),
+('HA00006', 'CT006', 'thiet_bi_2.jpg', N'Thiêt bị Linh kiện'),
+('HA00007', 'CT007', 'linh_kien_2.jpg', N'Thiêt bị Linh kiện'),
+('HA00008', 'CT008', 'bao_hanh_4.jpg', N'Bảo hành'),
+('HA00009', 'CT009', 'bao_hanh_5.jpg', N'Bảo hành'),
+('HA00010', 'CT010', 'thiet_bi_3.jpg', N'Thiêt bị Linh kiện');
+
+
+INSERT INTO DanhGia (idDanhGia, idDonDichVu, danhGiaNhanVien, danhGiaDichVu, gopY)
+VALUES 
+('DG00001', 'DDV001', 5, 4, N'Nhân viên thân thiện, dịch vụ tốt'),
+('DG00002', 'DDV002', 3, 3, N'Thời gian chờ hơi lâu'),
+('DG00003', 'DDV003', 4, 5, N'Hài lòng với chất lượng'),
+('DG00004', 'DDV004', 2, 2, N'Cần cải thiện dịch vụ'),
+('DG00005', 'DDV005', 5, 5, N'Tuyệt vời!'),
+('DG00006', 'DDV006', 1, 2, N'Không hài lòng'),
+('DG00007', 'DDV007', 4, 4, N'Ổn, sẽ quay lại'),
+('DG00008', 'DDV008', 3, 4, N'Nhân viên cần chuyên nghiệp hơn'),
+('DG00009', 'DDV009', 5, 3, N'Dịch vụ tốt nhưng giá cao'),
+('DG00010', 'DDV010', 4, 4, N'Tốt, đúng như mong đợi');
+
+select * from HinhAnh
+select * from DanhGia
+
