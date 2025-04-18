@@ -728,3 +728,87 @@ VALUES
 
 select * from [User]
 select * from DonDichVu
+
+
+
+--================================================Function tạo id lỗi kế tiếp=======================
+CREATE FUNCTION dbo.fn_GenerateNextLoiID()
+RETURNS CHAR(7)
+AS
+BEGIN
+    DECLARE @MaxNum INT
+    DECLARE @NextID CHAR(7)
+
+    -- Lấy phần số lớn nhất sau chữ 'L'
+    SELECT @MaxNum = MAX(CAST(SUBSTRING(idLoi, 2, 3) AS INT))
+    FROM LoaiLoi
+    WHERE ISNUMERIC(SUBSTRING(idLoi, 2, 3)) = 1
+
+    -- Nếu chưa có bản ghi nào, bắt đầu từ 1
+    IF @MaxNum IS NULL
+        SET @MaxNum = 0
+
+    -- Tạo ID mới, định dạng L + 3 chữ số
+    SET @NextID = 'L' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR), 3)
+
+    RETURN @NextID
+END
+go
+--=========================================Procedure insert Lỗi====================
+CREATE PROCEDURE sp_InsertLoaiLoi
+    @moTaLoi NVARCHAR(200)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @NewID CHAR(7)
+    
+    -- tạo id nối tiếp
+    SET @NewID = dbo.fn_GenerateNextLoiID()
+    
+    -- 
+    INSERT INTO LoaiLoi (idLoi, moTaLoi)
+    VALUES (@NewID, @moTaLoi)
+    
+   
+    SELECT @NewID AS NewLoiID
+    
+    RETURN 0
+END
+go
+--=========================================Procedure update Lỗi====================
+CREATE PROCEDURE sp_UpdateLoaiLoi
+    @idLoi CHAR(7),
+    @moTaLoi NVARCHAR(200)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- kiểm tra bản ghi tồn tại
+    IF NOT EXISTS (SELECT 1 FROM LoaiLoi WHERE idLoi = @idLoi)
+    BEGIN
+        RAISERROR('ID lỗi không tồn tại.', 16, 1)
+        RETURN 1
+    END
+    
+ 
+    UPDATE LoaiLoi
+    SET moTaLoi = @moTaLoi
+    WHERE idLoi = @idLoi
+    
+
+    SELECT @idLoi as UpdatedLoiID, @moTaLoi as moTaLoi
+    
+    RETURN 0
+END
+
+
+--drop function fn_GenerateNextLoiID
+--drop proc sp_InsertLoaiLoi
+--drop proc sp_UpdateLoaiLoi
+
+
+EXEC sp_InsertLoaiLoi N'Màn hình laptop bị sọc dọc'
+EXEC sp_UpdateLoaiLoi 'L062', N'Màn hình laptop bị sọc ngang'
+
+--select * from LoaiLoi where idLoi = 'L062'
