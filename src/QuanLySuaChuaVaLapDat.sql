@@ -844,3 +844,140 @@ EXEC sp_InsertLoaiLoi N'Màn hình laptop bị sọc dọc'
 EXEC sp_UpdateLoaiLoi 'L062', N'Màn hình laptop bị sọc ngang'
 
 --select * from LoaiLoi where idLoi = 'L062'
+
+
+--=========================================Function tạo id linh kiện kế tiếp====================
+CREATE FUNCTION dbo.fn_GenerateNextLinhKienID()
+RETURNS CHAR(7)
+AS
+BEGIN
+    DECLARE @MaxNum INT
+    DECLARE @NextID CHAR(7)
+
+    -- Lấy phần số lớn nhất sau chữ 'LK'
+    SELECT @MaxNum = MAX(CAST(SUBSTRING(idLinhKien, 3, 4) AS INT))
+    FROM LinhKien
+    WHERE ISNUMERIC(SUBSTRING(idLinhKien, 3, 4)) = 1
+
+    -- Nếu chưa có bản ghi nào, bắt đầu từ 1
+    IF @MaxNum IS NULL
+        SET @MaxNum = 0
+
+    -- Tạo ID mới, định dạng LK + 4 chữ số
+    SET @NextID = 'LK' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR), 3)
+
+    RETURN @NextID
+END
+GO
+--=========================================Procedure insert linh kiện====================
+CREATE PROCEDURE sp_InsertLinhKien
+    @idNSX CHAR(7),
+    @idLoaiLinhKien CHAR(7),
+    @tenLinhKien NVARCHAR(100),
+    @gia DECIMAL(18,2),
+    @soLuong CHAR(7),
+    @anh NVARCHAR(100),
+    @thoiGianBaoHanh DATE,
+    @dieuKienBaoHanh NVARCHAR(500)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @NewID CHAR(7)
+    
+    -- Tạo ID mới
+    SET @NewID = dbo.fn_GenerateNextLinhKienID()
+    
+    -- Thêm bản ghi mới
+    INSERT INTO LinhKien (
+        idLinhKien, 
+        idNSX, 
+        idLoaiLinhKien, 
+        tenLinhKien, 
+        gia, 
+        soLuong, 
+        anh, 
+        thoiGianBaoHanh, 
+        dieuKienBaoHanh
+    )
+    VALUES (
+        @NewID,
+        @idNSX,
+        @idLoaiLinhKien,
+        @tenLinhKien,
+        @gia,
+        @soLuong,
+        @anh,
+        @thoiGianBaoHanh,
+        @dieuKienBaoHanh
+    )
+    
+    -- Trả về ID mới tạo
+    SELECT @NewID AS NewLinhKienID
+    
+    RETURN 0
+END
+GO
+--=========================================Procedure update Linh kiện====================
+CREATE PROCEDURE sp_UpdateLinhKien
+    @idLinhKien CHAR(7),
+    @idNSX CHAR(7) = NULL,
+    @idLoaiLinhKien CHAR(7) = NULL,
+    @tenLinhKien NVARCHAR(100) = NULL,
+    @gia DECIMAL(18,2) = NULL,
+    @soLuong CHAR(7) = NULL,
+    @anh NVARCHAR(100) = NULL,
+    @thoiGianBaoHanh DATE = NULL,
+    @dieuKienBaoHanh NVARCHAR(500) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    -- Kiểm tra bản ghi tồn tại
+    IF NOT EXISTS (SELECT 1 FROM LinhKien WHERE idLinhKien = @idLinhKien)
+    BEGIN
+        RAISERROR('ID linh kiện không tồn tại.', 16, 1)
+        RETURN 1
+    END
+    
+    -- Cập nhật chỉ các trường được cung cấp
+    UPDATE LinhKien
+    SET 
+        idNSX = CASE WHEN @idNSX IS NOT NULL THEN @idNSX ELSE idNSX END,
+        idLoaiLinhKien = CASE WHEN @idLoaiLinhKien IS NOT NULL THEN @idLoaiLinhKien ELSE idLoaiLinhKien END,
+        tenLinhKien = CASE WHEN @tenLinhKien IS NOT NULL THEN @tenLinhKien ELSE tenLinhKien END,
+        gia = CASE WHEN @gia IS NOT NULL THEN @gia ELSE gia END,
+        soLuong = CASE WHEN @soLuong IS NOT NULL THEN @soLuong ELSE soLuong END,
+        anh = CASE WHEN @anh IS NOT NULL THEN @anh ELSE anh END,
+        thoiGianBaoHanh = CASE WHEN @thoiGianBaoHanh IS NOT NULL THEN @thoiGianBaoHanh ELSE thoiGianBaoHanh END,
+        dieuKienBaoHanh = CASE WHEN @dieuKienBaoHanh IS NOT NULL THEN @dieuKienBaoHanh ELSE dieuKienBaoHanh END
+    WHERE idLinhKien = @idLinhKien
+    
+    -- Trả về thông tin đã cập nhật
+    SELECT * FROM LinhKien WHERE idLinhKien = @idLinhKien
+    
+    RETURN 0
+END
+GO
+EXEC sp_InsertLinhKien 
+    @idNSX = 'NSX001',
+    @idLoaiLinhKien = 'LLK001',
+    @tenLinhKien = N'Tụ điện 500V 100uF',
+    @gia = 35000,
+    @soLuong = '200',
+    @anh = 'tu_dien_500v.jpg',
+    @thoiGianBaoHanh = '2025-12-31',
+    @dieuKienBaoHanh = N'Bảo hành 5 tháng, không bảo hành khi bị phồng tụ'
+
+select * from LinhKien
+
+EXEC sp_UpdateLinhKien 
+    @idLinhKien = 'LK021',
+    @idNSX = 'NSX001',
+    @idLoaiLinhKien = 'LLK001',
+    @tenLinhKien = N'Tụ điện 550V 100uF (Phiên bản mới)',
+    @gia = 28000,
+    @soLuong = '350',
+    @anh = 'tu_dien_550v_new.jpg'
+
+select * from LinhKien where idLinhKien = 'LK021'
