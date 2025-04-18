@@ -119,26 +119,29 @@ CREATE TABLE DonDichVu (
     ngayTaoDon DATETIME,
     ngayHoanThanh DATETIME,
     tongTien DECIMAL(18,2) CHECK (tongTien >= 0),
-	loaiDonDichVu NVARCHAR(100) NOT NULL CHECK (loaiDonDichVu IN (N'Sửa chữa', N'Lắp đặt'))
+	hinhThucDichVu NVARCHAR(100) NOT NULL CHECK (hinhThucDichVu in (N'Tại nhà', N'Trực tiếp')),
+	loaiDonDichVu NVARCHAR(100) NOT NULL CHECK (loaiDonDichVu IN (N'Sửa chữa', N'Lắp đặt')),
+	phuongThucThanhToan NVARCHAR(100),
+    trangThaiDon NVARCHAR(150) NOT NULL,
+	ngayChinhSua DATETIME
 );
-
---- thêm cột phuongThucThanhToan
-ALTER TABLE DonDichVu
-ADD phuongThucThanhToan NVARCHAR(100);
 
 CREATE TABLE ChiTietDonDichVu (
     idCTDH CHAR(7) PRIMARY KEY,
     idDonDichVu CHAR(7) FOREIGN KEY REFERENCES DonDichVu(idDonDichVu),
     idLinhKien CHAR(7) FOREIGN KEY REFERENCES LinhKien(idLinhKien),
     idLoi CHAR(7) FOREIGN KEY REFERENCES LoaiLoi(idLoi),
+	loaiDichVu NVARCHAR(100) NOT NULL CHECK (loaiDichVu IN (N'Sửa chữa', N'Lắp đặt')),
     moTa NVARCHAR(500),
-    trangThai NVARCHAR(150) NOT NULL,
     soLuong INT NOT NULL CHECK (soLuong >= 0),
-    ngayKetThucBH DATE,
-    loaiDichVu NVARCHAR(100) NOT NULL CHECK (loaiDichVu IN (N'Sửa chữa', N'Lắp đặt')),
+    ngayKetThucBH DATE, 
 	thoiGianThemLinhKien DATETIME,
 	hanBaoHanh BIT
 );
+
+--- thêm cột phuongThucThanhToan
+--ALTER TABLE DonDichVu
+--ADD phuongThucThanhToan NVARCHAR(100);
 
 ALTER TABLE ChiTietDonDichVu
 ADD CONSTRAINT chk_ChiTietDonDichVu_LoaiDichVu
@@ -648,3 +651,80 @@ update [User]
 set IdUser = REPLACE(idUser, 'U0', 'KH')
 where idRole = 'R005' AND idUser like 'U0%'
 
+-- Thêm 10 đơn dịch vụ mới
+INSERT INTO DonDichVu (idDonDichVu, idUser, idKhachVangLai, idNhanVienKyThuat, idUserTaoDon, idLoaiThietBi, tenThietBi, loaiKhachHang, ngayTaoDon, ngayHoanThanh, tongTien, hinhThucDichVu, loaiDonDichVu, phuongThucThanhToan, trangThaiDon, ngayChinhSua)
+VALUES
+-- Đơn 1: Khách hàng thường (KH001), NV kỹ thuật NVKT01
+('DDV001', 'KH00021', NULL, 'NVKT006', 'CSKH011', 'TB001', N'Laptop Dell Inspiron', N'Khách hàng thường', '2025-02-01 09:00:00', '2025-02-01 11:30:00', 1200000, N'Tại nhà', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-01 11:30:00'),
+
+-- Đơn 2: Khách vãng lai, NV kỹ thuật NVKT02
+('DDV002', NULL, 'KVL001', 'NVKT007', 'CSKH012', 'TB002', N'PC Asus Gaming', N'Khách vãng lai', '2025-02-02 10:00:00', '2025-02-02 12:45:00', 1850000, N'Trực tiếp', N'Sửa chữa', N'Chuyển khoản', N'Hoàn thành', '2025-02-02 12:45:00'),
+
+-- Đơn 3: Khách hàng thường (KH002), NV kỹ thuật NVKT03
+('DDV003', 'KH00022', NULL, 'NVKT008', 'CSKH013', 'TB003', N'Màn hình LG 24inch', N'Khách hàng thường', '2025-02-03 08:30:00', '2025-02-03 10:15:00', 650000, N'Tại nhà', N'Lắp đặt', N'Tiền mặt', N'Hoàn thành', '2025-02-03 10:15:00'),
+
+-- Đơn 4: Khách vãng lai, NV kỹ thuật NVKT04
+('DDV004', NULL, 'KVL002', 'NVKT009', 'CSKH014', 'TB004', N'Bàn phím cơ', N'Khách vãng lai', '2025-02-04 14:00:00', '2025-02-04 15:30:00', 350000, N'Trực tiếp', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-04 15:30:00'),
+
+-- Đơn 5: Khách hàng thường (KH003), NV kỹ thuật NVKT05
+('DDV005', 'KH00023', NULL, 'NVKT010', 'CSKH015', 'TB005', N'Chuột không dây', N'Khách hàng thường', '2025-02-05 11:00:00', '2025-02-05 12:00:00', 250000, N'Tại nhà', N'Sửa chữa', N'Chuyển khoản', N'Hoàn thành', '2025-02-05 12:00:00'),
+
+-- Đơn 6: Khách vãng lai, NV kỹ thuật NVKT01
+('DDV006', NULL, 'KVL003', 'NVKT006', 'CSKH011', 'TB006', N'Loa vi tính', N'Khách vãng lai', '2025-02-06 13:30:00', '2025-02-06 15:00:00', 500000, N'Trực tiếp', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-06 15:00:00'),
+
+-- Đơn 7: Khách hàng thường (KH004), NV kỹ thuật NVKT02
+('DDV007', 'KH00024', NULL, 'NVKT007', 'CSKH012', 'TB007', N'Tai nghe Bluetooth', N'Khách hàng thường', '2025-02-07 09:15:00', '2025-02-07 10:45:00', 450000, N'Tại nhà', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-07 10:45:00'),
+
+-- Đơn 8: Khách vãng lai, NV kỹ thuật NVKT03
+('DDV008', NULL, 'KVL004', 'NVKT006', 'CSKH013', 'TB008', N'Ổ cứng SSD 512GB', N'Khách vãng lai', '2025-02-08 10:30:00', '2025-02-08 12:00:00', 1200000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Hoàn thành', '2025-02-08 12:00:00'),
+
+-- Đơn 9: Khách hàng thường (KH005), NV kỹ thuật NVKT04
+('DDV009', 'KH00025', NULL, 'NVKT008', 'CSKH014', 'TB009', N'Ổ cứng HDD 1TB', N'Khách hàng thường', '2025-02-09 14:00:00', '2025-02-09 15:30:00', 800000, N'Tại nhà', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-09 15:30:00'),
+
+-- Đơn 10: Khách vãng lai, NV kỹ thuật NVKT05
+('DDV010', NULL, 'KVL005', 'NVKT010', 'CSKH015', 'TB010', N'RAM DDR4 8GB', N'Khách vãng lai', '2025-02-10 11:00:00', '2025-02-10 12:30:00', 600000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Hoàn thành', '2025-02-10 12:30:00');
+
+-- Thêm chi tiết đơn dịch vụ cho 10 đơn trên (mỗi đơn 2 chi tiết)
+INSERT INTO ChiTietDonDichVu (idCTDH, idDonDichVu, idLinhKien, idLoi, loaiDichVu, moTa, soLuong, ngayKetThucBH, thoiGianThemLinhKien, hanBaoHanh)
+VALUES
+
+('CT001', 'DDV001', NULL, 'L021', N'Sửa chữa', N'Sửa lỗi không lên hình', 1, NULL, NULL, 0),
+('CT002', 'DDV001', 'LK001', NULL, N'Sửa chữa', N'Thay tụ điện mới', 1, '2025-05-01', '2025-02-01 10:00:00', 1),
+
+
+('CT003', 'DDV002', NULL, 'L025', N'Sửa chữa', N'Khắc phục lỗi không lên màn hình', 1, NULL, NULL, 0),
+('CT004', 'DDV002', 'LK002', NULL, N'Sửa chữa', N'Thay điện trở công suất', 2, '2025-05-02', '2025-02-02 11:45:00', 1),
+
+('CT005', 'DDV003', 'LK016', NULL, N'Lắp đặt', N'Thay jack nguồn cho màn hình', 1, NULL, NULL, 1),
+('CT006', 'DDV003', NULL, 'L028', N'Lắp đặt', N'Cài đặt driver màn hình', 1, NULL, NULL, 0),
+
+
+('CT007', 'DDV004', NULL, 'L030', N'Sửa chữa', N'Sửa lỗi liệt phím', 1, NULL, NULL, 0),
+('CT008', 'DDV004', 'LK004', NULL, N'Sửa chữa', N'Thay diode bàn phím', 3, '2025-05-04', '2025-02-04 15:00:00', 1),
+
+
+('CT009', 'DDV005', NULL, 'L032', N'Sửa chữa', N'Sửa lỗi không nhận chuột', 1, NULL, NULL, 0),
+('CT010', 'DDV005', 'LK005', NULL, N'Sửa chữa', N'Thay triac cảm biến', 1, '2025-05-05', '2025-02-05 11:30:00', 1),
+
+
+('CT011', 'DDV006', NULL, 'L034', N'Sửa chữa', N'Sửa lỗi không phát âm thanh', 1, NULL, NULL, 0),
+('CT012', 'DDV006', 'LK006', NULL, N'Sửa chữa', N'Thay MOSFET khuếch đại', 1, '2025-05-06', '2025-02-06 14:30:00', 1),
+
+
+('CT013', 'DDV007', NULL, 'L036', N'Sửa chữa', N'Sửa lỗi không kết nối Bluetooth', 1, NULL, NULL, 0),
+('CT014', 'DDV007', 'LK007', NULL, N'Sửa chữa', N'Thay IC nguồn', 1, '2025-05-07', '2025-02-07 10:15:00', 1),
+
+
+('CT015', 'DDV008', 'LK008', NULL, N'Lắp đặt', N'Lắp đặt SSD mới', 1, '2025-05-08', '2025-02-08 11:30:00', 1),
+('CT016', 'DDV008', NULL, 'L038', N'Lắp đặt', N'Cài đặt hệ điều hành', 1, NULL, NULL, 0),
+
+
+('CT017', 'DDV009', NULL, 'L039', N'Sửa chữa', N'Khôi phục dữ liệu ổ cứng', 1, NULL, NULL, 0),
+('CT018', 'DDV009', 'LK009', NULL, N'Sửa chữa', N'Thay relay điều khiển', 1, '2025-05-09', '2025-02-09 15:00:00', 1),
+
+
+('CT019', 'DDV010', 'LK010', NULL, N'Lắp đặt', N'Lắp đặt RAM mới', 1, '2025-05-10', '2025-02-10 12:00:00', 1),
+('CT020', 'DDV010', NULL, 'L040', N'Lắp đặt', N'Kiểm tra tương thích RAM', 1, NULL, NULL, 0);
+
+select * from [User]
+select * from DonDichVu
