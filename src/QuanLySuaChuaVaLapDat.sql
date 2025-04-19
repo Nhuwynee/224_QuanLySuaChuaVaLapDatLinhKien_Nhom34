@@ -629,7 +629,7 @@ INSERT INTO DonGia (idDonGia, idLoi, gia, ngayCapNhat) VALUES
 
 
 ----------------------- UPDATE lại idUser trong bảng User (có chạy)
-SELECT * FROM [USER]
+-- SELECT * FROM [USER]
 
 update [User] 
 set IdUser = REPLACE(idUser, 'U0', 'AD')
@@ -726,11 +726,8 @@ VALUES
 ('CT019', 'DDV010', 'LK010', NULL, N'Lắp đặt', N'Lắp đặt RAM mới', 1, '2025-05-10', '2025-02-10 12:00:00', 1),
 ('CT020', 'DDV010', NULL, 'L040', N'Lắp đặt', N'Kiểm tra tương thích RAM', 1, NULL, NULL, 0);
 
-select * from [User]
-select * from DonDichVu
-
-
-
+-- select * from [User]
+-- select * from DonDichVu
 
 INSERT INTO HinhAnh (idHinhAnh,idCTDH, anh, loaiHinhAnh)
 VALUES 
@@ -759,10 +756,10 @@ VALUES
 ('DG00009', 'DDV009', 5, 3, N'Dịch vụ tốt nhưng giá cao'),
 ('DG00010', 'DDV010', 4, 4, N'Tốt, đúng như mong đợi');
 
-select * from HinhAnh
-select * from DanhGia
+-- select * from HinhAnh
+-- select * from DanhGia
 
-
+-- KHANH
 --================================================Function tạo id lỗi kế tiếp=======================
 CREATE FUNCTION dbo.fn_GenerateNextLoiID()
 RETURNS CHAR(7)
@@ -959,6 +956,7 @@ BEGIN
     RETURN 0
 END
 GO
+
 EXEC sp_InsertLinhKien 
     @idNSX = 'NSX001',
     @idLoaiLinhKien = 'LLK001',
@@ -981,3 +979,42 @@ EXEC sp_UpdateLinhKien
     @anh = 'tu_dien_550v_new.jpg'
 
 select * from LinhKien where idLinhKien = 'LK021'
+
+
+-- NHƯ
+----------------- TRIGGER ------------------
+-- I. Tự động cập nhật ngày hoàn thành đơn dịch vụ khi trạng thái đơn dịch vụ là "Hoàn thành"
+CREATE TRIGGER tg_UpdateNgayHoanThanh
+ON DonDichVu
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE ddv
+    SET ngayHoanThanh = GETDATE()
+    FROM DonDichVu ddv
+    INNER JOIN inserted i ON ddv.idDonDichVu = i.idDonDichVu
+    INNER JOIN deleted d ON ddv.idDonDichVu = d.idDonDichVu
+    WHERE i.trangThaiDon = N'Hoàn thành'
+      AND (d.trangThaiDon IS NULL OR d.trangThaiDon <> N'Hoàn thành');
+END;
+
+-- II. Tự động cập nhật thời gian chỉnh sửa mỗi khi có thay đổi trong bảng DonDichVu
+
+CREATE TRIGGER trg_UpdateNgayChinhSua
+ON DonDichVu
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE DonDichVu
+    SET ngayChinhSua = GETDATE()
+    FROM DonDichVu D
+    INNER JOIN inserted I ON D.idDonDichVu = I.idDonDichVu;
+END;
+GO
+
+
+
