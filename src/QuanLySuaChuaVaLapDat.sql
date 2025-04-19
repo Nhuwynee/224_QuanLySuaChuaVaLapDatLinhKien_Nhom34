@@ -1016,5 +1016,214 @@ BEGIN
 END;
 GO
 
+-------------------- FUNCTION/ PROCEDURE ----------------------------------
 
+--------------************************************-------------------------
+-- I. Bảng DonDichVu
+select * from DonDichVu
+-- 1. Function tạo idDonDichVu tự động
+CREATE FUNCTION fn_GetNextDonDichVuID()
+RETURNS CHAR(6)
+AS
+BEGIN
+    DECLARE @NextID CHAR(6);
+    DECLARE @CurrentMaxID CHAR(6);
+
+    SELECT @CurrentMaxID = MAX(idDonDichVu) FROM DonDichVu;
+
+    IF @CurrentMaxID IS NULL
+        SET @NextID = 'DDV001';
+    ELSE
+        SET @NextID = 'DDV' + RIGHT('000' + CAST(CAST(SUBSTRING(@CurrentMaxID, 4, 3) AS INT) + 1 AS VARCHAR), 3);
+
+    RETURN @NextID;
+END;
+GO
+
+--  2. Stored Procedure INSERT
+CREATE PROCEDURE sp_InsertDonDichVu
+    @idUser CHAR(7),
+    @idKhachVangLai CHAR(7),
+    @idNhanVienKyThuat CHAR(7),
+    @idUserTaoDon CHAR(7),
+    @idLoaiThietBi CHAR(7),
+    @tenThietBi NVARCHAR(150),
+    @loaiKhachHang NVARCHAR(50),
+    @ngayTaoDon DATETIME,
+	@ngayHoanThanh DATETIME,
+    @tongTien DECIMAL(18,2),
+    @hinhThucDichVu NVARCHAR(100),
+    @loaiDonDichVu NVARCHAR(100),
+    @phuongThucThanhToan NVARCHAR(100),
+    @trangThaiDon NVARCHAR(150),
+	@ngayChinhSua DATETIME
+AS
+BEGIN
+    DECLARE @NewID CHAR(6);
+    SET @NewID = dbo.fn_GetNextDonDichVuID();
+
+    INSERT INTO DonDichVu
+        (idDonDichVu, idUser, idKhachVangLai, idNhanVienKyThuat, idUserTaoDon, idLoaiThietBi, tenThietBi, loaiKhachHang, ngayTaoDon, ngayHoanThanh, tongTien, hinhThucDichVu, loaiDonDichVu, phuongThucThanhToan, trangThaiDon, ngayChinhSua)
+    VALUES
+        (@NewID, @idUser, @idKhachVangLai, @idNhanVienKyThuat, @idUserTaoDon, @idLoaiThietBi, @tenThietBi, @loaiKhachHang, @ngayTaoDon, @ngayHoanThanh, @tongTien, @hinhThucDichVu, @loaiDonDichVu, @phuongThucThanhToan, @trangThaiDon, @ngayChinhSua);
+
+    PRINT N'Đơn dịch vụ đã được thêm thành công!';
+END;
+GO
+
+-- 3. Stored Procedure UPDATE
+CREATE PROCEDURE sp_UpdateDonDichVu
+    @idDonDichVu CHAR(7),
+    @idUser CHAR(7),
+    @idKhachVangLai CHAR(7),
+    @idNhanVienKyThuat CHAR(7),
+    @idUserTaoDon CHAR(7),
+    @idLoaiThietBi CHAR(7),
+    @tenThietBi NVARCHAR(150),
+    @loaiKhachHang NVARCHAR(50),
+    @ngayTaoDon DATETIME,
+	@ngayHoanThanh DATETIME,
+    @tongTien DECIMAL(18,2),
+    @hinhThucDichVu NVARCHAR(100),
+    @loaiDonDichVu NVARCHAR(100),
+    @phuongThucThanhToan NVARCHAR(100),
+    @trangThaiDon NVARCHAR(150),
+	@ngayChinhSua DATETIME
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM DonDichVu WHERE idDonDichVu = @idDonDichVu)
+    BEGIN
+        PRINT N'Mã đơn dịch vụ không tồn tại.';
+        RETURN;
+    END
+
+    UPDATE DonDichVu
+    SET
+        idUser = @idUser,
+        idKhachVangLai = @idKhachVangLai,
+        idNhanVienKyThuat = @idNhanVienKyThuat,
+        idUserTaoDon = @idUserTaoDon,
+        idLoaiThietBi = @idLoaiThietBi,
+        tenThietBi = @tenThietBi,
+        loaiKhachHang = @loaiKhachHang,
+        ngayTaoDon = @ngayTaoDon,
+		ngayHoanThanh = @ngayHoanThanh,
+        tongTien = @tongTien,
+        hinhThucDichVu = @hinhThucDichVu,
+        loaiDonDichVu = @loaiDonDichVu,
+        phuongThucThanhToan = @phuongThucThanhToan,
+        trangThaiDon = @trangThaiDon,
+		ngayChinhSua = @ngayChinhSua
+    WHERE idDonDichVu = @idDonDichVu;
+
+    PRINT N'Đơn dịch vụ đã được cập nhật thành công!';
+END;
+GO
+
+-- 4. Stored Procedure DELETE
+CREATE PROCEDURE sp_DeleteDonDichVu
+    @idDonDichVu CHAR(7)
+AS
+BEGIN
+    DELETE FROM DonDichVu WHERE idDonDichVu = @idDonDichVu;
+    PRINT N'Đơn dịch vụ đã được xóa thành công!';
+END;
+GO
+
+--------------************************************-------------------------
+
+-- Bảng ChiTietDonDichVu
+select * from ChiTietDonDichVu
+-- 1. Function tạo ID tự động
+CREATE FUNCTION fn_GetNextChiTietDonDichVuID()
+RETURNS CHAR(6)
+AS
+BEGIN
+    DECLARE @NextID CHAR(6);
+    DECLARE @CurrentMaxID CHAR(6);
+
+    SELECT @CurrentMaxID = MAX(idCTDH) FROM ChiTietDonDichVu;
+
+    IF @CurrentMaxID IS NULL
+        SET @NextID = 'CT001';
+    ELSE
+        SET @NextID = 'CT' + RIGHT('000' + CAST(CAST(SUBSTRING(@CurrentMaxID, 3, 3) AS INT) + 1 AS VARCHAR), 3);
+
+    RETURN @NextID;
+END;
+GO
+
+--  2. Stored Procedure INSERT
+CREATE PROCEDURE sp_InsertChiTietDonDichVu
+    @idDonDichVu CHAR(7),
+    @idLinhKien CHAR(7),
+    @idLoi CHAR(7),
+    @loaiDichVu NVARCHAR(50),
+    @moTa NVARCHAR(MAX),
+    @soLuong INT,
+    @ngayKetThucBH DATETIME,
+    @thoiGianThemLinhKien DATETIME,
+    @hanBaoHanh INT
+AS
+BEGIN
+    DECLARE @NewID CHAR(6);
+    SET @NewID = dbo.fn_GetNextChiTietDonDichVuID();
+
+    INSERT INTO ChiTietDonDichVu
+        (idCTDH, idDonDichVu, idLinhKien, idLoi, loaiDichVu, moTa, soLuong, ngayKetThucBH, thoiGianThemLinhKien, hanBaoHanh)
+    VALUES
+        (@NewID, @idDonDichVu, @idLinhKien, @idLoi, @loaiDichVu, @moTa, @soLuong, @ngayKetThucBH, @thoiGianThemLinhKien, @hanBaoHanh);
+
+    PRINT N'Chi tiết đơn dịch vụ đã được thêm thành công!';
+END;
+GO
+
+-- 3. Stored Procedure UPDATE
+CREATE PROCEDURE sp_UpdateChiTietDonDichVu
+    @idCTDH CHAR(7),
+    @idDonDichVu CHAR(7),
+    @idLinhKien CHAR(7),
+    @idLoi CHAR(7),
+    @loaiDichVu NVARCHAR(50),
+    @moTa NVARCHAR(MAX),
+    @soLuong INT,
+    @ngayKetThucBH DATETIME,
+    @thoiGianThemLinhKien DATETIME,
+    @hanBaoHanh INT
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM ChiTietDonDichVu WHERE idCTDH = @idCTDH)
+    BEGIN
+        PRINT N'Mã chi tiết đơn dịch vụ không tồn tại.';
+        RETURN;
+    END
+
+    UPDATE ChiTietDonDichVu
+    SET
+        idDonDichVu = @idDonDichVu,
+        idLinhKien = @idLinhKien,
+        idLoi = @idLoi,
+        loaiDichVu = @loaiDichVu,
+        moTa = @moTa,
+        soLuong = @soLuong,
+        ngayKetThucBH = @ngayKetThucBH,
+        thoiGianThemLinhKien = @thoiGianThemLinhKien,
+        hanBaoHanh = @hanBaoHanh
+    WHERE idCTDH = @idCTDH;
+
+    PRINT N'Chi tiết đơn dịch vụ đã được cập nhật thành công!';
+END;
+GO
+
+-- 4. Stored Procedure DELETE
+CREATE PROCEDURE sp_DeleteChiTietDonDichVu
+    @idCTDH CHAR(6)
+AS
+BEGIN
+    DELETE FROM ChiTietDonDichVu WHERE idCTDH = @idCTDH;
+    PRINT N'Chi tiết đơn dịch vụ đã được xóa thành công!';
+END;
+GO
+
+--------------************************************-------------------------
 
