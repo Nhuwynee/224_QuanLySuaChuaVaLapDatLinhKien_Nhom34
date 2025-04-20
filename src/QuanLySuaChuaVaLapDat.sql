@@ -763,6 +763,38 @@ VALUES
 
 
 -- KHANH
+--========================================Trigger cập nhật trạng thái nhân viên=============================
+CREATE TRIGGER trg_UpdateTrangThaiNhanVienKyThuat 
+ON ChiTietDonDichVu
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Cập nhật trạng thái của các nhân viên kỹ thuật liên quan
+    UPDATE u
+    SET u.trangThai = 
+        CASE 
+            WHEN NOT EXISTS (
+                SELECT 1
+                FROM DonDichVu ddv
+                WHERE ddv.idNhanVienKyThuat = u.idUser
+                AND ddv.trangThaiDon = N'Hoàn thành'
+            ) THEN 1  -- rảnh
+            ELSE 0     -- bận
+        END
+    FROM [User] u
+    WHERE u.idRole = 'R002' -- chỉ cập nhật nhân viên kỹ thuật
+    AND u.idUser IN (
+        SELECT DISTINCT ddv.idNhanVienKyThuat
+        FROM inserted i
+        INNER JOIN DonDichVu ddv ON i.idDonDichVu = ddv.idDonDichVu
+        WHERE ddv.idNhanVienKyThuat IS NOT NULL
+    );
+END;
+GO
+
+
 --================================================Function tạo id lỗi kế tiếp=======================
 CREATE FUNCTION dbo.fn_GenerateNextLoiID()
 RETURNS CHAR(7)
@@ -863,7 +895,7 @@ BEGIN
     IF @MaxNum IS NULL
         SET @MaxNum = 0
 
-    -- Tạo ID mới, định dạng LK + 4 chữ số
+    -- Tạo ID mới, định dạng LK + 3 chữ số
     SET @NextID = 'LK' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR), 3)
 
     RETURN @NextID
@@ -875,7 +907,7 @@ CREATE PROCEDURE sp_InsertLinhKien
     @idLoaiLinhKien CHAR(7),
     @tenLinhKien NVARCHAR(100),
     @gia DECIMAL(18,2),
-    @soLuong CHAR(7),
+    @soLuong INT,
     @anh NVARCHAR(100),
     @thoiGianBaoHanh DATE,
     @dieuKienBaoHanh NVARCHAR(500)
@@ -925,7 +957,7 @@ CREATE PROCEDURE sp_UpdateLinhKien
     @idLoaiLinhKien CHAR(7) = NULL,
     @tenLinhKien NVARCHAR(100) = NULL,
     @gia DECIMAL(18,2) = NULL,
-    @soLuong CHAR(7) = NULL,
+    @soLuong INT = NULL,
     @anh NVARCHAR(100) = NULL,
     @thoiGianBaoHanh DATE = NULL,
     @dieuKienBaoHanh NVARCHAR(500) = NULL
@@ -965,7 +997,7 @@ EXEC sp_InsertLinhKien
     @idLoaiLinhKien = 'LLK001',
     @tenLinhKien = N'Tụ điện 500V 100uF',
     @gia = 35000,
-    @soLuong = '200',
+    @soLuong = 200,
     @anh = 'tu_dien_500v.jpg',
     @thoiGianBaoHanh = '2025-12-31',
     @dieuKienBaoHanh = N'Bảo hành 5 tháng, không bảo hành khi bị phồng tụ'
@@ -978,7 +1010,7 @@ EXEC sp_UpdateLinhKien
     @idLoaiLinhKien = 'LLK001',
     @tenLinhKien = N'Tụ điện 550V 100uF (Phiên bản mới)',
     @gia = 28000,
-    @soLuong = '350',
+    @soLuong = 350,
     @anh = 'tu_dien_550v_new.jpg'
 
 select * from LinhKien where idLinhKien = 'LK021'
@@ -1276,7 +1308,7 @@ WHERE idDonDichVu = 'DDV001';
 select * from LinhKien
 
 --------------************************************-------------------------
---functioin / proceduce
+--function / proceduce
 
 -- Nếu đã có sequence, xóa đi trước (nếu cần)
 -- Xóa sequence cũ nếu có
