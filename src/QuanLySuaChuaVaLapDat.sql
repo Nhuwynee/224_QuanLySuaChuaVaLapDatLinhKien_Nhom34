@@ -71,7 +71,7 @@ CREATE TABLE LinhKien (
     idLoaiLinhKien CHAR(7) FOREIGN KEY REFERENCES LoaiLinhKien(idLoaiLinhKien),
     tenLinhKien NVARCHAR(100) NOT NULL,
     gia DECIMAL(18,2) NOT NULL CHECK (gia >= 0),
-    soLuong CHAR(7) NOT NULL CHECK (soLuong >= 0),
+    soLuong INT NOT NULL CHECK (soLuong >= 0),
     anh NVARCHAR(100), -- path
     thoiGianBaoHanh DATE NOT NULL,
     dieuKienBaoHanh NVARCHAR(500) NOT NULL
@@ -360,26 +360,27 @@ INSERT INTO LoaiLinhKien (idLoaiLinhKien, tenLoaiLinhKien) VALUES
 ('LLK020', N'Cầu chì / Bảo vệ mạch');
 
 INSERT INTO LinhKien (idLinhKien, idNSX, idLoaiLinhKien, tenLinhKien, gia, soLuong, anh, thoiGianBaoHanh, dieuKienBaoHanh) VALUES
-('LK001', 'NSX001', 'LLK001', N'Tụ điện 450V 50uF', 25000, '300', 'tu_dien_450v.jpg', '2025-12-31', N'Bảo hành 12 tháng'),
-('LK002', 'NSX001', 'LLK002', N'Điện trở công suất 5W 220Ω', 5000, '500', 'dien_tro_5w.jpg', '2025-12-31', N'Không đổi trả sau hư hỏng do quá tải'),
-('LK003', 'NSX002', 'LLK003', N'Cuộn cảm 10mH 5A lõi ferrite', 18000, '250', 'cuon_cam_10mh.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK004', 'NSX002', 'LLK004', N'Diode Schottky 1N5819', 3000, '1000', 'diode.jpg', '2025-12-31', N'Không bảo hành do linh kiện nhỏ'),
-('LK005', 'NSX003', 'LLK005', N'Triac BTA16-600B', 9000, '400', 'triac.jpg', '2025-12-31', N'Bảo hành 3 tháng'),
-('LK006', 'NSX003', 'LLK006', N'MOSFET IRF540N 100V 33A', 12000, '600', 'mosfet.jpg', '2025-12-31', N'Không bảo hành nếu chân gãy'),
-('LK007', 'NSX004', 'LLK007', N'IC nguồn LNK304PN', 15000, '350', 'ic_lnk.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK008', 'NSX004', 'LLK008', N'IC vi điều khiển ATmega328P', 40000, '200', 'ic_atmega.jpg', '2025-12-31', N'Không bảo hành khi chân bị hàn lỗi'),
-('LK009', 'NSX005', 'LLK009', N'Relay 12VDC 10A', 18000, '450', 'relay_12v.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK010', 'NSX005', 'LLK010', N'Cảm biến nhiệt độ NTC 10K', 6000, '700', 'cam_bien_ntc.jpg', '2025-12-31', N'Không bảo hành'),
-('LK011', 'NSX006', 'LLK011', N'Cảm biến dòng ACS712 20A', 35000, '300', 'cam_bien_acs.jpg', '2025-12-31', N'Bảo hành 3 tháng'),
-('LK012', 'NSX006', 'LLK012', N'Mạch nguồn xung 5V 2A mini', 48000, '150', 'mach_nguon_5v.jpg', '2025-12-31', N'Bảo hành 12 tháng'),
-('LK013', 'NSX007', 'LLK013', N'Mạch inverter 220V LED', 65000, '100', 'mach_led.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK014', 'NSX007', 'LLK014', N'Mạch điều khiển vi xử lý STM32', 98000, '120', 'mach_stm32.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK015', 'NSX008', 'LLK015', N'Socket DIP 28 chân', 3000, '1000', 'socket_dip.jpg', '2025-12-31', N'Không bảo hành'),
-('LK016', 'NSX008', 'LLK016', N'Jack nguồn DC 5.5mm', 2000, '1200', 'jack_dc.jpg', '2025-12-31', N'Không bảo hành'),
-('LK017', 'NSX009', 'LLK017', N'Motor DC 12V 200rpm', 50000, '160', 'motor_12v.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK018', 'NSX009', 'LLK018', N'Board mạch điện tử đa năng', 75000, '140', 'board.jpg', '2025-12-31', N'Bảo hành 12 tháng'),
-('LK019', 'NSX010', 'LLK019', N'Mạch sạc pin lithium 3.7V TP4056', 12000, '400', 'mach_tp.jpg', '2025-12-31', N'Không bảo hành'),
-('LK020', 'NSX010', 'LLK020', N'Cầu chì 5A 250V chân cắm', 4000, '600', 'cauchi_5a.jpg', '2025-12-31', N'Không bảo hành');
+('LK001', 'NSX001', 'LLK001', N'Tụ điện 450V 50uF', 25000, 300, 'tu_dien_450v.jpg', '2025-12-31', N'Bảo hành 12 tháng'),
+('LK002', 'NSX001', 'LLK002', N'Điện trở công suất 5W 220Ω', 5000, 500, 'dien_tro_5w.jpg', '2025-12-31', N'Không đổi trả sau hư hỏng do quá tải'),
+('LK003', 'NSX002', 'LLK003', N'Cuộn cảm 10mH 5A lõi ferrite', 18000, 250, 'cuon_cam_10mh.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
+('LK004', 'NSX002', 'LLK004', N'Diode Schottky 1N5819', 3000, 1000, 'diode.jpg', '2025-12-31', N'Không bảo hành do linh kiện nhỏ'),
+('LK005', 'NSX003', 'LLK005', N'Triac BTA16-600B', 9000, 400, 'triac.jpg', '2025-12-31', N'Bảo hành 3 tháng'),
+('LK006', 'NSX003', 'LLK006', N'MOSFET IRF540N 100V 33A', 12000, 600, 'mosfet.jpg', '2025-12-31', N'Không bảo hành nếu chân gãy'),
+('LK007', 'NSX004', 'LLK007', N'IC nguồn LNK304PN', 15000, 350, 'ic_lnk.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
+('LK008', 'NSX004', 'LLK008', N'IC vi điều khiển ATmega328P', 40000, 200, 'ic_atmega.jpg', '2025-12-31', N'Không bảo hành khi chân bị hàn lỗi'),
+('LK009', 'NSX005', 'LLK009', N'Relay 12VDC 10A', 18000, 450, 'relay_12v.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
+('LK010', 'NSX005', 'LLK010', N'Cảm biến nhiệt độ NTC 10K', 6000, 700, 'cam_bien_ntc.jpg', '2025-12-31', N'Không bảo hành'),
+('LK011', 'NSX006', 'LLK011', N'Cảm biến dòng ACS712 20A', 35000, 300, 'cam_bien_acs.jpg', '2025-12-31', N'Bảo hành 3 tháng'),
+('LK012', 'NSX006', 'LLK012', N'Mạch nguồn xung 5V 2A mini', 48000, 150, 'mach_nguon_5v.jpg', '2025-12-31', N'Bảo hành 12 tháng'),
+('LK013', 'NSX007', 'LLK013', N'Mạch inverter 220V LED', 65000, 100, 'mach_led.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
+('LK014', 'NSX007', 'LLK014', N'Mạch điều khiển vi xử lý STM32', 98000, 120, 'mach_stm32.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
+('LK015', 'NSX008', 'LLK015', N'Socket DIP 28 chân', 3000, 1000, 'socket_dip.jpg', '2025-12-31', N'Không bảo hành'),
+('LK016', 'NSX008', 'LLK016', N'Jack nguồn DC 5.5mm', 2000, 1200, 'jack_dc.jpg', '2025-12-31', N'Không bảo hành'),
+('LK017', 'NSX009', 'LLK017', N'Motor DC 12V 200rpm', 50000, 160, 'motor_12v.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
+('LK018', 'NSX009', 'LLK018', N'Board mạch điện tử đa năng', 75000, 140, 'board.jpg', '2025-12-31', N'Bảo hành 12 tháng'),
+('LK019', 'NSX010', 'LLK019', N'Mạch sạc pin lithium 3.7V TP4056', 12000, 400, 'mach_tp.jpg', '2025-12-31', N'Không bảo hành'),
+('LK020', 'NSX010', 'LLK020', N'Cầu chì 5A 250V chân cắm', 4000, 600, 'cauchi_5a.jpg', '2025-12-31', N'Không bảo hành');
+
 
 INSERT INTO PhiLapDat (idPhiLapDat, idLinhKien, phi, ngayApDung) VALUES
 ('PLD001', 'LK001', 500000, '2023-01-01'),
@@ -758,6 +759,8 @@ VALUES
 
 -- select * from HinhAnh
 -- select * from DanhGia
+
+
 
 -- KHANH
 --================================================Function tạo id lỗi kế tiếp=======================
@@ -1226,4 +1229,205 @@ END;
 GO
 
 --------------************************************-------------------------
+-- Lộc 
+CREATE TRIGGER trg_CapNhatSoLuongLinhKien
+ON DonDichVu
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
 
+    -- Chỉ thực hiện khi trạng thái đơn chuyển sang 'Hoàn thành'
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        JOIN deleted d ON i.idDonDichVu = d.idDonDichVu
+        WHERE i.trangThaiDon = N'Hoàn thành' AND d.trangThaiDon != N'Hoàn thành'
+    )
+    BEGIN
+        PRINT N'Trigger đang cập nhật số lượng linh kiện...';
+
+        -- Cập nhật số lượng linh kiện (chỉ khi có idLinhKien)
+        UPDATE lk
+        SET lk.soLuong = lk.soLuong - ct.soLuong
+        FROM LinhKien lk
+        JOIN ChiTietDonDichVu ct ON lk.idLinhKien = ct.idLinhKien
+        JOIN inserted i ON ct.idDonDichVu = i.idDonDichVu
+        WHERE ct.idLinhKien IS NOT NULL;
+
+        PRINT N'Đã cập nhật xong.';
+    END
+    ELSE
+    BEGIN
+        PRINT N'Không có thay đổi trạng thái sang "Hoàn thành". Trigger không thực hiện.';
+    END
+END;
+
+
+-- test trigger 
+UPDATE DonDichVu
+SET trangThaiDon = N'Chưa hoàn thành'
+WHERE idDonDichVu = 'DDV001';
+
+UPDATE DonDichVu
+SET trangThaiDon = N'Hoàn thành'
+WHERE idDonDichVu = 'DDV001';
+
+select * from LinhKien
+
+--------------************************************-------------------------
+--functioin / proceduce
+
+-- Nếu đã có sequence, xóa đi trước (nếu cần)
+-- Xóa sequence cũ nếu có
+IF EXISTS (SELECT * FROM sys.sequences WHERE name = 'seq_Role')
+    DROP SEQUENCE dbo.seq_Role;
+GO
+
+-- Tìm ID lớn nhất hiện có trong bảng Role để khởi động lại sequence
+DECLARE @nextRoleId INT = ISNULL(
+    (SELECT MAX(CAST(SUBSTRING(idRole, 2, LEN(idRole)) AS INT)) FROM dbo.Role), 
+    0
+) + 1;
+
+-- Tạo sequence mới bắt đầu từ ID tiếp theo
+DECLARE @sql NVARCHAR(MAX) = 
+    'CREATE SEQUENCE dbo.seq_Role AS INT START WITH ' 
+    + CAST(@nextRoleId AS NVARCHAR) 
+    + ' INCREMENT BY 1;';
+EXEC(@sql);
+GO
+
+
+CREATE OR ALTER PROCEDURE dbo.sp_InsertRole
+    @tenRole NVARCHAR(150)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @n INT = NEXT VALUE FOR dbo.seq_Role;
+    DECLARE @newId CHAR(4) = 'R' + RIGHT('000' + CAST(@n AS VARCHAR(3)), 3);
+
+    INSERT INTO dbo.[Role](idRole, tenRole)
+    VALUES(@newId, @tenRole);
+
+    SELECT @newId AS NewRoleId;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.sp_UpdateRole
+    @idRole  CHAR(4),
+    @tenRole NVARCHAR(150)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE dbo.[Role]
+    SET tenRole = @tenRole
+    WHERE idRole = @idRole;
+
+    IF @@ROWCOUNT = 0
+        PRINT N'Không tìm thấy Role ID: ' + @idRole;
+    ELSE
+        PRINT N'Cập nhật Role thành công: ' + @idRole;
+END;
+GO
+
+-- Xóa sequence cũ nếu có
+IF EXISTS (SELECT * FROM sys.sequences WHERE name = 'seq_User')
+    DROP SEQUENCE dbo.seq_User;
+GO
+
+-- Tìm ID lớn nhất trong bảng User
+DECLARE @nextUserId INT = ISNULL(
+    (SELECT MAX(CAST(SUBSTRING(idUser, 3, LEN(idUser)) AS INT)) 
+     FROM dbo.[User] 
+     WHERE idUser LIKE 'AD%'), 
+    0
+) + 1;
+
+-- Tạo sequence mới bắt đầu từ giá trị tiếp theo
+DECLARE @sqlUser NVARCHAR(MAX) = 
+    'CREATE SEQUENCE dbo.seq_User AS INT START WITH ' 
+    + CAST(@nextUserId AS NVARCHAR) 
+    + ' INCREMENT BY 1;';
+EXEC(@sqlUser);
+GO
+
+
+CREATE OR ALTER PROCEDURE dbo.sp_InsertUser
+    @idRole    CHAR(4),
+    @idPhuong  CHAR(7),
+    @tenUser   VARCHAR(50),
+    @hoVaTen   NVARCHAR(100),
+    @SDT       VARCHAR(15),
+    @matKhau   VARCHAR(100),
+    @diaChi    NVARCHAR(200) = NULL,
+    @ngaySinh  DATE          = NULL,
+    @trangThai BIT           = 1,
+    @CCCD      VARCHAR(20)   = NULL,
+    @gioiTinh  BIT           = 1
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @n INT = NEXT VALUE FOR dbo.seq_User;
+    DECLARE @newId CHAR(7) = 'AD' + RIGHT('00000' + CAST(@n AS VARCHAR(5)), 5);
+
+    INSERT INTO dbo.[User](
+        idUser, idRole, idPhuong, tenUser, hoVaTen, SDT, matKhau,
+        diaChi, ngaySinh, trangThai, CCCD, gioiTinh
+    )
+    VALUES(
+        @newId, @idRole, @idPhuong, @tenUser, @hoVaTen, @SDT, @matKhau,
+        @diaChi, @ngaySinh, @trangThai, @CCCD, @gioiTinh
+    );
+
+    SELECT @newId AS NewUserId;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.sp_UpdateUser
+    @idUser    CHAR(7),
+    @idRole    CHAR(4),
+    @idPhuong  CHAR(7),
+    @tenUser   VARCHAR(50),
+    @hoVaTen   NVARCHAR(100),
+    @SDT       VARCHAR(15),
+    @matKhau   VARCHAR(100),
+    @diaChi    NVARCHAR(200) = NULL,
+    @ngaySinh  DATE          = NULL,
+    @trangThai BIT           = 1,
+    @CCCD      VARCHAR(20)   = NULL,
+    @gioiTinh  BIT           = 1
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE dbo.[User]
+    SET 
+        idRole    = @idRole,
+        idPhuong  = @idPhuong,
+        tenUser   = @tenUser,
+        hoVaTen   = @hoVaTen,
+        SDT       = @SDT,
+        matKhau   = @matKhau,
+        diaChi    = @diaChi,
+        ngaySinh  = @ngaySinh,
+        trangThai = @trangThai,
+        CCCD      = @CCCD,
+        gioiTinh  = @gioiTinh
+    WHERE idUser = @idUser;
+
+    IF @@ROWCOUNT = 0
+        PRINT N'Không tìm thấy User ID: ' + @idUser;
+    ELSE
+        PRINT N'Cập nhật User thành công: ' + @idUser;
+END;
+GO
+
+
+EXEC dbo.sp_InsertRole @tenRole = 'Admin';
+
+
+--------------************************************-------------------------
