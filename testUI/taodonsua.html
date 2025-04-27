@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo đơn sửa chữa</title>
+    <link rel="stylesheet" href="taodonsua.css">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Vietnamese locale for Flatpickr -->
+    <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/l10n/vn.js">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-container">
+            <!-- <i class="fa-solid fa-shop fa-2x logo"></i> -->
+             <img src="logo.png" alt="Logo" class="logo">
+            <div class="contact-info">
+            Liên hệ: 1900 232 461<br>
+            Địa chỉ: 220 Nguyễn Văn Linh, Tp. Đà Nẵng
+        </div>
+        </div>
+         
+        <div class="slogan">Mua sắm tiện lợi, Sửa chữa chuyên nghiệp, Lắp đặt tận tâm"</div>
+        <div class="search-box">
+            <input type="text" placeholder="Bạn tìm gì?">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        </div>
+                
+        <div class="user-actions">
+            <button class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket logout-icon"></i>
+                Đăng xuất
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="user-profile">
+                <i class="fa-solid fa-user-tie fa-4x user-avatar"></i>
+                <div>Nhân viên CSKH</div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="menu-item">
+                <i class="fa-solid fa-list-check fa-2x menu-icon"></i>
+                <div class="menu-text">Danh sách ĐK</div>
+            </div>
+            
+            <div class="menu-item">
+                <i class="fa-solid fa-clipboard-list fa-2x menu-icon"></i>
+                <div class="menu-text">Danh sách đơn</div>
+            </div>
+            
+            <div class="menu-item active">
+                <i class="fa-solid fa-file-circle-plus fa-2x menu-icon"></i>
+                <div class="menu-text">Tạo đơn</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1 class="page-title">Đơn sửa chữa</h1>
+            
+            <div class="order-info">
+                <div class="order-id">Mã đơn hàng: <span class="highlight">DH0001</span></div>
+                <div class="order-date">Ngày tạo: 27/03/2025</div>
+                <div class="staff-name">Nhân viên: no name</div>
+                <div class="turn-back"><a href="danhsachdangky.html" style="text-decoration: none;">Quay lại danh sách</a> </div>
+            </div>
+            
+            <div class="form-container">
+                <!-- Customer Information Section -->
+                <div class="section">
+                    <div class="section-title">Thông tin khách hàng</div>
+                    <div class="split">
+                        <div class="form-group">
+                            <label>Họ và tên khách hàng: <span class="required">(*)</span></label>
+                            <input type="text" value="Trần Văn A">
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại: <span class="required">(*)</span></label>
+                            <input type="text" value="0934742106">
+                        </div>
+                        <div class="form-group">
+                            <label>Email: <span class="required">(*)</span></label>
+                            <input type="email" value="abc123@gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ: <span class="required">(*)</span></label>
+                            <input type="text" value="homeless">
+                        </div>
+                        <div class="form-group">
+                            <label>Đường/ Số nhà: <span class="required">(*)</span></label>
+                            <input type="text" value="homeless">
+                        </div>
+                            
+                    </div>
+
+                    
+                </div>
+                
+                <!-- Product Information Section -->
+                <div class="section">
+                    <div class="section-title">Thông tin thiết bị</div>
+                    <div class="split">
+                        <div class="form-group">
+                        <label>Tên thiết bị: <span class="required">(*)</span></label>
+                        <input type="text" value="Redmi note 14">
+                    </div>
+                    <div class="form-group">
+                        <label>Loại thiết bị: <span class="required">(*)</span></label>
+                        <div class="dropdown">
+                            <input type="text" value="Điện thoại" readonly>
+                            <i class="fa-solid fa-chevron-down"></i>
+                            <div class="dropdown-content">
+                                <div class="dropdown-item">Điện thoại</div>
+                                <div class="dropdown-item">Laptop</div>
+                                <div class="dropdown-item">Máy tính bảng</div>
+                                <div class="dropdown-item">Máy tính để bàn</div>
+                                <div class="dropdown-item">Thiết bị âm thanh</div>
+                                <div class="dropdown-item">Khác</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <label>Bảo hành: <span class="required">(*)</span></label>
+                        <div class="checkbox-container">
+                            <div class="checkbox">
+                                <input type="checkbox" id="warranty-yes">
+                                <label for="warranty-yes">Còn bảo hành</label>
+                            </div>
+                            <div class="checkbox">
+                                <input type="checkbox" id="warranty-no" checked>
+                                <label for="warranty-no">Hết bảo hành</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tải ảnh: <span class="required">(*)</span></label>
+                        <div class="file-upload">
+                            <button class="file-btn">Chọn tệp</button>
+                            <div class="file-preview">
+                                <div class="file-name">anh1.png</div>
+                                <i class="fa-solid fa-xmark delete-file"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tải ảnh phiếu bảo hành:</label>
+                        <div class="file-upload">
+                            <button class="file-btn">Chọn tệp</button>
+                            <div class="file-preview">
+                                <div class="file-name">anh1.png</div>
+                                <i class="fa-solid fa-xmark delete-file"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="form-group">
+                        <label>Loại linh kiện: <span class="required">(*)</span></label>
+                        <div class="dropdown">
+                            <input type="text" value="Nguồn" readonly>
+                            <i class="fa-solid fa-chevron-down"></i>
+                            <div class="dropdown-content">
+                                <div class="dropdown-item">Nguồn</div>
+                                <div class="dropdown-item">Màn hình</div>
+                                <div class="dropdown-item">Pin</div>
+                                <div class="dropdown-item">Bàn phím</div>
+                                <div class="dropdown-item">Cảm ứng</div>
+                                <div class="dropdown-item">Loa</div>
+                                <div class="dropdown-item">Camera</div>
+                                <div class="dropdown-item">Khác</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Lỗi: <span class="required">(*)</span></label>
+                        <div class="dropdown">
+                            <input type="text" value="abc" readonly>
+                            <i class="fa-solid fa-chevron-down"></i>
+                            <div class="dropdown-content">
+                                <div class="dropdown-item">Không lên nguồn</div>
+                                <div class="dropdown-item">Màn hình nứt</div>
+                                <div class="dropdown-item">Màn hình không hiển thị</div>
+                                <div class="dropdown-item">Pin yếu</div>
+                                <div class="dropdown-item">Lỗi phần mềm</div>
+                                <div class="dropdown-item">Không nhận sạc</div>
+                                <div class="dropdown-item">Khác</div>
+                            </div>
+                        </div>
+                    </div>
+                            <div class="form-group">
+                        <label>Mô tả lỗi: <span class="required">(*)</span></label>
+                        <textarea>Không lên nguồn</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Đơn giá (VND): <span class="required">(*)</span></label>
+                        <input type="text" value="300.000">
+                    </div>
+                    </div>
+                    </div>
+                    
+                    
+                    <button class="add-part-btn">➕</button>
+
+
+                </div>
+                
+                <!-- Service Type Section -->
+                <div class="section">
+                    <div class="section-title">Loại dịch vụ</div>
+                    <div class="split-with-button">
+                        <div class="split">
+                        <div class="form-group">
+                        <label>Chọn loại dịch vụ: <span class="required">(*)</span></label>
+                        <div class="dropdown">
+                            <input type="text" value="Sửa chữa" readonly>
+                            <i class="fa-solid fa-chevron-down"></i>
+                            <div class="dropdown-content">
+                                <div class="dropdown-item">Sửa chữa</div>
+                                <div class="dropdown-item">Lắp đặt</div>
+                                
+
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Chọn nơi thực hiện: <span class="required">(*)</span></label>
+                        <div class="dropdown">
+                            <input type="text" value="Tại nhà" readonly>
+                            <i class="fa-solid fa-chevron-down"></i>
+                            <div class="dropdown-content">
+                                <div class="dropdown-item">Tại nhà</div>
+                                <div class="dropdown-item">Tại công ty</div>
+                                
+
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                   
+                    
+                    
+                    </div>
+                    
+                </div>
+                
+                <!-- Staff Assignment Section -->
+                <div class="section">
+                    <div class="section-title">Phân công nhân viên kỹ thuật</div>
+                    <div class="split">
+                        <div class="staff-selection">
+                            <button class="select-staff-btn">Chọn nhân viên</button>
+                            <div class="selected-staff">
+                                <span class="staff-name">Nguyễn Văn A - Chuyên môn: Phần cứng điện tử</span>
+                            </div>
+                        </div> 
+                    </div>
+                   
+                </div>
+                
+                <!-- Date and Time Section -->
+                <div class="section">
+                    <div class="section-title">Ngày giờ</div>
+                    <div class="split">
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Ngày giờ thực hiện:</label>
+                            <div class="date-time-input">
+                                <input id="startDatetimePicker" type="text" value="2025-02-04 15:00:00" readonly>
+                                <i class="fa-regular fa-calendar date-icon"></i>
+                            </div>
+                        </div>
+                    
+                        <div class="form-group">
+                            <label>Ngày giờ hoàn thành:</label>
+                            <div class="date-time-input">
+                                <input id="endDatetimePicker" type="text" value="2025-02-04 15:00:00" readonly>
+                                <i class="fa-regular fa-calendar date-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="note-text">
+                        *Lưu ý: Nhân viên phải thực hiện sửa chữa xong trong vòng 48 tiếng kể từ thời gian nhận yêu cầu !
+                    </div>
+                    </div>
+                </div>
+                
+                <!-- Other Section -->
+                <div class="section">
+                    <div class="section-title">Khác</div>
+                    <div class="split">
+                    <!-- First row: Chọn linh kiện and Tiền khách hàng ứng trước in one row -->
+                    <div class="two-column-row">
+                        <div class="form-group">
+                            <label>Chọn linh kiện thay thế:</label>
+                            <div class="search-parts">
+                                <input type="text" placeholder="Tìm kiếm linh kiện...">
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                
+                            </div>
+                            <!-- <div class="parts-list">
+                                <div class="part-item">
+                                    <span>Nguồn</span>
+                                </div>
+                            </div> -->
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Tiền khách hàng ứng trước (VND):</label>
+                            <input type="text">
+                        </div>
+                    </div>
+                    
+                    <!-- Second row: Giá tiền and Chọn trạng thái -->
+                    <div class="two-column-row">
+                        <div class="form-group">
+                            <label>Giá tiền (VND):</label>
+                            <input type="text" value="1.000.000" class="price-input" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Chọn trạng thái: <span class="required">(*)</span></label>
+                            <div class="dropdown">
+                                <input type="text" value="Hoàn thành" readonly>
+                                <i class="fa-solid fa-chevron-down"></i>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-item">Đã hoàn thành</div>
+                                    <div class="dropdown-item">Chưa hoàn thành</div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <div class="form-actions">
+                    <button class="create-order-btn">Tạo đơn</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dropdown functionality
+            const dropdowns = document.querySelectorAll('.dropdown');
+            
+            dropdowns.forEach(dropdown => {
+                const input = dropdown.querySelector('input');
+                const dropdownContent = dropdown.querySelector('.dropdown-content');
+                
+                // Toggle dropdown visibility when clicking on the input
+                input.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    closeAllDropdowns();
+                    dropdownContent.classList.toggle('show');
+                });
+                
+                // Handle item selection
+                const items = dropdown.querySelectorAll('.dropdown-item');
+                items.forEach(item => {
+                    item.addEventListener('click', function() {
+                        input.value = this.textContent;
+                        dropdownContent.classList.remove('show');
+                    });
+                });
+            });
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                closeAllDropdowns();
+            });
+            
+            function closeAllDropdowns() {
+                const dropdownContents = document.querySelectorAll('.dropdown-content');
+                dropdownContents.forEach(content => {
+                    content.classList.remove('show');
+                });
+            }
+            
+            // File upload preview
+            const fileButtons = document.querySelectorAll('.file-btn');
+            fileButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    console.log('File upload button clicked');
+                    // File upload functionality can be implemented here
+                });
+            });
+            
+            // Date picker functionality
+            const dateInputs = document.querySelectorAll('.date-time-input');
+            dateInputs.forEach(input => {
+                const inputField = input.querySelector('input');
+                const icon = input.querySelector('.date-icon');
+                
+                // Click handler for the calendar icon
+                icon.addEventListener('click', function() {
+                    inputField._flatpickr.toggle();
+                });
+            });
+            
+            // Create order button
+            const createOrderBtn = document.querySelector('.create-order-btn');
+            createOrderBtn.addEventListener('click', function() {
+                alert('Đơn sửa chữa đã được tạo!');
+                // Order creation functionality can be implemented here
+            });
+        });
+    </script>
+    
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
+    
+    <script>
+        // Initialize Flatpickr for the datetime fields
+        flatpickr("#startDatetimePicker", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i:S", // yyyy-MM-dd HH:mm:ss
+            time_24hr: true,
+            locale: "vn",
+            allowInput: true,
+            clickOpens: true,
+            position: "auto"
+        });
+        
+        flatpickr("#endDatetimePicker", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i:S",
+            time_24hr: true,
+            locale: "vn",
+            allowInput: true,
+            clickOpens: true,
+            position: "auto"
+        });
+        
+    </script>
+</body>
+</html>
