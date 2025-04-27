@@ -283,7 +283,8 @@ body {
 
 .checkbox-container {
     display: flex;
-    gap: 40px;
+    gap: 10px;
+    /* flex-direction: column; */
 }
 
 .checkbox {
