@@ -255,3 +255,45 @@ formGroups.forEach(group => {
         return new Intl.NumberFormat('vi-VN').format(price) + ' VND';
     }
 });
+
+// Staff Assignment Popup Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const selectStaffBtn = document.querySelector('.select-staff-btn');
+    const staffPopup = document.getElementById('staffPopup');
+    const specialtySelect = document.querySelector('.specialty-dropdown select');
+    const staffItems = document.querySelectorAll('.staff-item');
+    const selectedStaffDisplay = document.querySelector('.selected-staff .staff-name');
+
+    // Open popup when clicking the select staff button
+    selectStaffBtn.addEventListener('click', function() {
+        staffPopup.classList.add('show');
+    });
+
+    // Close popup when clicking outside
+    staffPopup.addEventListener('click', function(e) {
+        if (e.target === staffPopup) {
+            staffPopup.classList.remove('show');
+        }
+    });
+
+    // Handle specialty selection
+    specialtySelect.addEventListener('change', function() {
+        // Here you would typically filter the staff list based on specialty
+        // For now, we'll just log the selected specialty
+        console.log('Selected specialty:', this.value);
+    });
+
+    // Handle staff selection
+    staffItems.forEach(item => {
+        item.addEventListener('click', function() {
+            if (!item.classList.contains('busy')) {
+                const staffName = item.textContent;
+                const specialty = specialtySelect.value;
+                const selectedStaffDisplay = document.querySelector('.selected-staff');
+                selectedStaffDisplay.querySelector('.staff-name').textContent = `${staffName} - Chuyên môn: ${specialty}`;
+                selectedStaffDisplay.classList.add('has-staff');
+                staffPopup.classList.remove('show');
+            }
+        });
+    });
+});
