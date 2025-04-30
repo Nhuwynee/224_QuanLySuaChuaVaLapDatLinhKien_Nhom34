@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterGroups = document.querySelectorAll('.filter-group');
     
     addButton.addEventListener('click', function() {
-        alert('Thêm đơn đăng ký mới');
+        alert('Thêm đơn dịch vụ mới');
         // Functionality to add new registration
     });
     

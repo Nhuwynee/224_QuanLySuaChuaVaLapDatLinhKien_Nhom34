@@ -21,6 +21,9 @@ body {
     align-items: center;
     border-bottom: 1px solid #2c5282;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .logo-container {
@@ -114,16 +117,25 @@ body {
 /* Main container styles */
 .main-container {
     display: flex;
+    position: relative;
+    height: calc(100vh - 80px); /* Chiều cao của main container bằng với viewport trừ đi chiều cao header */
+    overflow: hidden; /* Ngăn chặn overflow từ cả main container */
 }
 
 /* Sidebar styles */
 .sidebar {
     background-color: #435370;
     width: 200px;
-    min-height: calc(100vh - 80px);
     color: white;
     padding: 20px 0;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    position: sticky;
+    height: calc(100vh - 80px); /* Chiều cao bằng với viewport trừ đi chiều cao header */
+    overflow-y: auto; /* Cho phép cuộn sidebar nếu nội dung quá dài */
+    align-self: flex-start;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+
 }
 
 .menu-item {
@@ -154,6 +166,8 @@ body {
 .main-content {
     flex: 1;
     padding: 20px;
+    margin-left: 0;
+    overflow-y: auto; /* Cho phép cuộn nội dung chính khi cần thiết */
 }
 
 .page-title {

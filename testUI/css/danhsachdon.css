@@ -1,4 +1,4 @@
-/* Styles for the Registration List (Danh sách đăng ký) interface */
+/* Styles for the Order List (Danh sách đơn) interface */
 /* Font import from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Alexandria:wght@600&family=Dancing+Script:wght@700&display=swap');
 
@@ -121,6 +121,7 @@ body {
     height: calc(100vh - 80px); /* Chiều cao của main container bằng với viewport trừ đi chiều cao header */
     overflow: hidden; /* Ngăn chặn overflow từ cả main container */
 }
+
 /* Sidebar styles */
 .sidebar {
     background-color: #435370;
@@ -134,7 +135,6 @@ body {
     align-self: flex-start;
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
-
 }
 
 .user-profile{
@@ -267,8 +267,8 @@ body {
     color: white;
 }
 
-/* Registration list styles */
-.registration-list {
+/* Order list styles */
+.order-list {
     background-color: #e9eef5;
     border-radius: 8px;
     padding: 12px;
@@ -305,6 +305,36 @@ body {
 .list-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+/* Status badge styles */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.in-progress {
+    background-color: #f0ad4e;
+    color: #fff;
+}
+
+.completed {
+    background-color: #5cb85c;
+    color: #fff;
+}
+
+.cancelled {
+    background-color: #d9534f;
+    color: #fff;
+}
+
+.pending {
+    background-color: #5bc0de;
+    color: #fff;
 }
 
 .action-buttons {
