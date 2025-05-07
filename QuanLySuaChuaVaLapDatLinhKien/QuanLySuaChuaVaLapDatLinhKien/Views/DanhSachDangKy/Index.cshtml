@@ -1,0 +1,129 @@
+﻿@{
+    ViewData["Title"] = "Danh sach dang ky";
+}
+
+<!-- Main Container -->
+<div class="main-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="user-profile">
+            <i class="fa-solid fa-user-tie fa-4x user-avatar"></i>
+            <div>Nhân viên CSKH</div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="menu-item active">
+            <i class="fa-solid fa-list-check fa-2x menu-icon" style="color: rgb(197, 17, 17);"></i>
+            <div class="menu-text">Danh sách ĐK</div>
+        </div>
+
+        <div class="menu-item">
+            <i class="fa-solid fa-clipboard-list fa-2x menu-icon" style="color: #EDDD53;"></i>
+            <div class="menu-text"><a asp-controller="DanhSachDon" asp-action="Index" style="text-decoration: none; color: white;">Danh sách đơn</a></div>
+        </div>
+
+        @* <div class="menu-item"> *@
+        @*     <i class="fa-solid fa-file-circle-plus fa-2x menu-icon" style="color: cornflowerblue;"></i> *@
+        @*     <div class="menu-text"><a asp-controller="Don" asp-action="DanhSach" style="text-decoration: none; color: white;">Tạo đơn</a></div> *@
+        @* </div> *@
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1 class="page-title">Danh sách đơn đăng ký</h1>
+
+        <div class="filter-bar">
+            <div class="filter-options">
+                <div class="search-filter">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Tìm kiếm đơn đăng ký...">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Ngày</div>
+                    <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Loại dịch vụ</div>
+                    <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="registration-list">
+            <div class="list-header">
+                <div>Mã ĐK</div>
+                <div>Khách hàng</div>
+                <div>Mô tả yêu cầu</div>
+                <div>Loại dịch vụ</div>
+                <div>Tiền đơn hàng</div>
+                <div>Thao tác</div>
+            </div>
+
+            <div class="list-item">
+                <div>DK001</div>
+                <div>Nguyễn Vũ Khanh</div>
+                <div>Lorem ipsum dolor sit amet,...</div>
+                <div>Lắp đặt</div>
+                <div>1.000.000 VND</div>
+                <div class="action-buttons">
+                    <a asp-controller="TaoDonSua" asp-action="Index" asp-route-maDon="DK001" class="action-link">
+                        <i class="fa-solid fa-pen-to-square action-icon"></i>
+                    </a>
+                    @* <i class="fa-solid fa-pen-to-square action-icon"></i> *@
+                    <i class="fa-solid fa-trash delete-icon"></i>
+                </div>
+            </div>
+
+            <div class="list-item">
+                <div>DK002</div>
+                <div>Trần Phước Lộc</div>
+                <div>Lorem ipsum dolor sit amet,...</div>
+                <div>Lắp đặt</div>
+                <div>1.000.000 VND</div>
+                <div class="action-buttons">
+                    <i class="fa-solid fa-pen-to-square action-icon"></i>
+                    <i class="fa-solid fa-trash delete-icon"></i>
+                </div>
+            </div>
+
+            <div class="list-item">
+                <div>DK003</div>
+                <div>Lưu Ngọc Yến Như</div>
+                <div>Lorem ipsum dolor sit amet,...</div>
+                <div>Sửa chữa</div>
+                <div>1.000.000 VND</div>
+                <div class="action-buttons">
+                    <i class="fa-solid fa-pen-to-square action-icon"></i>
+                    <i class="fa-solid fa-trash delete-icon"></i>
+                </div>
+            </div>
+
+            <div class="list-item">
+                <div>DK004</div>
+                <div>Nguyễn Văn Huyn</div>
+                <div>Lorem ipsum dolor sit amet,...</div>
+                <div>Sửa chữa</div>
+                <div>1.000.000 VND</div>
+                <div class="action-buttons">
+                    <i class="fa-solid fa-pen-to-square action-icon"></i>
+                    <i class="fa-solid fa-trash delete-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <button class="add-button">
+                <i class="fa-solid fa-plus add-icon"></i>
+                <a asp-controller="TaoDonSua" asp-action="Index" style="text-decoration: none; color: white;">Thêm đơn</a>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Include JavaScript file -->
+<script src="js/danhsachdangky.js"></script>

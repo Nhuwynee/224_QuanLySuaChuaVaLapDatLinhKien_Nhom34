@@ -7,41 +7,74 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/QuanLySuaChuaVaLapDatLinhKien.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/danhsachdangky.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/danhsachdon.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/taodonsua.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/taodonsuachuaKVL.css" asp-append-version="true" />
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Vietnamese locale for Flatpickr -->
+    <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/l10n/vn.js">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">QuanLySuaChuaVaLapDatLinhKien</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+        @* <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"> *@
+        @*     <div class="container-fluid"> *@
+        @*         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">QuanLySuaChuaVaLapDatLinhKien</a> *@
+        @*         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" *@
+        @*                 aria-expanded="false" aria-label="Toggle navigation"> *@
+        @*             <span class="navbar-toggler-icon"></span> *@
+        @*         </button> *@
+        @*         <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between"> *@
+        @*             <ul class="navbar-nav flex-grow-1"> *@
+        @*                 <li class="nav-item"> *@
+        @*                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a> *@
+        @*                 </li> *@
+        @*                 <li class="nav-item"> *@
+        @*                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> *@
+        @*                 </li> *@
+        @*             </ul> *@
+        @*         </div> *@
+        @*     </div> *@
+        @* </nav> *@
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-container">
+                <!-- <i class="fa-solid fa-shop fa-2x logo"></i> -->
+                <img src="~/images/logo.png" alt="Logo" class="logo">
+                <div class="contact-info">
+                    Liên hệ: 1900 232 461<br>
+                    Địa chỉ: 220 Nguyễn Văn Linh, Tp. Đà Nẵng
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - QuanLySuaChuaVaLapDatLinhKien - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+         
+            <div class="slogan">Mua sắm tiện lợi, Sửa chữa chuyên nghiệp, Lắp đặt tận tâm"</div>
+            <div class="search-box">
+                <input type="text" placeholder="Bạn tìm gì?">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            </div>
+                
+            <div class="user-actions">
+                <button class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket logout-icon"></i>
+                    Đăng xuất
+                </button>
+            </div>
         </div>
-    </footer>
+    </header>
+<div>
+
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+</div>
+
+    @* <footer class="border-top footer text-muted"> *@
+    @*     <div class="container"> *@
+    @*         &copy; 2025 - QuanLySuaChuaVaLapDatLinhKien - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> *@
+    @*     </div> *@
+    @* </footer> *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
