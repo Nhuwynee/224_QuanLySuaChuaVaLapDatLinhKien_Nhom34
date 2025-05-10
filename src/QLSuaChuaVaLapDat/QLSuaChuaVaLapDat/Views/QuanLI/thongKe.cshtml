@@ -1,0 +1,179 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutQuanLi.cshtml";
+}
+@using System.Globalization
+<body>
+    <div class="container">
+        <div class="dashboard">
+            <div class="metric-card">
+                <div>Tổng số đơn</div>
+                <div class="metric-value">@Model.TotalOrders</div>
+                <div class="metric-change">+0% last month</div>
+                <div class="metric-date">@Model.CurrentMonth</div>
+            </div>
+            <div class="metric-card">
+                <div>Tổng doanh thu</div>
+                <div class="metric-value">@Model.TotalRevenue.ToString("C0", new CultureInfo("vi-VN"))</div>
+                <div class="metric-change">+0% last month</div>
+                <div class="metric-date">@Model.CurrentMonth</div>
+            </div>
+            <div class="metric-card">
+                <div>Tổng nhân viên</div>
+                <div class="metric-value">@Model.TotalStaff</div>
+                <div class="metric-change">+0% last month</div>
+                <div class="metric-date">@Model.CurrentMonth</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="charts-container">
+            <div class="revenue-chart">
+                <div class="chart-title">Revenue</div>
+                <div class="chart-bars">
+                    <div class="bar bar-google">
+                        <div class="bar-label">Google ads</div>
+                    </div>
+                    <div class="bar bar-facebook">
+                        <div class="bar-label">Facebook ads</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visitors-chart">
+                <div class="visitors-title">Website Visitors</div>
+                <div class="visitors-data">
+                    <div class="visitors-pie"></div>
+                    <div class="visitors-legend">
+                        <div class="legend-item">
+                            <div class="legend-color direct"></div>
+                            <div>Direct 38%</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color organic"></div>
+                            <div>Organic 22%</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color paid"></div>
+                            <div>Paid 12%</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color other"></div>
+                            <div>Other 28%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="products-header">
+            <h2>Đơn dịch vụ gần đây</h2>
+        </div>
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Orders</th>
+                    <th>Price</th>
+                    <th>Ads Spent</th>
+                    <th>Refunds</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Product">
+                        <div class="product-info">
+                            <div class="product-icon">👟</div>
+                            <div class="product-text">
+                                <span class="product-name">Nike v22</span>
+                                <span class="product-category">Running Shoes</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Orders">
+                        <span class="orders-count">8,000</span>
+                    </td>
+                    <td data-label="Price">
+                        <span class="price-value">$130</span>
+                    </td>
+                    <td data-label="Ads Spent">
+                        <span class="ads-spent">$9,500</span>
+                    </td>
+                    <td data-label="Refunds">
+                        <span class="refunds-badge refund-high">> 13</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Product">
+                        <div class="product-info">
+                            <div class="product-icon">📷</div>
+                            <div class="product-text">
+                                <span class="product-name">Instax Camera</span>
+                                <span class="product-category">Portable Camera</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Orders">3,000</td>
+                    <td data-label="Price">$45</td>
+                    <td data-label="Ads Spent">$4,500</td>
+                    <td data-label="Refunds">
+                        <span class="refunds-badge refund-high">> 18</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Product">
+                        <div class="product-info">
+                            <div class="product-icon">🪑</div>
+                            <div class="product-text">
+                                <span class="product-name">Chair</span>
+                                <span class="product-category">Relaxing chair</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Orders">6,000</td>
+                    <td data-label="Price">$80</td>
+                    <td data-label="Ads Spent">$5,800</td>
+                    <td data-label="Refunds">
+                        <span class="refunds-badge refund-low">< 11</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Product">
+                        <div class="product-info">
+                            <div class="product-icon">💻</div>
+                            <div class="product-text">
+                                <span class="product-name">Laptop</span>
+                                <span class="product-category">Macbook pro 13</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Orders">4,000</td>
+                    <td data-label="Price">$500</td>
+                    <td data-label="Ads Spent">$4,700</td>
+                    <td data-label="Refunds">
+                        <span class="refunds-badge refund-high">> 18</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Product">
+                        <div class="product-info">
+                            <div class="product-icon">⌚</div>
+                            <div class="product-text">
+                                <span class="product-name">Watch</span>
+                                <span class="product-category">Digital watch</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Orders">2,000</td>
+                    <td data-label="Price">$15</td>
+                    <td data-label="Ads Spent">$2,500</td>
+                    <td data-label="Refunds">
+                        <span class="refunds-badge refund-low">< 10</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
