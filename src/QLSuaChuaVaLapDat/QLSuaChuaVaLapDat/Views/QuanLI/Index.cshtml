@@ -1,0 +1,25 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutQuanLi.cshtml";
+}
+
+<div class="container">
+    <h1>Danh sách người dùng</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.IdUser</td>
+                    <td>@user.TenUser</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
