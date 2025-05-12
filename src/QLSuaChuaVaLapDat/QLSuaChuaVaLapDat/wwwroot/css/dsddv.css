@@ -452,8 +452,16 @@ main {
     font-weight: 600;
     font-size: 14px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background-color: #52b788;
 }
+    .status-badge.hoan-thanh {
+        background-color: #52b788; /* Màu xanh lá */
+    }
 
+    .status-badge.dang-tien-hanh {
+        background-color: #ffff3f; /* Màu vàng */
+        color: #000; /* Chữ đen cho dễ đọc */
+    }
 .in-progress {
     background-color: #f0ad4e;
     color: #fff;

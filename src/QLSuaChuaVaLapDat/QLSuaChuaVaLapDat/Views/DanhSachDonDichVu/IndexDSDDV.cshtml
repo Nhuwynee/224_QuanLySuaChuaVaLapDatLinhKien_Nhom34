@@ -5,8 +5,8 @@
     Layout = null;
 }
 
-
-
+@* @model List<QLSuaChuaVaLapDat.Models.DonDichVuViewModel> *@
+@model QLSuaChuaVaLapDat.Models.DonDichVuPagedViewModel
 
 
 
@@ -147,54 +147,59 @@
                         <div>Cập nhật</div>
                     </div>
 
-                    <div class="list-item">
-                        <div>DH001</div>
-                        <div>Nguyễn Vũ Khanh</div>
-                        <div>Lorem ipsum dolor sit amet,...</div>
-                        <div><span class="status-badge in-progress">Đang tiến hành</span></div>
-                        <div>1.000.000 VND</div>
-                        <div class="action-buttons">
-                            <i class="fa-solid fa-pen-to-square action-icon"></i>
-                            <!-- <i class="fa-solid fa-eye action-icon"></i> -->
-                            <i class="fa-solid fa-trash delete-icon"></i>
+                    @foreach (var item in Model.DonDichVus)
+                    {
+                        <div class="list-item">
+                            <div>@item.MaDon</div>
+                            <div>@item.TenKhachHang</div>
+                            <div>@item.MoTa</div>
+                            <div>
+                                <span class="status-badge @(item.TrangThai == "Hoàn thành" ? "hoan-thanh" : "dang-tien-hanh")">
+                                    @item.TrangThai
+                                </span>
+                            </div>
+                            <div>@string.Format("{0:N0} VND", item.TongTien)</div>
+                            <div class="action-buttons">
+                                <i class="fa-solid fa-pen-to-square action-icon"></i>
+                                <i class="fa-solid fa-trash delete-icon"></i>
+                            </div>
                         </div>
-                    </div>
+                    }
 
-                    <div class="list-item">
-                        <div>DH002</div>
-                        <div>Trần Phước Lộc</div>
-                        <div>Lorem ipsum dolor sit amet,...</div>
-                        <div><span class="status-badge in-progress">Đang tiến hành</span></div>
-                        <div>1.000.000 VND</div>
-                        <div class="action-buttons">
-                            <i class="fa-solid fa-pen-to-square action-icon"></i>
-                            <i class="fa-solid fa-trash delete-icon"></i>
-                        </div>
-                    </div>
+                </div>
+                @* <nav> *@
+                @*     <ul class="pagination"> *@
+                @*         @for (int i = 1; i <= Model.TotalPages; i++) *@
+                @*         { *@
+                @*             <li class="page-item @(i == Model.CurrentPage ? "active" : "")"> *@
+                @*                 <a class="page-link" href="?page=@i">@i</a> *@
+                @*             </li> *@
+                @*         } *@
+                @*     </ul> *@
+                @* </nav> *@
+                <div class="pagination-container">
+                    <ul class="pagination">
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("IndexDSDDV", "DanhSachDonDichVu", new { page = Model.CurrentPage - 1 })">Trước</a>
+                            </li>
+                        }
 
-                    <div class="list-item">
-                        <div>DH003</div>
-                        <div>Lưu Ngọc Yến Như</div>
-                        <div>Lorem ipsum dolor sit amet,...</div>
-                        <div><span class="status-badge completed">Hoàn thành</span></div>
-                        <div>1.000.000 VND</div>
-                        <div class="action-buttons">
-                            <i class="fa-solid fa-pen-to-square action-icon"></i>
-                            <i class="fa-solid fa-trash delete-icon"></i>
-                        </div>
-                    </div>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("IndexDSDDV", "DanhSachDonDichVu", new { page = i })">@i</a>
+                            </li>
+                        }
 
-                    <div class="list-item">
-                        <div>DH004</div>
-                        <div>Nguyễn Văn Huyn</div>
-                        <div>Lorem ipsum dolor sit amet,...</div>
-                        <div><span class="status-badge completed">Hoàn thành</span></div>
-                        <div>1.000.000 VND</div>
-                        <div class="action-buttons">
-                            <i class="fa-solid fa-pen-to-square action-icon"></i>
-                            <i class="fa-solid fa-trash delete-icon"></i>
-                        </div>
-                    </div>
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("IndexDSDDV", "DanhSachDonDichVu", new { page = Model.CurrentPage + 1 })">Tiếp</a>
+                            </li>
+                        }
+                    </ul>
                 </div>
 
                 <div style="display: flex; justify-content: flex-end;">
