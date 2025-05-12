@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tìm kiếm nâng cao</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f2f6;
+      color: #2f3542;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #34495e;
+    }
+
+    .search-form {
+      margin-top: 30px;
+    }
+
+    .search-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .search-controls select,
+    .search-controls input[type="text"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+      min-width: 200px;
+      flex: 1;
+    }
+
+    .search-controls button {
+      padding: 10px 16px;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .filter-area {
+      margin-top: 20px;
+    }
+
+    .filter-group {
+      display: none;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .filter-group.active {
+      display: flex;
+    }
+
+    .filter-group label {
+      min-width: 120px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background: #ecf0f1;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+  </style>
+  <script>
+    function updateFilters() {
+      const type = document.getElementById('search-type').value;
+      const filterGroups = document.querySelectorAll('.filter-group');
+      filterGroups.forEach(group => group.classList.remove('active'));
+      const activeGroup = document.getElementById(`filters-${type}`);
+      if (activeGroup) activeGroup.classList.add('active');
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h2>Tìm kiếm nâng cao</h2>
+
+    <div class="search-form">
+      <div class="search-controls">
+        <select id="search-type" onchange="updateFilters()">
+          <option value="customer">Khách hàng</option>
+          <option value="order">Đơn hàng</option>
+          <option value="product">Linh kiện</option>
+          <option value="warranty">Bảo hành</option>
+        </select>
+        <input type="text" placeholder="Nhập thông tin tìm kiếm...">
+        <button>Tìm kiếm</button>
+      </div>
+
+      <!-- Bộ lọc -->
+      <div class="filter-area">
+        <!-- Khách hàng -->
+        <div id="filters-customer" class="filter-group">
+          <label><input type="checkbox"> Theo quận</label>
+          <label><input type="checkbox"> Theo độ tuổi</label>
+        </div>
+
+        <!-- Đơn hàng -->
+        <div id="filters-order" class="filter-group">
+          <label><input type="checkbox"> Theo ngày tạo</label>
+          <label><input type="checkbox"> Theo trạng thái</label>
+        </div>
+
+        <!-- Linh kiện -->
+        <div id="filters-product" class="filter-group">
+          <label><input type="checkbox"> Theo nhà sản xuất</label>
+          <label><input type="checkbox"> Theo màu sắc</label>
+          <label><input type="checkbox"> Theo mức giá</label>
+          <label><input type="checkbox"> Theo thời gian bảo hành</label>
+        </div>
+
+        <!-- Bảo hành -->
+        <div id="filters-warranty" class="filter-group">
+          <label><input type="checkbox"> Theo ngày hết hạn</label>
+          <label><input type="checkbox"> Theo linh kiện</label>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Thông tin 1</th>
+              <th>Thông tin 2</th>
+              <th>Thông tin 3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Giá trị 1</td>
+              <td>Giá trị 2</td>
+              <td>Giá trị 3</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

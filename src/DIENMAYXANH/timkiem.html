@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Dịch vụ</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333;
+            --border-color: #ddd;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+        }
+        
+        .search-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .search-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+            background-color: var(--light-gray);
+            transition: all 0.3s ease;
+        }
+        
+        .search-tab.active {
+            background-color: white;
+            border-color: var(--border-color);
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .search-tab:hover:not(.active) {
+            background-color: #e9e9e9;
+        }
+        
+        .search-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .search-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark-gray);
+        }
+        
+        .search-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .search-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .filter-sort {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .filter-section, .sort-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .results-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        
+        .results-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .results-table tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-confirmed {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success-color);
+        }
+        
+        .status-partial {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning-color);
+        }
+        
+        .status-completed {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--primary-color);
+        }
+        
+        .status-cancelled {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+        
+        .page-item {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .page-item.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .page-item:hover:not(.active) {
+            background-color: var(--light-gray);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        .price-range-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .price-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .price-separator {
+            padding: 0 5px;
+        }
+
+        .price-unit {
+            width: 80px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .price-quick-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .price-quick-btn {
+            padding: 5px 10px;
+            background-color: var(--light-gray);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .price-quick-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* CSS Thanh trượt giá linh kieejnb */
+
+         .price-range-wrapper {
+      max-width: 400px;
+    }
+
+    .price-inputs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .price-inputs input {
+      width: 48%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .slider-container {
+      position: relative;
+      height: 36px;
+    }
+
+    .slider-container input[type=range] {
+      position: absolute;
+      width: 100%;
+      pointer-events: none;
+      appearance: none;
+      height: 6px;
+      background: transparent;
+    }
+
+    .slider-track {
+      position: absolute;
+      height: 6px;
+      width: 100%;
+      background-color: #ddd;
+      border-radius: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+
+    .slider-range {
+      position: absolute;
+      height: 6px;
+      background-color: #4CAF50;
+      border-radius: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      pointer-events: auto;
+      appearance: none;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background-color: #75b940;
+      border: 2px solid white;
+      cursor: pointer;
+      z-index: 3;
+      position: relative;
+      margin-top: 20px !important;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      pointer-events: auto;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background-color: #75b940;
+      border: none;
+      cursor: pointer;
+      z-index: 3;
+      position: relative;
+      margin-top: 20px !important;
+    }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hệ thống Quản lý Dịch vụ</h1>
+            <div class="search-actions">
+                <button class="btn btn-secondary">Xuất Excel</button>
+                <button class="btn btn-primary">+ Tạo mới</button>
+            </div>
+        </header>
+        
+        <div class="search-tabs">
+            <div class="search-tab active" data-tab="service-orders">Đơn dịch vụ</div>
+            <div class="search-tab" data-tab="customers">Khách hàng</div>
+            <div class="search-tab" data-tab="components">Linh kiện</div>
+            <div class="search-tab" data-tab="warranty">Bảo hành</div>
+        </div>
+        
+        <!-- Đơn dịch vụ -->
+        <div class="search-container" id="service-orders">
+            <div class="search-header">
+                <div class="search-title">Tìm kiếm Đơn dịch vụ</div>
+                <div class="search-actions">
+                    <button class="btn btn-secondary">Làm mới</button>
+                    <button class="btn btn-primary">Tìm kiếm</button>
+                </div>
+            </div>
+            
+            <div class="search-fields">
+                <div class="form-group">
+                    <label for="so-id">Mã đơn dịch vụ</label>
+                    <input type="text" id="so-id" placeholder="Nhập mã đơn...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="so-customer">Khách hàng</label>
+                    <input type="text" id="so-customer" placeholder="Nhập tên hoặc SĐT...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="so-device">Thiết bị</label>
+                    <input type="text" id="so-device" placeholder="Nhập tên thiết bị...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="so-technician">Kỹ thuật viên</label>
+                    <input type="text" id="so-technician" placeholder="Nhập tên kỹ thuật viên...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="so-status">Trạng thái</label>
+                    <select id="so-status">
+                        <option value="">Tất cả</option>
+                        <option value="confirmed">Đã xác nhận</option>
+                        <option value="processing">Đang xử lý</option>
+                        <option value="completed">Hoàn thành</option>
+                        <option value="cancelled">Đã hủy</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="so-date-from">Từ ngày</label>
+                    <input type="date" id="so-date-from">
+                </div>
+                
+                <div class="form-group">
+                    <label for="so-date-to">Đến ngày</label>
+                    <input type="date" id="so-date-to">
+                </div>
+            </div>
+            
+            <div class="filter-sort">
+                <div class="filter-section">
+                    <span>Lọc theo:</span>
+                    <select>
+                        <option>Loại thiết bị</option>
+                        <option>Máy tính</option>
+                        <option>Điện thoại</option>
+                        <option>Thiết bị văn phòng</option>
+                    </select>
+                    <select>
+                        <option>Loại dịch vụ</option>
+                        <option>Sửa chữa</option>
+                        <option>Bảo hành</option>
+                        <option>Bảo trì</option>
+                    </select>
+                </div>
+                
+                <div class="sort-section">
+                    <span>Sắp xếp theo:</span>
+                    <select>
+                        <option>Ngày tạo (mới nhất)</option>
+                        <option>Ngày tạo (cũ nhất)</option>
+                        <option>Tổng tiền (cao nhất)</option>
+                        <option>Tổng tiền (thấp nhất)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Thiết bị</th>
+                        <th>Loại dịch vụ</th>
+                        <th>Trạng thái</th>
+                        <th>Tổng tiền</th>
+                        <th>Ngày tạo</th>
+                        <th>Cập nhật</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#DV-00001</td>
+                        <td>Nguyễn Văn A</td>
+                        <td>Laptop Dell XPS</td>
+                        <td>Sửa chữa</td>
+                        <td><span class="status status-confirmed">Đã xác nhận</span></td>
+                        <td>1,250,000 ₫</td>
+                        <td>15/06/2023</td>
+                        <td>Hôm nay</td>
+                    </tr>
+                    <tr>
+                        <td>#DV-00002</td>
+                        <td>Trần Thị B</td>
+                        <td>iPhone 13 Pro</td>
+                        <td>Bảo hành</td>
+                        <td><span class="status status-partial">Đang xử lý</span></td>
+                        <td>0 ₫</td>
+                        <td>14/06/2023</td>
+                        <td>Hôm qua</td>
+                    </tr>
+                    <tr>
+                        <td>#DV-00003</td>
+                        <td>Lê Văn C</td>
+                        <td>Máy in HP</td>
+                        <td>Bảo trì</td>
+                        <td><span class="status status-completed">Hoàn thành</span></td>
+                        <td>850,000 ₫</td>
+                        <td>10/06/2023</td>
+                        <td>12/06/2023</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="pagination">
+                <div class="page-item active">1</div>
+                <div class="page-item">2</div>
+                <div class="page-item">3</div>
+                <div class="page-item">...</div>
+                <div class="page-item">10</div>
+            </div>
+        </div>
+        
+        <!-- Khách hàng -->
+        <div class="search-container hidden" id="customers">
+            <div class="search-header">
+                <div class="search-title">Tìm kiếm Khách hàng</div>
+                <div class="search-actions">
+                    <button class="btn btn-secondary">Làm mới</button>
+                    <button class="btn btn-primary">Tìm kiếm</button>
+                </div>
+            </div>
+            
+            <div class="search-fields">
+                <div class="form-group">
+                    <label for="cus-name">Tên khách hàng</label>
+                    <input type="text" id="cus-name" placeholder="Nhập tên khách hàng...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cus-phone">Số điện thoại</label>
+                    <input type="text" id="cus-phone" placeholder="Nhập số điện thoại...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cus-email">Email</label>
+                    <input type="text" id="cus-email" placeholder="Nhập email...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cus-type">Loại khách hàng</label>
+                    <select id="cus-type">
+                        <option value="">Tất cả</option>
+                        <option value="regular">Thường</option>
+                        <option value="vip">VIP</option>
+                        <option value="business">Doanh nghiệp</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cus-city">Thành phố</label>
+                    <select id="cus-city">
+                        <option value="">Tất cả</option>
+                        <option value="hanoi">Hà Nội</option>
+                        <option value="hcm">TP.Hồ Chí Minh</option>
+                        <option value="danang">Đà Nẵng</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cus-district">Quận/Huyện</label>
+                    <select id="cus-district" disabled>
+                        <option value="">Chọn thành phố trước</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cus-ward">Phường/Xã</label>
+                    <select id="cus-ward" disabled>
+                        <option value="">Chọn quận/huyện trước</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-sort">
+                <div class="filter-section">
+                    <span>Lọc theo:</span>
+                    <select>
+                        <option>Nhóm khách hàng</option>
+                        <option>Khách cá nhân</option>
+                        <option>Khách doanh nghiệp</option>
+                    </select>
+                    <select>
+                        <option>Nguồn khách</option>
+                        <option>Website</option>
+                        <option>Cửa hàng</option>
+                        <option>Giới thiệu</option>
+                    </select>
+                </div>
+                
+                <div class="sort-section">
+                    <span>Sắp xếp theo:</span>
+                    <select>
+                        <option>Tên A-Z</option>
+                        <option>Tên Z-A</option>
+                        <option>Số đơn nhiều nhất</option>
+                        <option>Tổng chi tiêu cao nhất</option>
+                    </select>
+                </div>
+            </div>
+            
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Mã KH</th>
+                        <th>Tên khách hàng</th>
+                        <th>Số điện thoại</th>
+                        <th>Email</th>
+                        <th>Loại KH</th>
+                        <th>Địa chỉ</th>
+                        <th>Tổng đơn</th>
+                        <th>Tổng chi tiêu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#KH-0001</td>
+                        <td>Nguyễn Văn A</td>
+                        <td>0912345678</td>
+                        <td>nguyenvana@email.com</td>
+                        <td>Thường</td>
+                        <td>Q.1, TP.HCM</td>
+                        <td>5</td>
+                        <td>12,450,000 ₫</td>
+                    </tr>
+                    <tr>
+                        <td>#KH-0002</td>
+                        <td>Công ty TNHH B</td>
+                        <td>02838223344</td>
+                        <td>info@companyb.com</td>
+                        <td>Doanh nghiệp</td>
+                        <td>Q.Cầu Giấy, Hà Nội</td>
+                        <td>12</td>
+                        <td>45,780,000 ₫</td>
+                    </tr>
+                    <tr>
+                        <td>#KH-0003</td>
+                        <td>Trần Thị C</td>
+                        <td>0987654321</td>
+                        <td>tranthic@email.com</td>
+                        <td>VIP</td>
+                        <td>Q.Hải Châu, Đà Nẵng</td>
+                        <td>8</td>
+                        <td>28,150,000 ₫</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="pagination">
+                <div class="page-item active">1</div>
+                <div class="page-item">2</div>
+                <div class="page-item">3</div>
+                <div class="page-item">...</div>
+                <div class="page-item">10</div>
+            </div>
+        </div>
+        
+        <!-- Linh kiện -->
+<div class="search-container hidden" id="components">
+    <div class="search-header">
+        <div class="search-title">Tìm kiếm Linh kiện</div>
+        <div class="search-actions">
+            <button class="btn btn-secondary">Làm mới</button>
+            <button class="btn btn-primary">Tìm kiếm</button>
+        </div>
+    </div>
+    
+    <div class="search-fields">
+        <div class="form-group">
+            <label for="comp-id">Mã linh kiện</label>
+            <input type="text" id="comp-id" placeholder="Nhập mã linh kiện...">
+        </div>
+        
+        <div class="form-group">
+            <label for="comp-name">Tên linh kiện</label>
+            <input type="text" id="comp-name" placeholder="Nhập tên linh kiện...">
+        </div>
+        
+        <div class="form-group">
+            <label for="comp-type">Loại linh kiện</label>
+            <select id="comp-type">
+                <option value="">Tất cả</option>
+                <option value="cpu">CPU</option>
+                <option value="ram">RAM</option>
+                <option value="hdd">Ổ cứng</option>
+                <option value="screen">Màn hình</option>
+                <option value="keyboard">Bàn phím</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="comp-manu">Nhà sản xuất</label>
+            <select id="comp-manu">
+                <option value="">Tất cả</option>
+                <option value="intel">Intel</option>
+                <option value="amd">AMD</option>
+                <option value="samsung">Samsung</option>
+                <option value="kingston">Kingston</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Khoảng giá</label>
+            <div class="price-range-container">
+                <input type="number" id="comp-price-from" placeholder="Từ" class="price-input">
+                <span class="price-separator">-</span>
+                <input type="number" id="comp-price-to" placeholder="Đến" class="price-input">
+                <select id="price-unit" class="price-unit">
+                    <option value="vnd">VND</option>
+                    <option value="usd">USD</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Các mức giá</label>
+            <div class="price-quick-select">
+                <button class="price-quick-btn">80.000đ</button>
+                <button class="price-quick-btn">500.000đ</button>
+                <button class="price-quick-btn">1.000.000đ</button>
+                <button class="price-quick-btn">5.000.000đ</button>
+                <button class="price-quick-btn">10.000.000đ</button>
+            </div>
+        </div>
+
+        <div class="price-range-wrapper">
+            <label><strong>Giá</strong></label>
+            <div class="price-inputs">
+            <input type="text" id="minPrice" readonly>
+            <input type="text" id="maxPrice" readonly>
+            </div>
+
+            <div class="slider-container">
+            <div class="slider-track"></div>
+            <div class="slider-range" id="slider-range"></div>
+
+            <input type="range" id="rangeMin" min="1000000" max="200000000" style="border: none;" value="63656000" step="1000">
+            <input type="range" id="rangeMax" min="1000000" max="200000000" style="border: none;" value="137828000" step="1000">
+            </div>
+        </div>
+
+        
+        <div class="form-group">
+            <label for="comp-warranty">Bảo hành</label>
+            <select id="comp-warranty">
+                <option value="">Tất cả</option>
+                <option value="6">6 tháng</option>
+                <option value="12">12 tháng</option>
+                <option value="24">24 tháng</option>
+                <option value="36">36 tháng</option>
+            </select>
+        </div>
+    </div>
+            
+            <div class="filter-sort">
+                <div class="filter-section">
+                    <span>Lọc theo:</span>
+                    <select>
+                        <option>Tình trạng</option>
+                        <option>Còn hàng</option>
+                        <option>Hết hàng</option>
+                        <option>Sắp về hàng</option>
+                    </select>
+                    <select>
+                        <option>Nhà cung cấp</option>
+                        <option>Công ty A</option>
+                        <option>Công ty B</option>
+                        <option>Công ty C</option>
+                    </select>
+                </div>
+                
+                <div class="sort-section">
+                    <span>Sắp xếp theo:</span>
+                    <select>
+                        <option>Tên A-Z</option>
+                        <option>Tên Z-A</option>
+                        <option>Giá thấp nhất</option>
+                        <option>Giá cao nhất</option>
+                        <option>Bảo hành dài nhất</option>
+                    </select>
+                </div>
+            </div>
+            
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Mã linh kiện</th>
+                        <th>Tên linh kiện</th>
+                        <th>Loại</th>
+                        <th>Nhà SX</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Bảo hành</th>
+                        <th>Điều kiện BH</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#LK-001</td>
+                        <td>CPU Intel Core i7 10700</td>
+                        <td>CPU</td>
+                        <td>Intel</td>
+                        <td>7,500,000 ₫</td>
+                        <td>15</td>
+                        <td>36 tháng</td>
+                        <td>Không ép xung</td>
+                    </tr>
+                    <tr>
+                        <td>#LK-002</td>
+                        <td>RAM Kingston 8GB DDR4</td>
+                        <td>RAM</td>
+                        <td>Kingston</td>
+                        <td>1,200,000 ₫</td>
+                        <td>42</td>
+                        <td>Lifetime</td>
+                        <td>Không vật lý</td>
+                    </tr>
+                    <tr>
+                        <td>#LK-003</td>
+                        <td>SSD Samsung 970 EVO 500GB</td>
+                        <td>Ổ cứng</td>
+                        <td>Samsung</td>
+                        <td>2,300,000 ₫</td>
+                        <td>28</td>
+                        <td>60 tháng</td>
+                        <td>Không tháo rời</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="pagination">
+                <div class="page-item active">1</div>
+                <div class="page-item">2</div>
+                <div class="page-item">3</div>
+                <div class="page-item">...</div>
+                <div class="page-item">10</div>
+            </div>
+        </div>
+        
+        <!-- Bảo hành -->
+        <div class="search-container hidden" id="warranty">
+            <div class="search-header">
+                <div class="search-title">Tìm kiếm Bảo hành</div>
+                <div class="search-actions">
+                    <button class="btn btn-secondary">Làm mới</button>
+                    <button class="btn btn-primary">Tìm kiếm</button>
+                </div>
+            </div>
+            
+            <div class="search-fields">
+                <div class="form-group">
+                    <label for="war-code">Mã bảo hành</label>
+                    <input type="text" id="war-code" placeholder="Nhập mã bảo hành...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="war-order">Mã đơn dịch vụ</label>
+                    <input type="text" id="war-order" placeholder="Nhập mã đơn dịch vụ...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="war-component">Mã linh kiện</label>
+                    <input type="text" id="war-component" placeholder="Nhập mã linh kiện...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="war-customer">Khách hàng</label>
+                    <input type="text" id="war-customer" placeholder="Nhập tên hoặc SĐT KH...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="war-status">Trạng thái</label>
+                    <select id="war-status">
+                        <option value="">Tất cả</option>
+                        <option value="active">Đang bảo hành</option>
+                        <option value="expired">Hết hạn</option>
+                        <option value="used">Đã sử dụng</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="war-from">Từ ngày</label>
+                    <input type="date" id="war-from">
+                </div>
+                
+                <div class="form-group">
+                    <label for="war-to">Đến ngày</label>
+                    <input type="date" id="war-to">
+                </div>
+            </div>
+            
+            <div class="filter-sort">
+                <div class="filter-section">
+                    <span>Lọc theo:</span>
+                    <select>
+                        <option>Loại linh kiện</option>
+                        <option>CPU</option>
+                        <option>RAM</option>
+                        <option>Ổ cứng</option>
+                        <option>Màn hình</option>
+                    </select>
+                    <select>
+                        <option>Nhà sản xuất</option>
+                        <option>Intel</option>
+                        <option>AMD</option>
+                        <option>Samsung</option>
+                        <option>Kingston</option>
+                    </select>
+                </div>
+                
+                <div class="sort-section">
+                    <span>Sắp xếp theo:</span>
+                    <select>
+                        <option>Ngày kích hoạt (mới nhất)</option>
+                        <option>Ngày kích hoạt (cũ nhất)</option>
+                        <option>Ngày hết hạn (sớm nhất)</option>
+                        <option>Ngày hết hạn (muộn nhất)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Mã BH</th>
+                        <th>Mã đơn</th>
+                        <th>Linh kiện</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày kích hoạt</th>
+                        <th>Ngày hết hạn</th>
+                        <th>Trạng thái</th>
+                        <th>Điều kiện</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#BH-0001</td>
+                        <td>#DV-0012</td>
+                        <td>CPU Intel Core i5</td>
+                        <td>Nguyễn Văn A</td>
+                        <td>15/03/2023</td>
+                        <td>15/03/2026</td>
+                        <td><span class="status status-confirmed">Đang BH</span></td>
+                        <td>Không ép xung</td>
+                    </tr>
+                    <tr>
+                        <td>#BH-0002</td>
+                        <td>#DV-0045</td>
+                        <td>RAM Kingston 16GB</td>
+                        <td>Trần Thị B</td>
+                        <td>20/01/2022</td>
+                        <td>20/01/2025</td>
+                        <td><span class="status status-confirmed">Đang BH</span></td>
+                        <td>Không vật lý</td>
+                    </tr>
+                    <tr>
+                        <td>#BH-0003</td>
+                        <td>#DV-0078</td>
+                        <td>SSD Samsung 1TB</td>
+                        <td>Lê Văn C</td>
+                        <td>05/12/2021</td>
+                        <td>05/12/2023</td>
+                        <td><span class="status status-cancelled">Hết hạn</span></td>
+                        <td>Không tháo rời</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="pagination">
+                <div class="page-item active">1</div>
+                <div class="page-item">2</div>
+                <div class="page-item">3</div>
+                <div class="page-item">...</div>
+                <div class="page-item">10</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.search-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Hide all search containers
+                document.querySelectorAll('.search-container').forEach(container => {
+                    container.classList.add('hidden');
+                });
+                
+                // Show the selected search container
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.remove('hidden');
+            });
+        });
+        
+        // Dynamic district and ward selection based on city
+        document.getElementById('cus-city').addEventListener('change', function() {
+            const city = this.value;
+            const districtSelect = document.getElementById('cus-district');
+            const wardSelect = document.getElementById('cus-ward');
+            
+            // Reset districts and wards
+            districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+            wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+            districtSelect.disabled = true;
+            wardSelect.disabled = true;
+            
+            if (city) {
+                districtSelect.disabled = false;
+                
+                // Simulate loading districts based on city
+                let districts = [];
+                if (city === 'hanoi') {
+                    districts = [
+                        {id: 'cg', name: 'Cầu Giấy'},
+                        {id: 'hk', name: 'Hoàn Kiếm'},
+                        {id: 'bd', name: 'Ba Đình'}
+                    ];
+                } else if (city === 'hcm') {
+                    districts = [
+                        {id: 'q1', name: 'Quận 1'},
+                        {id: 'q3', name: 'Quận 3'},
+                        {id: 'bt', name: 'Bình Thạnh'}
+                    ];
+                } else if (city === 'danang') {
+                    districts = [
+                        {id: 'hc', name: 'Hải Châu'},
+                        {id: 'st', name: 'Sơn Trà'},
+                        {id: 'nt', name: 'Ngũ Hành Sơn'}
+                    ];
+                }
+                
+                districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district.id;
+                    option.textContent = district.name;
+                    districtSelect.appendChild(option);
+                });
+            }
+        });
+
+        // Xử lý khi click vào các nút giá nhanh
+    document.querySelectorAll('.price-quick-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const price = this.textContent.replace(/[^\d]/g, ''); // Lấy số từ text (bỏ ký tự không phải số)
+            document.getElementById('comp-price-to').value = price;
+            document.getElementById('comp-price-from').value = '';
+        });
+    });
+        
+        // Dynamic ward selection based on district
+        document.getElementById('cus-district').addEventListener('change', function() {
+            const district = this.value;
+            const wardSelect = document.getElementById('cus-ward');
+            
+            // Reset wards
+            wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+            wardSelect.disabled = true;
+            
+            if (district) {
+                wardSelect.disabled = false;
+                
+                // Simulate loading wards based on district
+                let wards = [];
+                if (district === 'cg' || district === 'hk' || district === 'bd') {
+                    // Hanoi districts
+                    wards = [
+                        {id: 'p1', name: 'Phường 1'},
+                        {id: 'p2', name: 'Phường 2'},
+                        {id: 'p3', name: 'Phường 3'}
+                    ];
+                } else if (district === 'q1' || district === 'q3' || district === 'bt') {
+                    // HCM districts
+                    wards = [
+                        {id: 'p1', name: 'Phường Bến Nghé'},
+                        {id: 'p2', name: 'Phường Bến Thành'},
+                        {id: 'p3', name: 'Phường Nguyễn Thái Bình'}
+                    ];
+                } else if (district === 'hc' || district === 'st' || district === 'nt') {
+                    // Da Nang districts
+                    wards = [
+                        {id: 'p1', name: 'Phường Hòa Cường'},
+                        {id: 'p2', name: 'Phường Hòa Thuận'},
+                        {id: 'p3', name: 'Phường Thanh Bình'}
+                    ];
+                }
+                
+                wards.forEach(ward => {
+                    const option = document.createElement('option');
+                    option.value = ward.id;
+                    option.textContent = ward.name;
+                    wardSelect.appendChild(option);
+                });
+            }
+        });
+    </script>
+
+    <script>
+        const rangeMin = document.getElementById("rangeMin");
+        const rangeMax = document.getElementById("rangeMax");
+        const minPrice = document.getElementById("minPrice");
+        const maxPrice = document.getElementById("maxPrice");
+        const sliderRange = document.getElementById("slider-range");
+
+        function formatCurrency(value) {
+        return parseInt(value).toLocaleString('vi-VN') + "₫";
+        }
+
+        function updateSlider() {
+        let minVal = parseInt(rangeMin.value);
+        let maxVal = parseInt(rangeMax.value);
+
+        if (minVal > maxVal - 1000000) {
+            minVal = maxVal - 1000000;
+            rangeMin.value = minVal;
+        }
+        if (maxVal < minVal + 1000000) {
+            maxVal = minVal + 1000000;
+            rangeMax.value = maxVal;
+        }
+
+        const rangeWidth = parseInt(rangeMin.max) - parseInt(rangeMin.min);
+        const leftPercent = ((minVal - parseInt(rangeMin.min)) / rangeWidth) * 100;
+        const rightPercent = ((maxVal - parseInt(rangeMin.min)) / rangeWidth) * 100;
+
+        sliderRange.style.left = leftPercent + "%";
+        sliderRange.style.width = (rightPercent - leftPercent) + "%";
+
+        minPrice.value = formatCurrency(minVal);
+        maxPrice.value = formatCurrency(maxVal);
+        }
+
+        rangeMin.addEventListener("input", updateSlider);
+        rangeMax.addEventListener("input", updateSlider);
+        window.addEventListener("DOMContentLoaded", updateSlider);
+    </script>
+
+</body>
+</html>
