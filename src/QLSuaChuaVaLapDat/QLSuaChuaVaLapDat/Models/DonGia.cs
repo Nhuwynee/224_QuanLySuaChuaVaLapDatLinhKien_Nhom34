@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace QLSuaChuaVaLapDat.Models;
 
-public partial class DonGium
+public partial class DonGia
 {
     public string IdDonGia { get; set; } = null!;
 

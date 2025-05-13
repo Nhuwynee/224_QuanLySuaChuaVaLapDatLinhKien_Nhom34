@@ -1,4 +1,4 @@
-﻿namespace QLSuaChuaVaLapDat.Models
+﻿namespace QLSuaChuaVaLapDat.Models.viewmodel
 {
     public class DonDichVuPagedViewModel
     {

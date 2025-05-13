@@ -23,7 +23,7 @@ public partial class QuanLySuaChuaVaLapDatContext : DbContext
 
     public virtual DbSet<DonDichVu> DonDichVus { get; set; }
 
-    public virtual DbSet<DonGium> DonGia { get; set; }
+    public virtual DbSet<DonGia> DonGia { get; set; }
 
     public virtual DbSet<HinhAnh> HinhAnhs { get; set; }
 
@@ -257,7 +257,7 @@ public partial class QuanLySuaChuaVaLapDatContext : DbContext
                 .HasConstraintName("FK__DonDichVu__idUse__7C4F7684");
         });
 
-        modelBuilder.Entity<DonGium>(entity =>
+        modelBuilder.Entity<DonGia>(entity =>
         {
             entity.HasKey(e => e.IdDonGia).HasName("PK__DonGia__3C885D6EE263457F");
 

@@ -439,19 +439,37 @@
                     <div class="split">
                     <!-- First row: Chọn linh kiện and Tiền khách hàng ứng trước in one row -->
                     <div class="two-column-row">
+                        @* <div class="form-group"> *@
+                        @*     <label>Chọn linh kiện thay thế:</label> *@
+                        @*     <div class="search-parts"> *@
+                        @*         <input type="text" id="partSearchInput" placeholder="Tìm kiếm linh kiện..."> *@
+                        @*         <i class="fa-solid fa-magnifying-glass search-icon"></i> *@
+                        @*         <div id="partsDropdown" class="parts-dropdown-content"> *@
+                        @*             <!-- Dropdown content will be populated by JavaScript --> *@
+                        @*         </div> *@
+                        @*     </div> *@
+                        @*     <div class="parts-list" id="selectedParts"> *@
+                        @*         <!-- Selected parts will appear here --> *@
+                        @*     </div> *@
+                        @* </div> *@
                         <div class="form-group">
                             <label>Chọn linh kiện thay thế:</label>
-                            <div class="search-parts">
+                            <div class="search-parts" style="position: relative;">
                                 <input type="text" id="partSearchInput" placeholder="Tìm kiếm linh kiện...">
                                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                                <div id="partsDropdown" class="parts-dropdown-content">
-                                    <!-- Dropdown content will be populated by JavaScript -->
+
+                                <!-- Gợi ý linh kiện hiển thị ở đây -->
+                                <div id="partsDropdown" class="parts-dropdown-content" 
+                                     style="position: absolute; background: white; border: 1px solid #ccc; z-index: 1000; width: 100%;">
                                 </div>
                             </div>
-                            <div class="parts-list" id="selectedParts">
-                                <!-- Selected parts will appear here -->
+
+                            <!-- Linh kiện đã chọn sẽ hiển thị tại đây -->
+                            <div class="parts-list" id="selectedParts" style="margin-top: 10px;">
+                                <!-- JS thêm phần tử vào đây -->
                             </div>
                         </div>
+
                         
                         <div class="form-group">
                             <label>Tiền khách hàng ứng trước (VND):</label>
@@ -493,7 +511,7 @@
         </main>
     </div>
 
-    <script src="/js/tddvkvl.js"></script>
+    <script src="/js/tddvkvl2.js"></script>
     
     <script>
         function confirmBack() {
