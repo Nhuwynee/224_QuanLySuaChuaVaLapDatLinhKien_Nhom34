@@ -230,8 +230,7 @@
                                         <h6 class="mb-0"><i class="fa-solid fa-info-circle me-2"></i>Thông tin cơ bản</h6>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
+                                        <div class="row">                                            <div class="col-md-6">
                                                 <div class="form-group d-flex">
                                                     <label class="col-5 font-weight-bold">Mã đơn:</label>
                                                     <span id="detail-madon" class="col-7 text-primary font-weight-bold"></span>
@@ -330,8 +329,21 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>                            <!-- Thông tin lỗi -->
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fa-solid fa-bug me-2"></i>Thông tin lỗi</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="error-detail-container">
+                                        <!-- Chi tiết lỗi sẽ được thêm vào đây bằng JavaScript -->
+                                        <div class="text-center text-muted" id="no-error-message">
+                                            <i class="fa fa-info-circle me-2"></i>Không có thông tin lỗi.
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-
+                            
                             <!-- Thông tin thời gian -->
                             <div class="card">
                                 <div class="card-header bg-light">
@@ -418,27 +430,45 @@
 
                 #orderDetailModal span:not(.badge) {
                     color: #212529;
-                }
-
-                /* Badge styling for status */
+                }                /* Badge styling for status */
                 #detail-trangthai .badge {
                     padding: 0.4rem 0.6rem;
                 }
-
-                @@media (max-width: 767.98px) {
-                    #orderDetailModal .form-group.d-flex
-
-                {
-                    flex-direction: column;
+                
+                /* Error detail table styling */
+                #error-detail-container table {
+                    font-size: 14px;
+                    margin-top: 10px;
                 }
-
-                #orderDetailModal .form-group.d-flex label,
-                #orderDetailModal .form-group.d-flex span {
-                    width: 100%;
-                    max-width: 100%;
-                    flex: 0 0 100%;
+                
+                #error-detail-container th {
+                    background-color: #f8f9fa;
                 }
-
+                
+                #error-detail-container .table td, 
+                #error-detail-container .table th {
+                    padding: 0.5rem;
+                    vertical-align: middle;
+                }
+                
+                #no-error-message {
+                    padding: 20px;
+                    color: #6c757d;
+                }                @@media (max-width: 767.98px) {
+                    #orderDetailModal .form-group.d-flex {
+                        flex-direction: column;
+                    }
+                
+                    #orderDetailModal .form-group.d-flex label,
+                    #orderDetailModal .form-group.d-flex span {
+                        width: 100%;
+                        max-width: 100%;
+                        flex: 0 0 100%;
+                    }
+                
+                    #error-detail-container .table {
+                        font-size: 12px;
+                    }
                 }
             </style>
 
@@ -483,13 +513,51 @@
                         $('#detail-ngaytaodon').text(ngayTao);
                         $('#detail-ngayhoanthanh').text(ngayHoanThanh);
                         $('#detail-nvkythuat').text(data.tenNhanVienKyThuat);
-                        $('#detail-nguoitaodon').text(data.tenNguoiTaoDon);
-                        $('#detail-tenthietbi').text(data.tenThietBi);
+                        $('#detail-nguoitaodon').text(data.tenNguoiTaoDon);                        $('#detail-tenthietbi').text(data.tenThietBi);
                         $('#detail-loaithietbi').text(data.loaiThietBi);
                         $('#detail-hinhthuc').text(data.hinhThucDichVu);
                         $('#detail-loaidon').text(data.loaiDonDichVu);
                         $('#detail-phuongthuc').text(data.phuongThucThanhToan || 'N/A');
                         $('#detail-tongtien').text(tongTien);
+                          // Thông tin lỗi - Hiển thị tất cả các chi tiết lỗi
+                        var errorContainer = $('#error-detail-container');
+                        errorContainer.empty(); // Xóa nội dung cũ
+                        
+                        if (data.danhSachChiTietLoi && data.danhSachChiTietLoi.length > 0) {
+                            $('#no-error-message').hide();
+                            
+                            // Tạo bảng để hiển thị các chi tiết lỗi
+                            var table = $('<table class="table table-striped table-bordered"></table>');
+                            var thead = $('<thead class="thead-light"></thead>');
+                            var headerRow = $('<tr></tr>');
+                            headerRow.append('<th scope="col">#</th>');
+                            headerRow.append('<th scope="col">Linh kiện</th>');
+                            headerRow.append('<th scope="col">Lỗi</th>');
+                            headerRow.append('<th scope="col">Mô tả</th>');
+                            headerRow.append('<th scope="col">Đơn giá</th>');
+                            headerRow.append('<th scope="col">Số lượng</th>');
+                            thead.append(headerRow);
+                            
+                            var tbody = $('<tbody></tbody>');
+                            $.each(data.danhSachChiTietLoi, function(index, item) {
+                                var row = $('<tr></tr>');
+                                row.append('<td>' + (index + 1) + '</td>');
+                                row.append('<td>' + (item.tenLinhKien || 'Không có') + '</td>');
+                                row.append('<td>' + (item.moTaLoi || 'Không có') + '</td>');
+                                row.append('<td>' + (item.moTaChiTiet || 'Không có') + '</td>');
+                                var donGia = item.donGiaLoi ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.donGiaLoi) : '0 ₫';
+                                row.append('<td class="text-danger">' + donGia + '</td>');
+                                row.append('<td>' + item.soLuong + '</td>');
+                                tbody.append(row);
+                            });
+                            
+                            table.append(thead);
+                            table.append(tbody);
+                            errorContainer.append(table);
+                        } else {
+                            // Hiển thị thông báo không có thông tin lỗi
+                            $('#no-error-message').show();
+                        }
 
                         // Set status with appropriate badge color
                         var statusBadge = $('#detail-trangthai .badge');

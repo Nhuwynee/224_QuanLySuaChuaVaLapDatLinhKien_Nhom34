@@ -17,5 +17,14 @@
         public decimal TongTien { get; set; }
         public string TrangThaiDon { get; set; }
         public DateTime? NgayChinhSua { get; set; }
+        
+        // Thông tin lỗi - Giữ lại để tương thích với code cũ
+        public string TenLinhKien { get; set; }
+        public string MoTaLoi { get; set; }
+        public string MoTaChiTiet { get; set; }
+        public decimal DonGiaLoi { get; set; }
+        
+        // Danh sách chi tiết lỗi
+        public List<ChiTietLoiViewModel> DanhSachChiTietLoi { get; set; } = new List<ChiTietLoiViewModel>();
     }
 }

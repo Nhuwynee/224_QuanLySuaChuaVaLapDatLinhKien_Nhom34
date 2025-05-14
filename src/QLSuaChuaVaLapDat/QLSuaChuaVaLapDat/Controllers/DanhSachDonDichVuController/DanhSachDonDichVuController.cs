@@ -73,9 +73,7 @@ namespace QLSuaChuaVaLapDat.Controllers.DanhSachDonDichVuController
             };
 
             return View("IndexDSDDV",viewModel);
-        }
-
-        [HttpGet]
+        }        [HttpGet]
         public IActionResult ChiTietDonDichVu(string id)
         {
             var chiTiet = (from don in _context.DonDichVus
@@ -109,6 +107,43 @@ namespace QLSuaChuaVaLapDat.Controllers.DanhSachDonDichVuController
             if (chiTiet == null)
             {
                 return NotFound();
+            }            // Lấy thông tin lỗi từ ChiTietDonDichVu
+            var danhSachChiTietLoi = (from ctdv in _context.ChiTietDonDichVus
+                join lk in _context.LinhKiens on ctdv.IdLinhKien equals lk.IdLinhKien into lkJoin
+                from lk in lkJoin.DefaultIfEmpty()
+                join ll in _context.LoaiLois on ctdv.IdLoi equals ll.IdLoi into llJoin
+                from ll in llJoin.DefaultIfEmpty()
+                where ctdv.IdDonDichVu == id
+                select new ChiTietLoiViewModel { 
+                    IdChiTiet = ctdv.IdCtdh,
+                    TenLinhKien = lk != null ? lk.TenLinhKien : "Không có",
+                    MoTaLoi = ll != null ? ll.MoTaLoi : "Không có",
+                    MoTaChiTiet = ctdv.MoTa ?? "Không có",
+                    DonGiaLoi = lk != null ? lk.Gia : 0,
+                    SoLuong = ctdv.SoLuong,
+                    LoaiDichVu = ctdv.LoaiDichVu,
+                    NgayKetThucBh = ctdv.NgayKetThucBh != null ? new DateTime(ctdv.NgayKetThucBh.Value.Year, ctdv.NgayKetThucBh.Value.Month, ctdv.NgayKetThucBh.Value.Day) : null,
+                    ThoiGianThemLinhKien = ctdv.ThoiGianThemLinhKien,
+                    HanBaoHanh = ctdv.HanBaoHanh
+                }).ToList();
+
+            if (danhSachChiTietLoi.Any())
+            {
+                chiTiet.DanhSachChiTietLoi = danhSachChiTietLoi;
+                
+                // Giữ lại cho tương thích với code cũ
+                var chiTietDauTien = danhSachChiTietLoi.First();
+                chiTiet.TenLinhKien = chiTietDauTien.TenLinhKien;
+                chiTiet.MoTaLoi = chiTietDauTien.MoTaLoi;
+                chiTiet.MoTaChiTiet = chiTietDauTien.MoTaChiTiet;
+                chiTiet.DonGiaLoi = chiTietDauTien.DonGiaLoi;
+            }
+            else
+            {
+                chiTiet.TenLinhKien = "Không có";
+                chiTiet.MoTaLoi = "Không có";
+                chiTiet.MoTaChiTiet = "Không có";
+                chiTiet.DonGiaLoi = 0;
             }
 
             return Json(chiTiet);
