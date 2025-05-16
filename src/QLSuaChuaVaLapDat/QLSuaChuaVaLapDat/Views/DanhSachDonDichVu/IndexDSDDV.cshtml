@@ -329,7 +329,8 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>                            <!-- Thông tin lỗi -->
+                            </div>                            
+                            <!-- Thông tin lỗi -->
                             <div class="card mb-3">
                                 <div class="card-header bg-light">
                                     <h6 class="mb-0"><i class="fa-solid fa-bug me-2"></i>Thông tin lỗi</h6>
@@ -538,14 +539,21 @@
                             headerRow.append('<th scope="col">Số lượng</th>');
                             thead.append(headerRow);
                             
-                            var tbody = $('<tbody></tbody>');
-                            $.each(data.danhSachChiTietLoi, function(index, item) {
+                            var tbody = $('<tbody></tbody>');                            
+                                $.each(data.danhSachChiTietLoi, function(index, item) {
                                 var row = $('<tr></tr>');
                                 row.append('<td>' + (index + 1) + '</td>');
                                 row.append('<td>' + (item.tenLinhKien || 'Không có') + '</td>');
                                 row.append('<td>' + (item.moTaLoi || 'Không có') + '</td>');
-                                row.append('<td>' + (item.moTaChiTiet || 'Không có') + '</td>');
-                                var donGia = item.donGiaLoi ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.donGiaLoi) : '0 ₫';
+                                row.append('<td>' + (item.moTaChiTiet || 'Không có') + '</td>');                                // Kiểm tra nếu item và donGiaLoi tồn tại, nếu không dùng 0
+                                var price = item.donGiaLoi;
+                                
+                                // Đảm bảo giá trị luôn là một số
+                                if (price === null || price === undefined || isNaN(price)) {
+                                    price = 0;
+                                }
+                                
+                                var donGia = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
                                 row.append('<td class="text-danger">' + donGia + '</td>');
                                 row.append('<td>' + item.soLuong + '</td>');
                                 tbody.append(row);

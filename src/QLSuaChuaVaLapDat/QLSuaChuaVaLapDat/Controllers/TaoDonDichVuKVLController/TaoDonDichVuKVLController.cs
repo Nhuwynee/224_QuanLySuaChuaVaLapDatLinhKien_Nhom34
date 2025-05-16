@@ -41,7 +41,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
             return View();
         }        
         
-        [HttpGet]
+          [HttpGet]
         public IActionResult TimKiemLinhKien(string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword))
@@ -62,6 +62,42 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                 }).Take(10).ToList(); // Limiting to 10 results for better performance
 
             return Json(result);
+        }
+        
+
+        //lấy danh sách chuyên môn và nhân viên
+        [HttpGet]
+        public IActionResult LayDanhSachChuyenMon()
+        {
+            var chuyenMon = _context.Users
+                .Where(u => u.ChuyenMon != null && u.ChuyenMon.Length > 0)
+                .Select(u => u.ChuyenMon)
+                .Distinct()
+                .ToList();
+                
+            return Json(chuyenMon);
+        }        
+        
+        [HttpGet]
+        public IActionResult LayNhanVienTheoChuyenMon(string chuyenMon)
+        {
+            if (string.IsNullOrWhiteSpace(chuyenMon))
+            {
+                return Json(new List<UserViewModel>());
+            }
+            
+            var nhanVien = _context.Users
+                .Where(u => u.ChuyenMon == chuyenMon && u.IdRole == "R002")
+                .Select(u => new UserViewModel
+                {
+                    IdUser = u.IdUser,
+                    HoVaTen = u.HoVaTen,
+                    ChuyenMon = u.ChuyenMon,
+                    SDT = u.Sdt
+                })
+                .ToList();
+                
+            return Json(nhanVien);
         }
 
 
