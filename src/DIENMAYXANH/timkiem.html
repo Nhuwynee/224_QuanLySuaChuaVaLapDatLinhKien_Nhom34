@@ -14,6 +14,7 @@
             --success-color: #2ecc71;
             --warning-color: #f39c12;
             --danger-color: #e74c3c;
+            --highlight-color: #e8f4f8; /* Color for selected rows */
         }
         
         * {
@@ -131,6 +132,33 @@
             background-color: #e0e0e0;
         }
         
+        .btn-edit {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background-color: #d35400;
+        }
+        
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-lock {
+            background-color: #7f8c8d;
+            color: white;
+        }
+        
+        .btn-lock:hover {
+            background-color: #6c7a89;
+        }
+        
         .search-fields {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -196,6 +224,10 @@
             background-color: rgba(52, 152, 219, 0.1);
         }
         
+        .results-table tr.selected {
+            background-color: var(--highlight-color);
+        }
+        
         .status {
             display: inline-block;
             padding: 4px 8px;
@@ -251,6 +283,7 @@
         .hidden {
             display: none;
         }
+        
         .price-range-container {
             display: flex;
             align-items: center;
@@ -296,91 +329,99 @@
             background-color: #e0e0e0;
         }
 
-        /* CSS Thanh trượt giá linh kieejnb */
+        .price-range-wrapper {
+            max-width: 400px;
+        }
 
-         .price-range-wrapper {
-      max-width: 400px;
-    }
+        .price-inputs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
 
-    .price-inputs {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
+        .price-inputs input {
+            width: 48%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
 
-    .price-inputs input {
-      width: 48%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      text-align: center;
-      font-size: 16px;
-      font-weight: bold;
-    }
+        .slider-container {
+            position: relative;
+            height: 36px;
+        }
 
-    .slider-container {
-      position: relative;
-      height: 36px;
-    }
+        .slider-container input[type=range] {
+            position: absolute;
+            width: 100%;
+            pointer-events: none;
+            appearance: none;
+            height: 6px;
+            background: transparent;
+        }
 
-    .slider-container input[type=range] {
-      position: absolute;
-      width: 100%;
-      pointer-events: none;
-      appearance: none;
-      height: 6px;
-      background: transparent;
-    }
+        .slider-track {
+            position: absolute;
+            height: 6px;
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 3px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
 
-    .slider-track {
-      position: absolute;
-      height: 6px;
-      width: 100%;
-      background-color: #ddd;
-      border-radius: 3px;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 1;
-    }
+        .slider-range {
+            position: absolute;
+            height: 6px;
+            background-color: #4CAF50;
+            border-radius: 3px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
 
-    .slider-range {
-      position: absolute;
-      height: 6px;
-      background-color: #4CAF50;
-      border-radius: 3px;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 2;
-    }
+        input[type=range]::-webkit-slider-thumb {
+            pointer-events: auto;
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background-color: #75b940;
+            border: 2px solid white;
+            cursor: pointer;
+            z-index: 3;
+            position: relative;
+            margin-top: 20px !important;
+        }
 
-    input[type=range]::-webkit-slider-thumb {
-      pointer-events: auto;
-      appearance: none;
-      height: 20px;
-      width: 20px;
-      border-radius: 50%;
-      background-color: #75b940;
-      border: 2px solid white;
-      cursor: pointer;
-      z-index: 3;
-      position: relative;
-      margin-top: 20px !important;
-    }
+        input[type=range]::-moz-range-thumb {
+            pointer-events: auto;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background-color: #75b940;
+            border: none;
+            cursor: pointer;
+            z-index: 3;
+            position: relative;
+            margin-top: 20px !important;
+        }
 
-    input[type=range]::-moz-range-thumb {
-      pointer-events: auto;
-      height: 20px;
-      width: 20px;
-      border-radius: 50%;
-      background-color: #75b940;
-      border: none;
-      cursor: pointer;
-      z-index: 3;
-      position: relative;
-      margin-top: 20px !important;
-    }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
 
-
+        .select-all-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -481,9 +522,14 @@
                 </div>
             </div>
             
+            <div class="select-all-container">
+                <label for="select-all-service-orders" style="margin-top: 15px;">Chọn tất cả</label>
+            </div>
+            
             <table class="results-table">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" class="select-all" data-table="service-orders"></th>
                         <th>Mã đơn</th>
                         <th>Khách hàng</th>
                         <th>Thiết bị</th>
@@ -492,10 +538,12 @@
                         <th>Tổng tiền</th>
                         <th>Ngày tạo</th>
                         <th>Cập nhật</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#DV-00001</td>
                         <td>Nguyễn Văn A</td>
                         <td>Laptop Dell XPS</td>
@@ -504,8 +552,10 @@
                         <td>1,250,000 ₫</td>
                         <td>15/06/2023</td>
                         <td>Hôm nay</td>
+                        <td><button class="btn btn-edit">Sửa</button></td>
                     </tr>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#DV-00002</td>
                         <td>Trần Thị B</td>
                         <td>iPhone 13 Pro</td>
@@ -514,8 +564,10 @@
                         <td>0 ₫</td>
                         <td>14/06/2023</td>
                         <td>Hôm qua</td>
+                        <td><button class="btn btn-edit">Sửa</button></td>
                     </tr>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#DV-00003</td>
                         <td>Lê Văn C</td>
                         <td>Máy in HP</td>
@@ -524,6 +576,7 @@
                         <td>850,000 ₫</td>
                         <td>10/06/2023</td>
                         <td>12/06/2023</td>
+                        <td><button class="btn btn-edit">Sửa</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -570,6 +623,7 @@
                         <option value="regular">Thường</option>
                         <option value="vip">VIP</option>
                         <option value="business">Doanh nghiệp</option>
+                        <option value="guest">Vãng lai</option>
                     </select>
                 </div>
                 
@@ -625,9 +679,14 @@
                 </div>
             </div>
             
+            <div class="select-all-container">
+                <label for="select-all-customers" style="margin-top: 15px;">Chọn tất cả</label>
+            </div>
+            
             <table class="results-table">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" class="select-all" data-table="customers"></th>
                         <th>Mã KH</th>
                         <th>Tên khách hàng</th>
                         <th>Số điện thoại</th>
@@ -636,10 +695,12 @@
                         <th>Địa chỉ</th>
                         <th>Tổng đơn</th>
                         <th>Tổng chi tiêu</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#KH-0001</td>
                         <td>Nguyễn Văn A</td>
                         <td>0912345678</td>
@@ -648,8 +709,13 @@
                         <td>Q.1, TP.HCM</td>
                         <td>5</td>
                         <td>12,450,000 ₫</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit">Sửa</button>
+                            <button class="btn btn-lock">Khóa</button>
+                        </td>
                     </tr>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#KH-0002</td>
                         <td>Công ty TNHH B</td>
                         <td>02838223344</td>
@@ -658,16 +724,24 @@
                         <td>Q.Cầu Giấy, Hà Nội</td>
                         <td>12</td>
                         <td>45,780,000 ₫</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit">Sửa</button>
+                            <button class="btn btn-lock">Khóa</button>
+                        </td>
                     </tr>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#KH-0003</td>
                         <td>Trần Thị C</td>
                         <td>0987654321</td>
                         <td>tranthic@email.com</td>
-                        <td>VIP</td>
+                        <td>Vãng lai</td>
                         <td>Q.Hải Châu, Đà Nẵng</td>
                         <td>8</td>
                         <td>28,150,000 ₫</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit">Sửa</button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -682,101 +756,99 @@
         </div>
         
         <!-- Linh kiện -->
-<div class="search-container hidden" id="components">
-    <div class="search-header">
-        <div class="search-title">Tìm kiếm Linh kiện</div>
-        <div class="search-actions">
-            <button class="btn btn-secondary">Làm mới</button>
-            <button class="btn btn-primary">Tìm kiếm</button>
-        </div>
-    </div>
-    
-    <div class="search-fields">
-        <div class="form-group">
-            <label for="comp-id">Mã linh kiện</label>
-            <input type="text" id="comp-id" placeholder="Nhập mã linh kiện...">
-        </div>
-        
-        <div class="form-group">
-            <label for="comp-name">Tên linh kiện</label>
-            <input type="text" id="comp-name" placeholder="Nhập tên linh kiện...">
-        </div>
-        
-        <div class="form-group">
-            <label for="comp-type">Loại linh kiện</label>
-            <select id="comp-type">
-                <option value="">Tất cả</option>
-                <option value="cpu">CPU</option>
-                <option value="ram">RAM</option>
-                <option value="hdd">Ổ cứng</option>
-                <option value="screen">Màn hình</option>
-                <option value="keyboard">Bàn phím</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="comp-manu">Nhà sản xuất</label>
-            <select id="comp-manu">
-                <option value="">Tất cả</option>
-                <option value="intel">Intel</option>
-                <option value="amd">AMD</option>
-                <option value="samsung">Samsung</option>
-                <option value="kingston">Kingston</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label>Khoảng giá</label>
-            <div class="price-range-container">
-                <input type="number" id="comp-price-from" placeholder="Từ" class="price-input">
-                <span class="price-separator">-</span>
-                <input type="number" id="comp-price-to" placeholder="Đến" class="price-input">
-                <select id="price-unit" class="price-unit">
-                    <option value="vnd">VND</option>
-                    <option value="usd">USD</option>
-                </select>
+        <div class="search-container hidden" id="components">
+            <div class="search-header">
+                <div class="search-title">Tìm kiếm Linh kiện</div>
+                <div class="search-actions">
+                    <button class="btn btn-secondary">Làm mới</button>
+                    <button class="btn btn-primary">Tìm kiếm</button>
+                </div>
             </div>
-        </div>
-        
-        <div class="form-group">
-            <label>Các mức giá</label>
-            <div class="price-quick-select">
-                <button class="price-quick-btn">80.000đ</button>
-                <button class="price-quick-btn">500.000đ</button>
-                <button class="price-quick-btn">1.000.000đ</button>
-                <button class="price-quick-btn">5.000.000đ</button>
-                <button class="price-quick-btn">10.000.000đ</button>
+            
+            <div class="search-fields">
+                <div class="form-group">
+                    <label for="comp-id">Mã linh kiện</label>
+                    <input type="text" id="comp-id" placeholder="Nhập mã linh kiện...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="comp-name">Tên linh kiện</label>
+                    <input type="text" id="comp-name" placeholder="Nhập tên linh kiện...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="comp-type">Loại linh kiện</label>
+                    <select id="comp-type">
+                        <option value="">Tất cả</option>
+                        <option value="cpu">CPU</option>
+                        <option value="ram">RAM</option>
+                        <option value="hdd">Ổ cứng</option>
+                        <option value="screen">Màn hình</option>
+                        <option value="keyboard">Bàn phím</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="comp-manu">Nhà sản xuất</label>
+                    <select id="comp-manu">
+                        <option value="">Tất cả</option>
+                        <option value="intel">Intel</option>
+                        <option value="amd">AMD</option>
+                        <option value="samsung">Samsung</option>
+                        <option value="kingston">Kingston</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Khoảng giá</label>
+                    <div class="price-range-container">
+                        <input type="number" id="comp-price-from" placeholder="Từ" class="price-input">
+                        <span class="price-separator">-</span>
+                        <input type="number" id="comp-price-to" placeholder="Đến" class="price-input">
+                        <select id="price-unit" class="price-unit">
+                            <option value="vnd">VND</option>
+                            <option value="usd">USD</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Các mức giá</label>
+                    <div class="price-quick-select">
+                        <button class="price-quick-btn">80.000đ</button>
+                        <button class="price-quick-btn">500.000đ</button>
+                        <button class="price-quick-btn">1.000.000đ</button>
+                        <button class="price-quick-btn">5.000.000đ</button>
+                        <button class="price-quick-btn">10.000.000đ</button>
+                    </div>
+                </div>
+
+                <div class="price-range-wrapper">
+                    <label><strong>Giá</strong></label>
+                    <div class="price-inputs">
+                        <input type="text" id="minPrice" readonly>
+                        <input type="text" id="maxPrice" readonly>
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-track"></div>
+                        <div class="slider-range" id="slider-range"></div>
+                        <input type="range" id="rangeMin" min="1000000" max="200000000" style="border: none;" value="63656000" step="1000">
+                        <input type="range" id="rangeMax" min="1000000" max="200000000" style="border: none;" value="137828000" step="1000">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="comp-warranty">Bảo hành</label>
+                    <select id="comp-warranty">
+                        <option value="">Tất cả</option>
+                        <option value="6">6 tháng</option>
+                        <option value="12">12 tháng</option>
+                        <option value="24">24 tháng</option>
+                        <option value="36">36 tháng</option>
+                    </select>
+                </div>
             </div>
-        </div>
-
-        <div class="price-range-wrapper">
-            <label><strong>Giá</strong></label>
-            <div class="price-inputs">
-            <input type="text" id="minPrice" readonly>
-            <input type="text" id="maxPrice" readonly>
-            </div>
-
-            <div class="slider-container">
-            <div class="slider-track"></div>
-            <div class="slider-range" id="slider-range"></div>
-
-            <input type="range" id="rangeMin" min="1000000" max="200000000" style="border: none;" value="63656000" step="1000">
-            <input type="range" id="rangeMax" min="1000000" max="200000000" style="border: none;" value="137828000" step="1000">
-            </div>
-        </div>
-
-        
-        <div class="form-group">
-            <label for="comp-warranty">Bảo hành</label>
-            <select id="comp-warranty">
-                <option value="">Tất cả</option>
-                <option value="6">6 tháng</option>
-                <option value="12">12 tháng</option>
-                <option value="24">24 tháng</option>
-                <option value="36">36 tháng</option>
-            </select>
-        </div>
-    </div>
             
             <div class="filter-sort">
                 <div class="filter-section">
@@ -807,9 +879,14 @@
                 </div>
             </div>
             
+            <div class="select-all-container">
+                <label for="select-all-components" style="margin-top: 15px;">Chọn tất cả</label>
+            </div>
+            
             <table class="results-table">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" class="select-all" data-table="components"></th>
                         <th>Mã linh kiện</th>
                         <th>Tên linh kiện</th>
                         <th>Loại</th>
@@ -818,10 +895,12 @@
                         <th>Số lượng</th>
                         <th>Bảo hành</th>
                         <th>Điều kiện BH</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#LK-001</td>
                         <td>CPU Intel Core i7 10700</td>
                         <td>CPU</td>
@@ -830,8 +909,13 @@
                         <td>15</td>
                         <td>36 tháng</td>
                         <td>Không ép xung</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit">Sửa</button>
+                            <button class="btn btn-delete">Xóa</button>
+                        </td>
                     </tr>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#LK-002</td>
                         <td>RAM Kingston 8GB DDR4</td>
                         <td>RAM</td>
@@ -840,8 +924,13 @@
                         <td>42</td>
                         <td>Lifetime</td>
                         <td>Không vật lý</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit">Sửa</button>
+                            <button class="btn btn-delete">Xóa</button>
+                        </td>
                     </tr>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#LK-003</td>
                         <td>SSD Samsung 970 EVO 500GB</td>
                         <td>Ổ cứng</td>
@@ -850,6 +939,10 @@
                         <td>28</td>
                         <td>60 tháng</td>
                         <td>Không tháo rời</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit">Sửa</button>
+                            <button class="btn btn-delete">Xóa</button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -945,9 +1038,14 @@
                 </div>
             </div>
             
+            <div class="select-all-container">
+                <label for="select-all-warranty" style="margin-top: 15px;">Chọn tất cả</label>
+            </div>
+            
             <table class="results-table">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" class="select-all" data-table="warranty"></th>
                         <th>Mã BH</th>
                         <th>Mã đơn</th>
                         <th>Linh kiện</th>
@@ -956,10 +1054,12 @@
                         <th>Ngày hết hạn</th>
                         <th>Trạng thái</th>
                         <th>Điều kiện</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#BH-0001</td>
                         <td>#DV-0012</td>
                         <td>CPU Intel Core i5</td>
@@ -968,8 +1068,10 @@
                         <td>15/03/2026</td>
                         <td><span class="status status-confirmed">Đang BH</span></td>
                         <td>Không ép xung</td>
+                        <td><button class="btn btn-edit">Sửa</button></td>
                     </tr>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#BH-0002</td>
                         <td>#DV-0045</td>
                         <td>RAM Kingston 16GB</td>
@@ -978,8 +1080,10 @@
                         <td>20/01/2025</td>
                         <td><span class="status status-confirmed">Đang BH</span></td>
                         <td>Không vật lý</td>
+                        <td><button class="btn btn-edit">Sửa</button></td>
                     </tr>
                     <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
                         <td>#BH-0003</td>
                         <td>#DV-0078</td>
                         <td>SSD Samsung 1TB</td>
@@ -988,6 +1092,7 @@
                         <td>05/12/2023</td>
                         <td><span class="status status-cancelled">Hết hạn</span></td>
                         <td>Không tháo rời</td>
+                        <td><button class="btn btn-edit">Sửa</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -1069,13 +1174,13 @@
         });
 
         // Xử lý khi click vào các nút giá nhanh
-    document.querySelectorAll('.price-quick-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const price = this.textContent.replace(/[^\d]/g, ''); // Lấy số từ text (bỏ ký tự không phải số)
-            document.getElementById('comp-price-to').value = price;
-            document.getElementById('comp-price-from').value = '';
+        document.querySelectorAll('.price-quick-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const price = this.textContent.replace(/[^\d]/g, ''); // Lấy số từ text (bỏ ký tự không phải số)
+                document.getElementById('comp-price-to').value = price;
+                document.getElementById('comp-price-from').value = '';
+            });
         });
-    });
         
         // Dynamic ward selection based on district
         document.getElementById('cus-district').addEventListener('change', function() {
@@ -1122,6 +1227,35 @@
                 });
             }
         });
+
+        // Select All functionality
+        document.querySelectorAll('.select-all').forEach(selectAll => {
+            selectAll.addEventListener('change', function() {
+                const tableId = this.getAttribute('data-table');
+                const checkboxes = document.querySelectorAll(`#${tableId} .row-checkbox`);
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                    const row = checkbox.closest('tr');
+                    row.classList.toggle('selected', this.checked);
+                });
+            });
+        });
+
+        // Individual checkbox functionality
+        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const table = this.closest('.search-container');
+                const selectAll = table.querySelector('.select-all');
+                const allCheckboxes = table.querySelectorAll('.row-checkbox');
+                const row = this.closest('tr');
+                
+                // Toggle selected class for the row
+                row.classList.toggle('selected', this.checked);
+                
+                // Update select-all checkbox state
+                selectAll.checked = Array.from(allCheckboxes).every(cb => cb.checked);
+            });
+        });
     </script>
 
     <script>
@@ -1132,37 +1266,36 @@
         const sliderRange = document.getElementById("slider-range");
 
         function formatCurrency(value) {
-        return parseInt(value).toLocaleString('vi-VN') + "₫";
+            return parseInt(value).toLocaleString('vi-VN') + "₫";
         }
 
         function updateSlider() {
-        let minVal = parseInt(rangeMin.value);
-        let maxVal = parseInt(rangeMax.value);
+            let minVal = parseInt(rangeMin.value);
+            let maxVal = parseInt(rangeMax.value);
 
-        if (minVal > maxVal - 1000000) {
-            minVal = maxVal - 1000000;
-            rangeMin.value = minVal;
-        }
-        if (maxVal < minVal + 1000000) {
-            maxVal = minVal + 1000000;
-            rangeMax.value = maxVal;
-        }
+            if (minVal > maxVal - 1000000) {
+                minVal = maxVal - 1000000;
+                rangeMin.value = minVal;
+            }
+            if (maxVal < minVal + 1000000) {
+                maxVal = minVal + 1000000;
+                rangeMax.value = maxVal;
+            }
 
-        const rangeWidth = parseInt(rangeMin.max) - parseInt(rangeMin.min);
-        const leftPercent = ((minVal - parseInt(rangeMin.min)) / rangeWidth) * 100;
-        const rightPercent = ((maxVal - parseInt(rangeMin.min)) / rangeWidth) * 100;
+            const rangeWidth = parseInt(rangeMin.max) - parseInt(rangeMin.min);
+            const leftPercent = ((minVal - parseInt(rangeMin.min)) / rangeWidth) * 100;
+            const rightPercent = ((maxVal - parseInt(rangeMin.min)) / rangeWidth) * 100;
 
-        sliderRange.style.left = leftPercent + "%";
-        sliderRange.style.width = (rightPercent - leftPercent) + "%";
+            sliderRange.style.left = leftPercent + "%";
+            sliderRange.style.width = (rightPercent - leftPercent) + "%";
 
-        minPrice.value = formatCurrency(minVal);
-        maxPrice.value = formatCurrency(maxVal);
+            minPrice.value = formatCurrency(minVal);
+            maxPrice.value = formatCurrency(maxVal);
         }
 
         rangeMin.addEventListener("input", updateSlider);
         rangeMax.addEventListener("input", updateSlider);
         window.addEventListener("DOMContentLoaded", updateSlider);
     </script>
-
 </body>
 </html>
