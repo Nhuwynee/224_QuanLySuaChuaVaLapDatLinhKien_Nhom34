@@ -24,11 +24,224 @@
     <link rel="stylesheet" href="/css/staff-selection.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
         <!-- Flatpickr CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <title>Tổng quan thống kê - Quản lý cửa hàng</title>
+    <style>
+        .file-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .file-item {
+            position: relative;
+            width: 120px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            background: #f9f9f9;
+            margin-bottom: 5px;
+        }
+        
+        .file-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 3px;
+            display: block;
+        }
+        
+        .file-info {
+            font-size: 12px;
+            color: #555;
+            margin-top: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .delete-file {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4d4f;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        
+        .file-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+          .file-btn:hover {
+            background-color: #40a9ff;
+        }
+        
+        /* CSS cho modal xem ảnh */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .modal-content {
+            animation-name: zoom;
+            animation-duration: 0.3s;
+        }
+        
+        @@keyframes zoom {
+            from {transform: translate(-50%, -50%) scale(0)}
+            to {transform: translate(-50%, -50%) scale(1)}
+        }
+          .file-item img {
+            cursor: pointer; /* Thêm con trỏ để biểu thị hình ảnh có thể bấm vào */
+        }
+          /* CSS cho input với icon dropdown */
+        .input-with-icon {
+            position: relative;
+            width: 100%;
+        }
+        
+        .input-with-icon input {
+            width: 100%;
+            padding-right: 30px; /* Để có chỗ cho icon */
+        }
+        
+        .location-dropdown-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            cursor: pointer;
+        }
+          .location-dropdown-icon:hover {
+            color: #1890ff;
+        }
+        
+        /* Loading indicator */
+        .loading-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-top: 2px solid #1890ff;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }/* Custom dropdown styling */
+        .custom-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-top: 2px;
+            animation: slideDown 0.2s ease;
+        }
+        
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .selected {
+            background-color: #e6f7ff;
+            font-weight: 500;
+        }
+        
+        .input-active {
+            border-color: #40a9ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .location-dropdown-icon.active {
+            color: #1890ff;
+            transform: translateY(-50%) rotate(180deg);
+            transition: transform 0.3s;
+        }
+    </style>
 </head>
 
 <body>
@@ -117,8 +330,9 @@
                 <h1 class="page-title">Đơn sửa chữa</h1>
             
             <div class="order-info">
-                <div class="order-id">Mã đơn hàng: <span class="highlight">DH0001</span></div>
-                <div class="order-date">Ngày tạo: 27/03/2025</div>
+                <div class="order-id">Mã đơn dịch vụ: <span class="highlight">@ViewBag.NextServiceOrderId</span></div>
+                <input type="hidden" id="IdDonDichVu" name="IdDonDichVu" value="@ViewBag.NextServiceOrderId" />
+                <div class="order-date">Ngày tạo: @ViewBag.OrderDate</div>
                 <div class="staff-name">Nhân viên: no name</div>
                 <div class="turn-back"><a href="javascript:void(0);" onclick ="confirmBack()" style="text-decoration: none;">Quay lại DS</a> </div>
             </div>
@@ -144,40 +358,37 @@
                             </div>
                         </div>
 
-                        
-                        <div class="flex-date-time">
-                            <div class="form-group">
-                                <label>Thành phố/Tỉnh: <span class="required">(*)</span></label>
-                                <input list="cities" type="text" placeholder="Chọn hoặc nhập thành phố">
-                                <datalist id="cities">
-                                    <option value="Hà Nội"/>
-                                    <option value="TP. Hồ Chí Minh"/>
-                                    <option value="Đà Nẵng"/>
-                                    <option value="Hải Phòng"/>
-                                    <option value="Cần Thơ"/>
-                                </datalist>
+                          <div class="flex-date-time">                            <div class="form-group">
+                                <label>Thành phố/Tỉnh: <span class="required">(*)</span></label>                                <div class="input-with-icon">
+                                    <input id="cityInput" type="text" placeholder="Chọn thành phố/tỉnh" readonly style="cursor: pointer; background-color: #fff;">
+                                    <input type="hidden" id="cityId" name="cityId" value="">
+                                    <i class="fa-solid fa-chevron-down location-dropdown-icon" id="cityDropdownIcon"></i>
+                                    <div id="cityDropdown" class="custom-dropdown">
+                                        <!-- Sẽ được tải từ database -->
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Quận/Huyện: <span class="required">(*)</span></label>
-                                <input list="districts" type="text" placeholder="Chọn hoặc nhập quận/huyện">
-                                <datalist id="districts">
-                                    <option value="Quận 1"/>
-                                    <option value="Quận 2"/>
-                                    <option value="Quận 3"/>
-                                    <option value="Huyện Bình Chánh"/>
-                                    <option value="Huyện Củ Chi"/>
-                                </datalist>
+                                <label>Quận/Huyện: <span class="required">(*)</span></label>                                <div class="input-with-icon">
+                                    <input id="districtInput" type="text" placeholder="Chọn quận/huyện" readonly style="cursor: pointer; background-color: #fff;">
+                                    <input type="hidden" id="districtId" name="districtId" value="">
+                                    <i class="fa-solid fa-chevron-down location-dropdown-icon" id="districtDropdownIcon"></i>
+                                    <div id="districtDropdown" class="custom-dropdown">
+                                        <!-- Sẽ được tải từ database dựa theo thành phố -->
+                                    </div>
+                                    <div id="districtError" class="error-message" style="display: none;"></div>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Phường/Xã: <span class="required">(*)</span></label>
-                                <input list="wards" type="text" placeholder="Chọn hoặc nhập phường/xã">
-                                <datalist id="wards">
-                                    <option value="Phường 1"/>
-                                    <option value="Phường 2"/>
-                                    <option value="Phường 3"/>
-                                    <option value="Xã Bình Hưng"/>
-                                    <option value="Xã An Phú Tây"/>
-                                </datalist>
+                                <label>Phường/Xã: <span class="required">(*)</span></label>                                <div class="input-with-icon">
+                                    <input id="wardInput" type="text" placeholder="Chọn phường/xã" readonly style="cursor: pointer; background-color: #fff;">
+                                    <input type="hidden" id="wardId" name="wardId" value="">
+                                    <i class="fa-solid fa-chevron-down location-dropdown-icon" id="wardDropdownIcon"></i>
+                                    <div id="wardDropdown" class="custom-dropdown">
+                                        <!-- Sẽ được tải từ database dựa theo quận/huyện -->
+                                    </div>
+                                    <div id="wardError" class="error-message" style="display: none;"></div>
+                                </div>
                             </div>
                         </div>
                        <div class="form-group">
@@ -201,7 +412,8 @@
                                     @Html.DropDownList("IdLoaiThietBi", ViewBag.LoaiThietBis as List<SelectListItem>, "Chọn loại thiết bị", new { @class = "form-control" })
                         </div>
                         <div class="form-group" style="padding-bottom: 10px;">
-                            <label>Tên thiết bị: <span class="required">(*)</span></label>
+                            <label>Tên thiết bị: <span class="required">(*)</span>
+                            </label>
                             <input type="text" value="Redmi note 14">
                         </div>
                      </div>   
@@ -215,26 +427,14 @@
                         </div>
                     
                     
-                    <div class="flex-date-time">
-                        <div class="form-group">
+                        <div class="flex-date-time">                        
+                            <div class="form-group">
                             <label>Lỗi: <span class="required">(*)</span></label>
-                            <div class="dropdown">
-                                <input type="text" value="abc" readonly>
-                                <i class="fa-solid fa-chevron-down"></i>
-                                <div class="dropdown-content">
-                                    <div class="dropdown-item">Không lên nguồn</div>
-                                    <div class="dropdown-item">Màn hình nứt</div>
-                                    <div class="dropdown-item">Màn hình không hiển thị</div>
-                                    <div class="dropdown-item">Pin yếu</div>
-                                    <div class="dropdown-item">Lỗi phần mềm</div>
-                                    <div class="dropdown-item">Không nhận sạc</div>
-                                    <div class="dropdown-item">Khác</div>
-                                </div>
-                            </div>
-                        </div>
+                                @Html.DropDownList("IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new { @class = "form-control", @onchange="layGiaTheoLoi(this.value)" })
+                        </div>                        
                         <div class="form-group">
                             <label>Đơn giá (VND): <span class="required">(*)</span></label>
-                            <input type="text" value="0">
+                            <input type="text" id="donGia" name="donGia" value="0" readonly class="price-field">
                         </div>
                         <div class="form-group checkbox-group">
                             <label>Bảo hành: <span class="required">(*)</span></label>
@@ -269,15 +469,15 @@
                     <div class="buttons-container">
                         <button class="add-part-btn" title="Thêm phần mới"><i class="fa-solid fa-plus"></i></button>
                     </div>
-                    </div>
-                    <div class="flex-date-time" style="margin-top: 20px;">
+                        </div>                    
+                        <div class="flex-date-time" style="margin-top: 20px;">
                         <div class="form-group">
                             <label>Tải ảnh: <span class="required">(*)</span></label>
                             <div class="file-upload">
-                                <button class="file-btn">Chọn tệp</button>
-                                <div class="file-preview">
-                                    <div class="file-name">anh1.png</div>
-                                    <i class="fa-solid fa-xmark delete-file"></i>
+                                <input type="file" id="deviceImageInput" accept="image/*" style="display: none;" multiple />
+                                <button class="file-btn" id="deviceImageButton">Chọn tệp</button>
+                                <div class="file-preview" id="deviceImagePreview">
+                                    <!-- Ảnh sẽ được hiển thị ở đây sau khi tải lên -->
                                 </div>
                             </div>
                         </div>
@@ -285,10 +485,10 @@
                         <div class="form-group">
                             <label>Tải ảnh phiếu bảo hành:</label>
                             <div class="file-upload">
-                                <button class="file-btn">Chọn tệp</button>
-                                <div class="file-preview">
-                                    <div class="file-name">anh1.png</div>
-                                    <i class="fa-solid fa-xmark delete-file"></i>
+                                <input type="file" id="warrantyImageInput" accept="image/*" style="display: none;" multiple />
+                                <button class="file-btn" id="warrantyImageButton">Chọn tệp</button>
+                                <div class="file-preview" id="warrantyImagePreview">
+                                    <!-- Ảnh sẽ được hiển thị ở đây sau khi tải lên -->
                                 </div>
                             </div>
                         </div>
@@ -309,7 +509,7 @@
                                 <div class="form-group">
                                     <label>Chọn loại dịch vụ: <span class="required">(*)</span></label>
                                     <div class="dropdown">
-                                        <input type="text" value="Sửa chữa" readonly>
+                                        <input type="text" placeholder="Sửa chữa hoặc lắp đặt" readonly>
                                         <i class="fa-solid fa-chevron-down"></i>
                                         <div class="dropdown-content">
                                             <div class="dropdown-item">Sửa chữa</div>
@@ -320,11 +520,11 @@
                                     <div class="form-group">
                                         <label>Chọn nơi thực hiện: <span class="required">(*)</span></label>
                                         <div class="dropdown">
-                                            <input type="text" value="Tại nhà" readonly>
+                                            <input type="text" placeholder="Trực tiếp hoặc tại nhà" readonly>
                                             <i class="fa-solid fa-chevron-down"></i>
                                             <div class="dropdown-content">
                                                 <div class="dropdown-item">Tại nhà</div>
-                                                <div class="dropdown-item">Tại công ty</div>
+                                                <div class="dropdown-item">Trực tiếp</div>
                                             </div>
                                         </div>
                                     </div>
@@ -473,9 +673,8 @@
                         </div>
                     </div>
                 </div>
-                </div>
-                <div class="form-actions">
-                    <button class="create-order-btn">Tạo đơn</button>
+                </div>                <div class="form-actions">
+                    <button type="button" class="create-order-btn">Tạo đơn</button>
                 </div>
             </div>
             </div>
@@ -485,10 +684,17 @@
             
         </main>
         </div>    
-        <!-- Định nghĩa URLs cho JavaScript -->    <script>
-        // Định nghĩa các URLs cho tddvkvl2.js
+        <!-- Định nghĩa URLs cho JavaScript -->      
+        
+        <!--Định nghĩa các URLs cho tddvkvl2.js -->
+        <script>    
         var backToListUrl = '@Url.Action("IndexDSDDV", "DanhSachDonDichVu")';
         var searchLinhKienUrl = '@Url.Action("TimKiemLinhKien", "TaoDonDichVuKVL")';
+        var layGiaTheoLoiUrl = '@Url.Action("LayGiaTheoLoi", "TaoDonDichVuKVL")';
+        var layDanhSachThanhPhoUrl = '@Url.Action("LayDanhSachThanhPho", "TaoDonDichVuKVL")';
+        var layDanhSachQuanUrl = '@Url.Action("LayDanhSachQuan", "TaoDonDichVuKVL")';
+        var layDanhSachPhuongUrl = '@Url.Action("LayDanhSachPhuong", "TaoDonDichVuKVL")';
+        var createServiceOrderUrl = '@Url.Action("CreateServiceOrder", "TaoDonDichVuKVL")';
     </script>
     
     <!-- Tải script JS bên ngoài -->
@@ -497,6 +703,12 @@
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
+    
+    <!-- Modal để hiển thị ảnh khi bấm vào -->
+    <div id="imageModal" class="image-modal">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
 </body>
 
 </html>
