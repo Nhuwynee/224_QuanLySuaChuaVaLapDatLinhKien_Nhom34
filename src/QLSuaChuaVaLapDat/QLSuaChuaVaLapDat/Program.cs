@@ -1,7 +1,17 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.EntityFrameworkCore;
+using QLSuaChuaVaLapDat.Models;
+using QLSuaChuaVaLapDat.Models;
 
-// Add services to the container.
+var builder = WebApplication.CreateBuilder(args);
+//builder.Services.AddDbContext<QLSuaChuaVaLapDatContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 builder.Services.AddControllersWithViews();
+
 
 var app = builder.Build();
 
@@ -13,6 +23,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -22,6 +33,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=TimKiem}/{action=TimKiem}/{id?}");
 
 app.Run();

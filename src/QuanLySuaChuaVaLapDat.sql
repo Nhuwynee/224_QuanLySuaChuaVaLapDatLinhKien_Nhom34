@@ -167,6 +167,12 @@ CREATE TABLE DanhGia (
     gopY NTEXT
 );
 
+
+select * from dbo.DonDichVu
+
+update dbo.DonDichVu
+set trangThaiDon =N'Đang sửa chữa'
+where idDonDichVu ='DDV001'
 ------------------------- INSERT
 
 INSERT INTO ThanhPho (idThanhPho, tenThanhPho) VALUES
@@ -683,7 +689,10 @@ VALUES
 ('DDV009', 'KH00025', NULL, 'NVKT008', 'CSKH014', 'TB009', N'Ổ cứng HDD 1TB', N'Khách hàng thường', '2025-02-09 14:00:00', '2025-02-09 15:30:00', 800000, N'Tại nhà', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-09 15:30:00'),
 
 -- Đơn 10: Khách vãng lai, NV kỹ thuật NVKT05
-('DDV010', NULL, 'KVL005', 'NVKT010', 'CSKH015', 'TB010', N'RAM DDR4 8GB', N'Khách vãng lai', '2025-02-10 11:00:00', '2025-02-10 12:30:00', 600000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Hoàn thành', '2025-02-10 12:30:00');
+('DDV010', NULL, 'KVL005', 'NVKT010', 'CSKH015', 'TB010', N'RAM DDR4 8GB', N'Khách vãng lai', '2025-02-10 11:00:00', '2025-02-10 12:30:00', 600000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Hoàn thành', '2025-02-10 12:30:00'),
+
+-- Đơn 11: Khách vãng lai, NV kỹ thuật NVKT05
+('DDV011', NULL, 'KVL005', 'NVKT010', 'CSKH015', 'TB010', N'RAM DDR4 8GB', N'Khách vãng lai', '2025-02-10 11:00:00', '2025-02-10 12:30:00', 600000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Đang sửa chữa', '2025-02-10 12:30:00');
 
 -- Thêm chi tiết đơn dịch vụ cho 10 đơn trên (mỗi đơn 2 chi tiết)
 INSERT INTO ChiTietDonDichVu (idCTDH, idDonDichVu, idLinhKien, idLoi, loaiDichVu, moTa, soLuong, ngayKetThucBH, thoiGianThemLinhKien, hanBaoHanh)
