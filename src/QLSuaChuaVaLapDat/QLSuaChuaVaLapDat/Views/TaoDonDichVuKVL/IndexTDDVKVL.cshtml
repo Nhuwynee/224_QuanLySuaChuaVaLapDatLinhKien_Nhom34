@@ -241,6 +241,17 @@
             transform: translateY(-50%) rotate(180deg);
             transition: transform 0.3s;
         }
+
+         .remaining-amount {
+        display: block;
+        font-size: 16px;
+        font-weight: bold;
+        color: #d9534f;
+        margin-top: 8px;
+        padding: 8px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+        border-left: 3px solid #d9534f;
     </style>
 </head>
 
@@ -648,17 +659,26 @@
                         
                         <div class="form-group">
                             <label>Tiền khách hàng ứng trước (VND):</label>
-                            <input type="text">
+                            <input type="number" id="advancePayment">
                         </div>
                     </div>
                     
                     <!-- Second row: Giá tiền and Chọn trạng thái -->
                     <div class="two-column-row">
                         <div class="form-group">
-                            <label>Giá tiền (VND):</label>
-                            <input type="text" value="1.000.000" class="price-input" readonly>
+                            <label>Tiền lỗi (VND):</label>
+                            <input type="text"  class="price-input" readonly>
                         </div>
-                        
+                        <div class="form-group">
+                            <label>Tổng tiền (VND):</label>
+                            <input type="text"  class="price-input" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Tiền còn lại (VND):</label>
+    <span id="remainingAmount" class="remaining-amount">0 VND</span>
+                        </div>
+    
+                    </div>
                         <div class="form-group">
                             <label>Chọn trạng thái: <span class="required">(*)</span></label>
                             <div class="dropdown">
@@ -673,7 +693,8 @@
                         </div>
                     </div>
                 </div>
-                </div>                <div class="form-actions">
+                </div>                
+                <div class="form-actions">
                     <button type="button" class="create-order-btn">Tạo đơn</button>
                 </div>
             </div>

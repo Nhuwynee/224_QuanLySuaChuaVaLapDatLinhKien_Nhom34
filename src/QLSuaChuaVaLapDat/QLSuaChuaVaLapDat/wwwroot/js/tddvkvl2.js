@@ -21,7 +21,7 @@ $(document).ready(function() {
         
         // Clear any input values in the cloned section
         newComponentSection.find('input[type="text"]').val('');        newComponentSection.find('textarea').val('');
-        newComponentSection.find('input[type="radio"]').prop('checked', false);
+        newComponentSection.find('input[type="radio"]').prop('checked', true);
         newComponentSection.find('select').val('');
         newComponentSection.find('input[type="text"]').val('0');
         
@@ -183,6 +183,8 @@ $(document).ready(function() {
             });
 
             selectedPartsContainer.append(partElement);
+             // Cập nhật tổng tiền sau khi thêm linh kiện
+            updateTotalPrice();
         }
     }
 
@@ -190,6 +192,9 @@ $(document).ready(function() {
     function removeSelectedPart(partId) {
         selectedParts = selectedParts.filter(p => p.id !== partId);
         selectedPartsContainer.find(`[data-id="${partId}"]`).remove();
+
+         // Cập nhật tổng tiền sau khi xóa linh kiện
+        updateTotalPrice();
     }
 
     // Định dạng tiền tệ
@@ -363,24 +368,63 @@ function layGiaTheoLoi(idLoi, targetId) {
 
 // Hàm để cập nhật tổng tiền
 function updateTotalPrice() {
-    const priceInput = document.querySelector('.price-input');
-    if (priceInput) {
-        // Tìm tất cả các trường đơn giá (bao gồm các trường được thêm động)
-        const donGiaFields = document.querySelectorAll('.price-field');
-        let totalPrice = 0;
-        
-        // Tính tổng giá từ tất cả các thành phần
-        donGiaFields.forEach(field => {
-            // Chuyển đổi chuỗi giá có định dạng (ví dụ: "1.000.000") thành số
-            const priceText = field.value.replace(/\./g, '').replace(/,/g, '');
-            const price = parseInt(priceText) || 0;
-            totalPrice += price;
-        });
-        
-        // Định dạng lại tổng tiền
-        priceInput.value = new Intl.NumberFormat('vi-VN').format(totalPrice);
+    // Tìm tất cả các trường đơn giá (bao gồm các trường được thêm động)
+    const donGiaFields = document.querySelectorAll('.price-field');
+    let totalPrice = 0;
+    
+    // Tính tổng giá từ tất cả các thành phần
+    donGiaFields.forEach(field => {
+        // Chuyển đổi chuỗi giá có định dạng (ví dụ: "1.000.000") thành số
+        const priceText = field.value.replace(/\./g, '').replace(/,/g, '');
+        const price = parseInt(priceText) || 0;
+        totalPrice += price;
+    });
+    
+    // Cập nhật input "Tiền lỗi" (chính là tổng của các price-field)
+    const errorPriceInput = document.querySelectorAll('.price-input')[0];
+    if (errorPriceInput) {
+        errorPriceInput.value = new Intl.NumberFormat('vi-VN').format(totalPrice);
+    }
+    
+    // Tính tổng tiền = Tiền lỗi + Tiền linh kiện (nếu có)
+    let partPrice = 0;
+    const selectedParts = document.querySelectorAll('.selected-part');
+    selectedParts.forEach(part => {
+        const priceText = part.querySelector('.part-price').textContent;
+        const priceMatch = priceText.match(/[\d,.]+/);
+        if (priceMatch) {
+            const price = parseFloat(priceMatch[0].replace(/\./g, '').replace(/,/g, '.')) || 0;
+            partPrice += price;
+        }
+    });
+    
+    // Tổng tiền = Tiền lỗi + Tiền linh kiện
+    const finalPrice = totalPrice + partPrice;
+    
+    // Cập nhật input "Tổng tiền"
+    const totalPriceInput = document.querySelectorAll('.price-input')[1];
+    if (totalPriceInput) {
+        totalPriceInput.value = new Intl.NumberFormat('vi-VN').format(finalPrice);
+    }
+    
+    // Tính tiền còn lại = Tổng tiền - Tiền ứng trước
+    const advancePaymentInput = document.getElementById('advancePayment');
+    const advancePayment = parseInt(advancePaymentInput.value) || 0;
+    const remainingAmount = finalPrice - advancePayment;
+    
+    // Cập nhật hiển thị tiền còn lại
+    const remainingAmountSpan = document.getElementById('remainingAmount');
+    if (remainingAmountSpan) {
+        remainingAmountSpan.textContent = `Tiền còn lại mà khách phải trả là: ${new Intl.NumberFormat('vi-VN').format(remainingAmount)} VND`;
     }
 }
+
+$(document).ready(function() {
+    // Thêm sự kiện để cập nhật tổng tiền khi tiền ứng trước thay đổi
+    $('#advancePayment').on('input', function() {
+        updateTotalPrice();
+    });
+});
 
 // Staff Assignment Popup Functionality
 $(document).ready(function() {
