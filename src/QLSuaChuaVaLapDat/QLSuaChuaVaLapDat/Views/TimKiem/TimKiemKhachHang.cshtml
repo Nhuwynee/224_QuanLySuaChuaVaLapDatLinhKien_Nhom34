@@ -1,0 +1,157 @@
+﻿@model QLSuaChuaVaLapDat.Models.KhachHang
+
+<div class="search-container" id="customers">
+    <div class="search-header">
+        <div class="search-title">Tìm kiếm Khách hàng</div>
+        <div class="search-actions">
+            <button class="btn btn-secondary">Làm mới</button>
+            <button class="btn btn-primary">Tìm kiếm</button>
+        </div>
+    </div>
+
+    <div class="search-fields">
+        <div class="form-group">
+            <label for="cus-name">Tên khách hàng</label>
+            <input type="text" id="cus-name" placeholder="Nhập tên khách hàng...">
+        </div>
+
+        <div class="form-group">
+            <label for="cus-phone">Số điện thoại</label>
+            <input type="text" id="cus-phone" placeholder="Nhập số điện thoại...">
+        </div>
+
+        <div class="form-group">
+            <label for="cus-email">Email</label>
+            <input type="text" id="cus-email" placeholder="Nhập email...">
+        </div>
+
+        <div class="form-group">
+            <label for="cus-type">Loại khách hàng</label>
+            <select id="cus-type">
+                <option value="">Tất cả</option>
+                <option value="regular">Thường</option>
+                <option value="vip">VIP</option>
+                <option value="business">Doanh nghiệp</option>
+                <option value="guest">Vãng lai</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cus-city">Thành phố</label>
+            <select id="cus-city">
+                <option value="">Tất cả</option>
+                <option value="hanoi">Hà Nội</option>
+                <option value="hcm">TP.Hồ Chí Minh</option>
+                <option value="danang">Đà Nẵng</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cus-district">Quận/Huyện</label>
+            <select id="cus-district" disabled>
+                <option value="">Chọn thành phố trước</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cus-ward">Phường/Xã</label>
+            <select id="cus-ward" disabled>
+                <option value="">Chọn quận/huyện trước</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="filter-sort">
+        <div class="filter-section">
+            <span>Lọc theo:</span>
+            <select>
+                <option>Nhóm khách hàng</option>
+                <option>Khách cá nhân</option>
+                <option>Khách doanh nghiệp</option>
+            </select>
+            <select>
+                <option>Nguồn khách</option>
+                <option>Website</option>
+                <option>Cửa hàng</option>
+                <option>Giới thiệu</option>
+            </select>
+        </div>
+
+        <div class="sort-section">
+            <span>Sắp xếp theo:</span>
+            <select>
+                <option>Tên A-Z</option>
+                <option>Tên Z-A</option>
+                <option>Số đơn nhiều nhất</option>
+                <option>Tổng chi tiêu cao nhất</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="select-all-container">
+        <label for="select-all-customers" style="margin-top: 15px;">Chọn tất cả</label>
+    </div>
+
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" class="select-all" data-table="customers"></th>
+                <th>Mã KH</th>
+                <th>Tên User</th>
+                <th>Tên khách hàng</th>
+                <th>Số điện thoại</th>
+                <th>Địa chỉ</th>
+                <th>Ngày sinh</th>
+                <th>Trạng thái </th>
+                <th>Giới tính</th>
+                <th>Tổng số tiền sửa chữa</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Users)
+            {
+                <tr>
+                    <td><input type="checkbox" class="row-checkbox"></td>
+                    <td>@item.IdUser</td>
+                    <td>@item.TenUser</td>
+                    <td>@item.HoVaTen</td>
+                    <td>@item.Sdt</td>
+                    <td>@item.DiaChi</td>
+                    <td>@item.NgaySinh</td>
+                    @if (item.TrangThai == true)
+                    {
+                        <td>Đang hoạt động</td>
+                    }
+                    else
+                    {
+                        <td>Không hoạt động</td>
+                    }
+
+                    @if (item.GioiTinh == true)
+                    {
+                        <td>Nam</td>
+                    }
+                    else
+                    {
+                        <td>Nữ</td>
+                    }
+
+                    <td>@(item.tongDonHang.ToString("#,##0") + " vnđ" ?? "0,00 vnđ")</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-edit">Sửa</button>
+                        <button class="btn btn-lock">Khóa</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <div class="page-item active">1</div>
+        <div class="page-item">2</div>
+        <div class="page-item">3</div>
+        <div class="page-item">...</div>
+        <div class="page-item">10</div>
+    </div>
+</div>

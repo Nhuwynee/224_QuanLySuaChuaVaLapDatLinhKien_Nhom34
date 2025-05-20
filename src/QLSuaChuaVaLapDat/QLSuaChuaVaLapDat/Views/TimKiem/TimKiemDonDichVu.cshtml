@@ -1,0 +1,158 @@
+﻿@model IEnumerable<QLSuaChuaVaLapDat.Models.DonDichVu>
+@{
+    ViewData["Title"] = "Tìm kiếm";
+}
+
+<div class="search-container" id="service-orders">
+    <div class="search-header">
+        <div class="search-title">Tìm kiếm Đơn dịch vụ</div>
+        <div class="search-actions">
+            <button class="btn btn-secondary">Làm mới</button>
+            <button class="btn btn-primary">Tìm kiếm</button>
+        </div>
+    </div>
+
+    <div class="search-fields">
+        <div class="form-group">
+            <label for="so-id">Mã đơn dịch vụ</label>
+            <input type="text" id="so-id" placeholder="Nhập mã đơn...">
+        </div>
+
+        <div class="form-group">
+            <label for="so-customer">Khách hàng</label>
+            <input type="text" id="so-customer" placeholder="Nhập tên hoặc SĐT...">
+        </div>
+
+        <div class="form-group">
+            <label for="so-device">Thiết bị</label>
+            <input type="text" id="so-device" placeholder="Nhập tên thiết bị...">
+        </div>
+
+        <div class="form-group">
+            <label for="so-technician">Kỹ thuật viên</label>
+            <input type="text" id="so-technician" placeholder="Nhập tên kỹ thuật viên...">
+        </div>
+
+        <div class="form-group">
+            <label for="so-status">Trạng thái</label>
+            <select id="so-status">
+                <option value="">Tất cả</option>
+                <option value="confirmed">Đã xác nhận</option>
+                <option value="processing">Đang xử lý</option>
+                <option value="completed">Hoàn thành</option>
+                <option value="cancelled">Đã hủy</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="so-date-from">Từ ngày</label>
+            <input type="date" id="so-date-from">
+        </div>
+
+        <div class="form-group">
+            <label for="so-date-to">Đến ngày</label>
+            <input type="date" id="so-date-to">
+        </div>
+    </div>
+
+    <div class="filter-sort">
+        <div class="filter-section">
+            <span>Lọc theo:</span>
+            <select>
+                <option>Loại thiết bị</option>
+                <option>Máy tính</option>
+                <option>Điện thoại</option>
+                <option>Thiết bị văn phòng</option>
+            </select>
+            <select>
+                <option>Loại dịch vụ</option>
+                <option>Sửa chữa</option>
+                <option>Bảo hành</option>
+                <option>Bảo trì</option>
+            </select>
+        </div>
+
+        <div class="sort-section">
+            <span>Sắp xếp theo:</span>
+            <select>
+                <option>Ngày tạo (mới nhất)</option>
+                <option>Ngày tạo (cũ nhất)</option>
+                <option>Tổng tiền (cao nhất)</option>
+                <option>Tổng tiền (thấp nhất)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="select-all-container">
+        <label for="select-all-service-orders" style="margin-top: 15px;">Chọn tất cả</label>
+    </div>
+
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" class="select-all" data-table="service-orders"></th>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Thiết bị</th>
+                <th>Loại dịch vụ</th>
+                <th>Trạng thái</th>
+                <th>Tổng tiền</th>
+                <th>Ngày tạo</th>
+                <th>Cập nhật</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><input type="checkbox" class="row-checkbox"></td>
+                    <td>@item.IdDonDichVu</td>
+                    @if (@item.IdKhachVangLaiNavigation != null)
+                    {
+                        <td>@item.IdKhachVangLaiNavigation.HoVaTen</td>
+                    }
+                    else
+                    {
+                        <td>@item.IdUserTaoDonNavigation.HoVaTen</td>
+                    }
+
+                    <td>@item.IdLoaiThietBiNavigation.TenLoaiThietBi</td>
+                    <td>@item.LoaiDonDichVu</td>
+                    @if (@item.TrangThaiDon == "Hoàn thành")
+                    {
+                        <td><span class="status status-confirmed">@item.TrangThaiDon</span></td>
+                    }
+                    else if (item.TrangThaiDon == "Đang xử lý")
+                    {
+                        <td><span class="status status-partial">Đang xử lý</span></td>
+
+                    }
+                    else if (item.TrangThaiDon == "Đang sửa chữa")
+                    {
+                        <td><span class="status status-partial">Đang sửa chữa</span></td>
+
+                    }
+                    else if (item.TrangThaiDon == "Hoàn thành")
+                    {
+                        <td><span class="status status-completed">Hoàn thành</span></td>
+
+                    }
+
+                    <td>@item.TongTien</td>
+                    <td>@item.NgayTaoDon</td>
+                    <td>@item.NgayChinhSua</td>
+                    <td><button class="btn btn-edit">Sửa</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <div class="page-item active">1</div>
+        <div class="page-item">2</div>
+        <div class="page-item">3</div>
+        <div class="page-item">...</div>
+        <div class="page-item">10</div>
+    </div>
+</div>

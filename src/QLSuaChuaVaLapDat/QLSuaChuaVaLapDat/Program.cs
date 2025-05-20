@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using QLSuaChuaVaLapDat.Models;
-using QLSuaChuaVaLapDat.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddDbContext<QLSuaChuaVaLapDatContext>(options =>
@@ -33,6 +32,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=TimKiem}/{action=TimKiem}/{id?}");
+    pattern: "{controller=TimKiem}/{action=TimKiemDonDichVu}/{id?}");
 
 app.Run();

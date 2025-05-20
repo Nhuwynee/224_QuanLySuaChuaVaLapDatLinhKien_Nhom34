@@ -1,0 +1,148 @@
+﻿<div class="search-container " id="warranty">
+    <div class="search-header">
+        <div class="search-title">Tìm kiếm Bảo hành</div>
+        <div class="search-actions">
+            <button class="btn btn-secondary">Làm mới</button>
+            <button class="btn btn-primary">Tìm kiếm</button>
+        </div>
+    </div>
+
+    <div class="search-fields">
+        <div class="form-group">
+            <label for="war-code">Mã bảo hành</label>
+            <input type="text" id="war-code" placeholder="Nhập mã bảo hành...">
+        </div>
+
+        <div class="form-group">
+            <label for="war-order">Mã đơn dịch vụ</label>
+            <input type="text" id="war-order" placeholder="Nhập mã đơn dịch vụ...">
+        </div>
+
+        <div class="form-group">
+            <label for="war-component">Mã linh kiện</label>
+            <input type="text" id="war-component" placeholder="Nhập mã linh kiện...">
+        </div>
+
+        <div class="form-group">
+            <label for="war-customer">Khách hàng</label>
+            <input type="text" id="war-customer" placeholder="Nhập tên hoặc SĐT KH...">
+        </div>
+
+        <div class="form-group">
+            <label for="war-status">Trạng thái</label>
+            <select id="war-status">
+                <option value="">Tất cả</option>
+                <option value="active">Đang bảo hành</option>
+                <option value="expired">Hết hạn</option>
+                <option value="used">Đã sử dụng</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="war-from">Từ ngày</label>
+            <input type="date" id="war-from">
+        </div>
+
+        <div class="form-group">
+            <label for="war-to">Đến ngày</label>
+            <input type="date" id="war-to">
+        </div>
+    </div>
+
+    <div class="filter-sort">
+        <div class="filter-section">
+            <span>Lọc theo:</span>
+            <select>
+                <option>Loại linh kiện</option>
+                <option>CPU</option>
+                <option>RAM</option>
+                <option>Ổ cứng</option>
+                <option>Màn hình</option>
+            </select>
+            <select>
+                <option>Nhà sản xuất</option>
+                <option>Intel</option>
+                <option>AMD</option>
+                <option>Samsung</option>
+                <option>Kingston</option>
+            </select>
+        </div>
+
+        <div class="sort-section">
+            <span>Sắp xếp theo:</span>
+            <select>
+                <option>Ngày kích hoạt (mới nhất)</option>
+                <option>Ngày kích hoạt (cũ nhất)</option>
+                <option>Ngày hết hạn (sớm nhất)</option>
+                <option>Ngày hết hạn (muộn nhất)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="select-all-container">
+        <label for="select-all-warranty" style="margin-top: 15px;">Chọn tất cả</label>
+    </div>
+
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" class="select-all" data-table="warranty"></th>
+                <th>Mã BH</th>
+                <th>Mã đơn</th>
+                <th>Linh kiện</th>
+                <th>Khách hàng</th>
+                <th>Ngày kích hoạt</th>
+                <th>Ngày hết hạn</th>
+                <th>Trạng thái</th>
+                <th>Điều kiện</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="checkbox" class="row-checkbox"></td>
+                <td>#BH-0001</td>
+                <td>#DV-0012</td>
+                <td>CPU Intel Core i5</td>
+                <td>Nguyễn Văn A</td>
+                <td>15/03/2023</td>
+                <td>15/03/2026</td>
+                <td><span class="status status-confirmed">Đang BH</span></td>
+                <td>Không ép xung</td>
+                <td><button class="btn btn-edit">Sửa</button></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="row-checkbox"></td>
+                <td>#BH-0002</td>
+                <td>#DV-0045</td>
+                <td>RAM Kingston 16GB</td>
+                <td>Trần Thị B</td>
+                <td>20/01/2022</td>
+                <td>20/01/2025</td>
+                <td><span class="status status-confirmed">Đang BH</span></td>
+                <td>Không vật lý</td>
+                <td><button class="btn btn-edit">Sửa</button></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="row-checkbox"></td>
+                <td>#BH-0003</td>
+                <td>#DV-0078</td>
+                <td>SSD Samsung 1TB</td>
+                <td>Lê Văn C</td>
+                <td>05/12/2021</td>
+                <td>05/12/2023</td>
+                <td><span class="status status-cancelled">Hết hạn</span></td>
+                <td>Không tháo rời</td>
+                <td><button class="btn btn-edit">Sửa</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <div class="page-item active">1</div>
+        <div class="page-item">2</div>
+        <div class="page-item">3</div>
+        <div class="page-item">...</div>
+        <div class="page-item">10</div>
+    </div>
+</div>

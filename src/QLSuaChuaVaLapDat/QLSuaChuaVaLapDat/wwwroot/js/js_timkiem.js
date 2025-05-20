@@ -1,46 +1,4 @@
-﻿@{
-    ViewData["Title"] = "Tìm kiếm";
-}
-
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ thống Quản lý</title>
-    <link rel="stylesheet" href="~/css/style_timkiem.css">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Hệ thống Quản lý</h1>
-            <div class="search-actions">
-                <button class="btn btn-secondary">Xuất Excel</button>
-                <button class="btn btn-primary">+ Tạo mới</button>
-            </div>
-        </header>
-
-        <div class="search-tabs">
-            <a class="search-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "TimKiemDonDichVu" ? "active" : "")"
-               asp-action="TimKiemDonDichVu" asp-controller="TimKiem">Đơn dịch vụ</a>
-
-            <a class="search-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "TimKiemKhachHang" ? "active" : "")"
-               asp-action="TimKiemKhachHang" asp-controller="TimKiem">Khách hàng</a>
-
-            <a class="search-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "TimKiemLinhKien" ? "active" : "")"
-               asp-action="TimKiemLinhKien" asp-controller="TimKiem">Linh kiện</a>
-
-            <a class="search-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "TimKiemBaoHanh" ? "active" : "")"
-               asp-action="TimKiemBaoHanh" asp-controller="TimKiem">Bảo hành</a>
-        </div>
-
-        
-        @* Body *@
-        @RenderBody()
-    </div>
-
-    <script>
-        // Dynamic district and ward selection based on city
+﻿        // Dynamic district and ward selection based on city
         document.getElementById('cus-city').addEventListener('change', function() {
             const city = this.value;
             const districtSelect = document.getElementById('cus-district');
@@ -169,46 +127,4 @@
                 selectAll.checked = Array.from(allCheckboxes).every(cb => cb.checked);
             });
         });
-    </script>
 
-    <script>
-        const rangeMin = document.getElementById("rangeMin");
-        const rangeMax = document.getElementById("rangeMax");
-        const minPrice = document.getElementById("minPrice");
-        const maxPrice = document.getElementById("maxPrice");
-        const sliderRange = document.getElementById("slider-range");
-
-        function formatCurrency(value) {
-            return parseInt(value).toLocaleString('vi-VN') + "₫";
-        }
-
-        function updateSlider() {
-            let minVal = parseInt(rangeMin.value);
-            let maxVal = parseInt(rangeMax.value);
-
-            if (minVal > maxVal - 1000000) {
-                minVal = maxVal - 1000000;
-                rangeMin.value = minVal;
-            }
-            if (maxVal < minVal + 1000000) {
-                maxVal = minVal + 1000000;
-                rangeMax.value = maxVal;
-            }
-
-            const rangeWidth = parseInt(rangeMin.max) - parseInt(rangeMin.min);
-            const leftPercent = ((minVal - parseInt(rangeMin.min)) / rangeWidth) * 100;
-            const rightPercent = ((maxVal - parseInt(rangeMin.min)) / rangeWidth) * 100;
-
-            sliderRange.style.left = leftPercent + "%";
-            sliderRange.style.width = (rightPercent - leftPercent) + "%";
-
-            minPrice.value = formatCurrency(minVal);
-            maxPrice.value = formatCurrency(maxVal);
-        }
-
-        rangeMin.addEventListener("input", updateSlider);
-        rangeMax.addEventListener("input", updateSlider);
-        window.addEventListener("DOMContentLoaded", updateSlider);
-    </script>
-</body>
-</html>
