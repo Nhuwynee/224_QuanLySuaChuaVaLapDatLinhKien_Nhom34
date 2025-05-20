@@ -1,4 +1,5 @@
-﻿<div class="search-container " id="warranty">
+﻿@model IEnumerable<QLSuaChuaVaLapDat.Models.DonDichVu>
+<div class="search-container " id="warranty">
     <div class="search-header">
         <div class="search-title">Tìm kiếm Bảo hành</div>
         <div class="search-actions">
@@ -89,52 +90,85 @@
                 <th><input type="checkbox" class="select-all" data-table="warranty"></th>
                 <th>Mã BH</th>
                 <th>Mã đơn</th>
-                <th>Linh kiện</th>
+                <th>Linh kiện/ Loại lỗi</th>
+                <th>Loại dịch vụ</th>
                 <th>Khách hàng</th>
                 <th>Ngày kích hoạt</th>
                 <th>Ngày hết hạn</th>
-                <th>Trạng thái</th>
+                <th>Trạng thái bảo hành</th>
                 <th>Điều kiện</th>
                 <th>Hành động</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td><input type="checkbox" class="row-checkbox"></td>
-                <td>#BH-0001</td>
-                <td>#DV-0012</td>
-                <td>CPU Intel Core i5</td>
-                <td>Nguyễn Văn A</td>
-                <td>15/03/2023</td>
-                <td>15/03/2026</td>
-                <td><span class="status status-confirmed">Đang BH</span></td>
-                <td>Không ép xung</td>
-                <td><button class="btn btn-edit">Sửa</button></td>
-            </tr>
-            <tr>
-                <td><input type="checkbox" class="row-checkbox"></td>
-                <td>#BH-0002</td>
-                <td>#DV-0045</td>
-                <td>RAM Kingston 16GB</td>
-                <td>Trần Thị B</td>
-                <td>20/01/2022</td>
-                <td>20/01/2025</td>
-                <td><span class="status status-confirmed">Đang BH</span></td>
-                <td>Không vật lý</td>
-                <td><button class="btn btn-edit">Sửa</button></td>
-            </tr>
-            <tr>
-                <td><input type="checkbox" class="row-checkbox"></td>
-                <td>#BH-0003</td>
-                <td>#DV-0078</td>
-                <td>SSD Samsung 1TB</td>
-                <td>Lê Văn C</td>
-                <td>05/12/2021</td>
-                <td>05/12/2023</td>
-                <td><span class="status status-cancelled">Hết hạn</span></td>
-                <td>Không tháo rời</td>
-                <td><button class="btn btn-edit">Sửa</button></td>
-            </tr>
+            @foreach (var item in Model)
+            {
+                @foreach (var chiTiet in item.ChiTietDonDichVus)
+                {
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                        <td>@item.IdDonDichVu</td>
+                        <td>@chiTiet.IdCtdh</td>
+                        @if (chiTiet.IdLinhKienNavigation != null)
+                        {
+                            <td>@chiTiet.IdLinhKienNavigation.TenLinhKien </td>
+                        }
+                        else if (chiTiet.IdLoiNavigation != null)
+                        {
+                            <td>@chiTiet.IdLoiNavigation.MoTaLoi</td>
+                         }
+
+                         <td>@chiTiet.LoaiDichVu</td>
+
+                        @if (@item.IdKhachVangLaiNavigation != null)
+                        {
+                            <td>@item.IdKhachVangLaiNavigation.HoVaTen</td>
+                        }
+                        else if (@item.IdUserNavigation != null)
+                        {
+                            <td>@item.IdUserNavigation.HoVaTen</td>
+                        }
+                        else
+                        {
+                            <td>Khách ẩn danh</td>
+                        }
+                        <td>@chiTiet.ThoiGianThemLinhKien</td>
+
+                        @if (chiTiet.LoaiDichVu == "Sửa chữa")
+                        {
+                            <td>@chiTiet.NgayKetThucBh</td>
+                        }
+
+                        else if (chiTiet.LoaiDichVu == "Lắp đặt")
+                        {
+                            <td>@chiTiet.IdLinhKienNavigation.ThoiGianBaoHanh</td>
+                        }
+
+                        <td>
+                            @if (chiTiet.HanBaoHanh == true)
+                            {
+                                <span class="status status-confirmed">Đang BH</span>
+                            }
+                            else
+                            {
+                                <span class="status status-pending" style="background:rgba(231, 76, 60, 0.2); color:#e74c3c;">Hết hạn BH</span>
+                            }
+                        </td>
+                        @if (chiTiet.LoaiDichVu == "Sửa chữa")
+                        {
+                            <td>Không có</td>
+                        }
+
+                        else if (chiTiet.LoaiDichVu == "Lắp đặt")
+                        {
+                            <td>@chiTiet.IdLinhKienNavigation.DieuKienBaoHanh</td>
+                        }
+
+                       
+                        <td><button class="btn btn-edit">Sửa</button></td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
 

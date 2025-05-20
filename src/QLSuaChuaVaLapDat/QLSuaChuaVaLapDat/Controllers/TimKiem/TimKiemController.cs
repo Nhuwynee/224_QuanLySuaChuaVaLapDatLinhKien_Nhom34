@@ -94,7 +94,23 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
         }
         public async Task<IActionResult> TimKiemBaoHanh()
         {
-            return View();
+            try
+            {
+                var result = await _context.DonDichVus
+                    .Include(d=>d.IdKhachVangLaiNavigation)
+                    .Include(d=>d.IdUserNavigation)
+                    .Include(d => d.ChiTietDonDichVus)
+                        .ThenInclude(ct => ct.IdLinhKienNavigation)
+                    .Include(d => d.ChiTietDonDichVus)
+                    .ThenInclude(ct => ct.IdLoiNavigation)
+                    .ToListAsync();
+
+                return View(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Lỗi: {ex.Message}");
+            }
         }
 
 
