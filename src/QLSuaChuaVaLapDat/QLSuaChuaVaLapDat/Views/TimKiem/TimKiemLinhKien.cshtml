@@ -128,65 +128,42 @@
 
     <table class="results-table">
         <thead>
-            <tr>
-                <th><input type="checkbox" class="select-all" data-table="components"></th>
-                <th>Mã linh kiện</th>
-                <th>Tên linh kiện</th>
-                <th>Loại</th>
-                <th>Nhà SX</th>
-                <th>Giá</th>
-                <th>Số lượng</th>
-                <th>Bảo hành</th>
-                <th>Điều kiện BH</th>
-                <th>Hành động</th>
-            </tr>
+           
+                <tr>
+                    <th><input type="checkbox" class="select-all" data-table="components"></th>
+                    <th>Hình ảnh</th>
+                    <th>Mã linh kiện</th>
+                    <th>Tên linh kiện</th>
+                    <th>Loại</th>
+                    <th>Nhà SX</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Bảo hành</th>
+                    <th>Điều kiện BH</th>
+                    <th>Hành động</th>
+                </tr>
+           
         </thead>
         <tbody>
-            <tr>
-                <td><input type="checkbox" class="row-checkbox"></td>
-                <td>#LK-001</td>
-                <td>CPU Intel Core i7 10700</td>
-                <td>CPU</td>
-                <td>Intel</td>
-                <td>7,500,000 ₫</td>
-                <td>15</td>
-                <td>36 tháng</td>
-                <td>Không ép xung</td>
-                <td class="action-buttons">
-                    <button class="btn btn-edit">Sửa</button>
-                    <button class="btn btn-delete">Xóa</button>
-                </td>
-            </tr>
-            <tr>
-                <td><input type="checkbox" class="row-checkbox"></td>
-                <td>#LK-002</td>
-                <td>RAM Kingston 8GB DDR4</td>
-                <td>RAM</td>
-                <td>Kingston</td>
-                <td>1,200,000 ₫</td>
-                <td>42</td>
-                <td>Lifetime</td>
-                <td>Không vật lý</td>
-                <td class="action-buttons">
-                    <button class="btn btn-edit">Sửa</button>
-                    <button class="btn btn-delete">Xóa</button>
-                </td>
-            </tr>
-            <tr>
-                <td><input type="checkbox" class="row-checkbox"></td>
-                <td>#LK-003</td>
-                <td>SSD Samsung 970 EVO 500GB</td>
-                <td>Ổ cứng</td>
-                <td>Samsung</td>
-                <td>2,300,000 ₫</td>
-                <td>28</td>
-                <td>60 tháng</td>
-                <td>Không tháo rời</td>
-                <td class="action-buttons">
-                    <button class="btn btn-edit">Sửa</button>
-                    <button class="btn btn-delete">Xóa</button>
-                </td>
-            </tr>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><input type="checkbox" class="row-checkbox"></td>
+                    <td><img src="/img/@item.Anh" alt="Alternate Text" /></td>
+                    <td>@item.IdLoaiLinhKien</td>
+                    <td>@item.TenLinhKien</td>
+                    <td>@item.IdLoaiLinhKienNavigation.TenLoaiLinhKien</td>
+                    <td>@item.IdNsxNavigation.TenNsx</td>
+                    <td>@item.Gia</td>
+                    <td>@item.SoLuong</td>
+                    <td>@item.ThoiGianBaoHanh</td>
+                    <td>@item.DieuKienBaoHanh</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-edit">Sửa</button>
+                        <button class="btn btn-delete">Xóa</button>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 
