@@ -1,179 +1,114 @@
-﻿@{
+﻿@model QLSuaChuaVaLapDat.Models.ThongKeModel
+@{
     Layout = "~/Views/Shared/_LayoutQuanLi.cshtml";
 }
-@using System.Globalization
+@using System.Globalization 
+<html>
 <body>
     <div class="container">
         <div class="dashboard">
             <div class="metric-card">
                 <div>Tổng số đơn</div>
-                <div class="metric-value">@Model.TotalOrders</div>
+                <div class="metric-value">@Model.TongDon</div>
                 <div class="metric-change">+0% last month</div>
-                <div class="metric-date">@Model.CurrentMonth</div>
+                <div class="metric-date">@Model.ThangHT</div>
             </div>
             <div class="metric-card">
                 <div>Tổng doanh thu</div>
-                <div class="metric-value">@Model.TotalRevenue.ToString("C0", new CultureInfo("vi-VN"))</div>
+                <div class="metric-value">@Model.TongDoanhTHu.ToString("C0", new CultureInfo("vi-VN"))</div>
                 <div class="metric-change">+0% last month</div>
-                <div class="metric-date">@Model.CurrentMonth</div>
+                <div class="metric-date">@Model.ThangHT</div>
             </div>
             <div class="metric-card">
                 <div>Tổng nhân viên</div>
-                <div class="metric-value">@Model.TotalStaff</div>
+                <div class="metric-value">@Model.TongNhanVien</div>
                 <div class="metric-change">+0% last month</div>
-                <div class="metric-date">@Model.CurrentMonth</div>
+                <div class="metric-date">@Model.ThangHT</div>
             </div>
         </div>
     </div>
 
+    
+
     <div class="container">
+        <h3 class="mb-4">Tổng quan doanh thu và khách hàng</h3> <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="metric-card">
+                    <div class="metric-title">Tổng đơn tháng này (@Model.ThangHT)</div>
+                    <div class="metric-value">@Model.TongDon</div>
+                    @* <div class="metric-change">+0% last month</div> *@
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-card">
+                    <div class="metric-title">Doanh thu tháng này</div>
+                    <div class="metric-value">@Model.TongDoanhThuThangHT.ToString("N0") VNĐ</div>
+                    @* <div class="metric-change">...</div> *@
+                </div>
+            </div>
+        </div>
+
+
         <div class="charts-container">
-            <div class="revenue-chart">
-                <div class="chart-title">Revenue</div>
-                <div class="chart-bars">
-                    <div class="bar bar-google">
-                        <div class="bar-label">Google ads</div>
-                    </div>
-                    <div class="bar bar-facebook">
-                        <div class="bar-label">Facebook ads</div>
-                    </div>
+            <div class="chart-card">
+                <div class="chart-title">Doanh thu (Đơn hoàn thành)</div>
+                @if (Model.DoanhThuThang != null && Model.DoanhThuThang.Count > 0)
+                {
+                <div class="revenue-chart-bars">
+                    @foreach (var monthData in Model.DoanhThuThang)
+                    {
+                        <a href="#" class="revenue-bar-item">
+                            <div class="revenue-bar" style="height:@(monthData.ChieuCaoCot.ToString(System.Globalization.CultureInfo.InvariantCulture) + "%")"></div>
+                            <div class="revenue-bar-value-tooltip">@monthData.TongDoanhThuTheoThang.ToString("N0") VND</div>
+                            <div class="revenue-bar-label">@monthData.ThangVaNam</div>
+                        </a>
+                    }
                 </div>
+                }   
+                else
+                {
+                    <p class="text-center text-muted">Không có dữ liệu doanh thu để hiển thị.</p>
+                }
             </div>
 
-            <div class="visitors-chart">
-                <div class="visitors-title">Website Visitors</div>
+            <div class="chart-card">
+                <div class="chart-title">Phân loại khách hàng (Theo đơn hàng)</div>
                 <div class="visitors-data">
-                    <div class="visitors-pie"></div>
-                    <div class="visitors-legend">
-                        <div class="legend-item">
-                            <div class="legend-color direct"></div>
-                            <div>Direct 38%</div>
+                    @if (Model.KhachHang > 0 || Model.KhacVangLai > 0)
+                    {
+                        var regPercentCss = Model.PTKhachHang.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        // Đảm bảo totalPercentCss không vượt quá 100 và cũng không gây lỗi nếu tổng là 0
+                        var sumPercentages = Model.PTKhachHang + Model.PTKhachVangLai;
+                        var totalPercentCssValue = sumPercentages > 100 ? 100 : sumPercentages;
+                        var totalPercentCss = totalPercentCssValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        var remainingColor = "#eee"; // Màu cho phần còn lại nếu tổng < 100
+
+                        // Cập nhật style cho conic-gradient
+                        var pieStyle = $"background-image: conic-gradient(#337ab7 0% {regPercentCss}%, #f0ad4e {regPercentCss}% {totalPercentCss}%, {remainingColor} {totalPercentCss}% 100%);";
+
+
+                        <div class="css-pie" style="@pieStyle">
+                            <div>
+                                @((Model.KhachHang + Model.KhacVangLai))<br />Đơn
+                            </div>
                         </div>
-                        <div class="legend-item">
-                            <div class="legend-color organic"></div>
-                            <div>Organic 22%</div>
+                        <div class="visitors-legend">
+                            <div class="legend-item">
+                                <div class="legend-color direct"></div> <div>Có tài khoản: @Model.KhachHang (@Model.PTKhachHang.ToString("F1"))%</div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color organic"></div> <div>Khách vãng lai: @Model.KhacVangLai (@Model.PTKhachVangLai.ToString("F1"))%</div>
+                            </div>
                         </div>
-                        <div class="legend-item">
-                            <div class="legend-color paid"></div>
-                            <div>Paid 12%</div>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color other"></div>
-                            <div>Other 28%</div>
-                        </div>
-                    </div>
+                    }
+                    else
+                    {
+                        <p class="text-center text-muted">Không có dữ liệu khách hàng để hiển thị.</p>
+                    }
                 </div>
             </div>
         </div>
     </div>
-    <div class="container">
-        <div class="products-header">
-            <h2>Đơn dịch vụ gần đây</h2>
-        </div>
-        <table class="products-table">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Orders</th>
-                    <th>Price</th>
-                    <th>Ads Spent</th>
-                    <th>Refunds</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td data-label="Product">
-                        <div class="product-info">
-                            <div class="product-icon">👟</div>
-                            <div class="product-text">
-                                <span class="product-name">Nike v22</span>
-                                <span class="product-category">Running Shoes</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td data-label="Orders">
-                        <span class="orders-count">8,000</span>
-                    </td>
-                    <td data-label="Price">
-                        <span class="price-value">$130</span>
-                    </td>
-                    <td data-label="Ads Spent">
-                        <span class="ads-spent">$9,500</span>
-                    </td>
-                    <td data-label="Refunds">
-                        <span class="refunds-badge refund-high">> 13</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td data-label="Product">
-                        <div class="product-info">
-                            <div class="product-icon">📷</div>
-                            <div class="product-text">
-                                <span class="product-name">Instax Camera</span>
-                                <span class="product-category">Portable Camera</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td data-label="Orders">3,000</td>
-                    <td data-label="Price">$45</td>
-                    <td data-label="Ads Spent">$4,500</td>
-                    <td data-label="Refunds">
-                        <span class="refunds-badge refund-high">> 18</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td data-label="Product">
-                        <div class="product-info">
-                            <div class="product-icon">🪑</div>
-                            <div class="product-text">
-                                <span class="product-name">Chair</span>
-                                <span class="product-category">Relaxing chair</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td data-label="Orders">6,000</td>
-                    <td data-label="Price">$80</td>
-                    <td data-label="Ads Spent">$5,800</td>
-                    <td data-label="Refunds">
-                        <span class="refunds-badge refund-low">< 11</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td data-label="Product">
-                        <div class="product-info">
-                            <div class="product-icon">💻</div>
-                            <div class="product-text">
-                                <span class="product-name">Laptop</span>
-                                <span class="product-category">Macbook pro 13</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td data-label="Orders">4,000</td>
-                    <td data-label="Price">$500</td>
-                    <td data-label="Ads Spent">$4,700</td>
-                    <td data-label="Refunds">
-                        <span class="refunds-badge refund-high">> 18</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td data-label="Product">
-                        <div class="product-info">
-                            <div class="product-icon">⌚</div>
-                            <div class="product-text">
-                                <span class="product-name">Watch</span>
-                                <span class="product-category">Digital watch</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td data-label="Orders">2,000</td>
-                    <td data-label="Price">$15</td>
-                    <td data-label="Ads Spent">$2,500</td>
-                    <td data-label="Refunds">
-                        <span class="refunds-badge refund-low">< 10</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+
 </body>
 </html>
