@@ -6,6 +6,7 @@ namespace QLSuaChuaVaLapDat.Controllers.DanhSachDangKyController
     {
         public IActionResult IndexDSDK()
         {
+            
             return View();
         }
     }

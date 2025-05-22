@@ -4,7 +4,13 @@ function confirmBack() {
         window.location.href = backToListUrl;
     }
 }
-
+// Định dạng tiền tệ
+function formatCurrency(value) {
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(value);
+}
 // Xử lý chức năng tìm kiếm linh kiện
 $(document).ready(function() {
     const searchInput = $('#searchPartsInput');
@@ -20,7 +26,8 @@ $(document).ready(function() {
         let newComponentSection = $('.split-with-button').first().clone(false);
         
         // Clear any input values in the cloned section
-        newComponentSection.find('input[type="text"]').val('');        newComponentSection.find('textarea').val('');
+        newComponentSection.find('input[type="text"]').val('');        
+        newComponentSection.find('textarea').val('');
         newComponentSection.find('input[type="radio"]').prop('checked', true);
         newComponentSection.find('select').val('');
         newComponentSection.find('input[type="text"]').val('0');
@@ -39,6 +46,7 @@ $(document).ready(function() {
         newComponentSection.find('select#IdLoi').each(function() {
             let newId = 'IdLoi-' + timestamp;
             $(this).attr('id', newId);
+            $(this).addClass('error-type-select');
             $(this).attr('onchange', 'layGiaTheoLoi(this.value, "donGia-' + timestamp + '")');
         });
           // Update price input to have a unique ID
@@ -197,13 +205,8 @@ $(document).ready(function() {
         updateTotalPrice();
     }
 
-    // Định dạng tiền tệ
-    function formatCurrency(value) {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(value);
-    }    // Đóng dropdown khi click ra ngoài
+   
+    // Đóng dropdown khi click ra ngoài
     $(document).on('click', function(e) {
         if (!$(e.target).closest('.search-parts-container').length) {
             partsDropdown.hide();
@@ -622,19 +625,65 @@ $(document).ready(function() {
 $(document).ready(function() {
     // Initialize flatpickr for date/time pickers
     if (typeof flatpickr !== 'undefined') {
+        // Default date for both pickers
+        const now = new Date();
+        const nowStr = now.toISOString().slice(0, 16).replace('T', ' ');
+        
+        // Initialize start date picker
         flatpickr("#startDatetimePicker", {
             enableTime: true,
-            dateFormat: "Y-m-d H:i:S",
+            dateFormat: "Y-m-d H:i",  // Format: day-month-year hour:minute
             time_24hr: true,
-            locale: "vn"
+            locale: "vn",
+            allowInput: true,
+            clickOpens: true,
+            defaultDate: nowStr,
+            onChange: function(selectedDates, dateStr) {
+                // Update the input value when the date changes
+                $('#startDatetimePicker').val(dateStr);
+                console.log('Start date changed to: ' + dateStr);
+            }
         });
+        
+        // Initialize end date picker with date 2 days later
+        const twoDaysLater = new Date();
+        twoDaysLater.setDate(now.getDate() + 2);
+        const twoDaysLaterStr = twoDaysLater.toISOString().slice(0, 16).replace('T', ' ');
         
         flatpickr("#endDatetimePicker", {
             enableTime: true,
-            dateFormat: "Y-m-d H:i:S", 
+            dateFormat: "Y-m-d H:i",  // Format: day-month-year hour:minute
             time_24hr: true,
-            locale: "vn"
+            locale: "vn",
+            allowInput: true,
+            clickOpens: true,
+            defaultDate: twoDaysLaterStr,
+            onChange: function(selectedDates, dateStr) {
+                // Update the input value when the date changes
+                $('#endDatetimePicker').val(dateStr);
+                console.log('End date changed to: ' + dateStr);
+            }
         });
+        
+        // Set initial values after initialization
+        setTimeout(function() {
+            // Force the input values to be updated with formatted dates
+            const startPicker = document.getElementById('startDatetimePicker')._flatpickr;
+            const endPicker = document.getElementById('endDatetimePicker')._flatpickr;
+            
+            if (startPicker) {
+                const startFormatted = startPicker.formatDate(startPicker.selectedDates[0], "Y-m-d H:i");
+                $('#startDatetimePicker').val(startFormatted);
+            }
+            
+            if (endPicker) {
+                const endFormatted = endPicker.formatDate(endPicker.selectedDates[0], "Y-m-d H:i");
+                $('#endDatetimePicker').val(endFormatted);
+            }
+              // Thêm 2 dòng này ngay sau khi set value
+            $('#startDatetimePicker').trigger('change');
+            $('#endDatetimePicker').trigger('change');
+        }, 100);
     }
     
     // Initialize dropdowns
@@ -1050,4 +1099,290 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+});
+
+// Xử lý sự kiện khi chọn trạng thái đơn hàng
+$(document).ready(function() {
+    // Trạng thái dropdown
+    const statusDropdown = $('#statusDropdown');
+    const statusInput = statusDropdown.find('input');
+    const statusDropdownItems = statusDropdown.find('.dropdown-item');
+    const paymentBtn = $('.payment-btn');
+    
+    // Đặt trạng thái ban đầu
+    // checkStatusAndTogglePaymentButton(statusInput.val());
+    statusInput.val("Chưa hoàn thành");
+
+
+    // Xử lý khi click vào các item trong dropdown trạng thái
+    statusDropdownItems.click(function() {
+        const selectedStatus = $(this).text().trim();
+        statusInput.val(selectedStatus);
+        //checkStatusAndTogglePaymentButton(selectedStatus);
+        // Hiển thị nút thanh toán chỉ khi chọn "Đã hoàn thành"
+       if (selectedStatus === "Đã hoàn thành") {
+            paymentBtn.addClass('payment-btn-visible');
+        } else {
+            paymentBtn.removeClass('payment-btn-visible');
+        }
+    });
+    
+    // Hàm kiểm tra trạng thái và hiển thị/ẩn nút thanh toán
+    function checkStatusAndTogglePaymentButton(status) {
+        if (status === "Đã hoàn thành") {
+            paymentBtn.show();
+        } else {
+            paymentBtn.hide();
+        }
+    }
+    
+    // Xử lý khi click vào nút thanh toán
+    paymentBtn.click(function() {
+        // Kiểm tra tiền còn lại
+        const remainingText = $('#remainingAmount').text();
+        const remainingAmount = parseInt(remainingText.match(/\d+/g).join('')) || 0;
+        
+        if (remainingAmount <= 1000) {
+            alert("Đơn hàng phải nhập đầy đủ các thông tin bắt buộc!");
+        } else {
+            // Hiển thị popup hóa đơn thanh toán
+            showPaymentPopup();
+        }
+    });    // Hiển thị popup hóa đơn thanh toán
+    function showPaymentPopup() {
+        console.log('Opening payment popup...');
+        
+        // Log date values before populating
+        console.log('Start date before populate:', $('#startDatetimePicker').val());
+        console.log('End date before populate:', $('#endDatetimePicker').val());
+        
+        // Lấy thông tin từ form để hiển thị trong hóa đơn
+        populateInvoiceData();
+        
+        // Log date values after populating
+        console.log('Start date displayed:', $('#invoice-start-time').text());
+        console.log('End date displayed:', $('#invoice-end-time').text());
+        
+        // Hiển thị popup
+        $('#paymentModal').fadeIn(100);
+    }
+
+    // Lấy dữ liệu từ form và điền vào hóa đơn
+    function populateInvoiceData() {
+        // Đảm bảo flatpickr đã cập nhật value cho input
+    if (window.flatpickr) {
+        const startPicker = document.getElementById('startDatetimePicker')._flatpickr;
+        const endPicker = document.getElementById('endDatetimePicker')._flatpickr;
+        if (startPicker && startPicker.selectedDates[0]) {
+            $('#startDatetimePicker').val(startPicker.formatDate(startPicker.selectedDates[0], "Y-m-d H:i"));
+        }
+        if (endPicker && endPicker.selectedDates[0]) {
+            $('#endDatetimePicker').val(endPicker.formatDate(endPicker.selectedDates[0], "Y-m-d H:i"));
+        }
+    }
+        // Thông tin đơn hàng
+        $('#invoice-order-id').text($('#IdDonDichVu').val());
+        $('#invoice-order-date').text($('.order-date').text().replace('Ngày tạo: ', ''));
+        //$('#invoice-staff-name').text($('.staff-name').text().replace('Nhân viên: ', ''));        
+        const allStaff = $('.staff-name').map(function () {
+    return $(this).text().replace('Nhân viên: ', '').trim();
+}).get().join(', ');
+
+$('#invoice-staff-name').text(allStaff);
+
+
+        // Thông tin khách hàng
+        const customerName = $('.form-group:contains("Họ và tên khách hàng") input').val() || 'Chưa có thông tin';
+        const customerPhone = $('.form-group:contains("Số điện thoại") input').val() || 'Chưa có thông tin';
+        $('#invoice-customer-name').text(customerName);
+        $('#invoice-customer-phone').text(customerPhone);
+
+        // Địa chỉ khách hàng
+        const city = $('#cityInput').val();
+        const district = $('#districtInput').val();
+        const ward = $('#wardInput').val();
+        const streetAddress = $('input[placeholder="Số nhà, đường"]').val() || '';
+        const fullAddress = [streetAddress, ward, district, city].filter(item => item).join(', ');
+        $('#invoice-customer-address').text(fullAddress || 'Chưa có thông tin');        
+        
+        // Thông tin thiết bị
+        const deviceTypes = [];
+        const errorTypes = [];
+        const errorDescriptions = [];        
+        // Collect all device types, errors, and descriptions from all sections
+        $('.section').each(function() {
+            // Collect device types - look for both ID and class selectors to handle dynamic additions
+            $(this).find('select[id*="IdLoaiThietBi"], select.device-type-select').each(function() {
+                const deviceText = $(this).find('option:selected').text();
+                if (deviceText && deviceText !== 'Chọn loại thiết bị') {
+                    deviceTypes.push(deviceText.trim());
+                }
+            });
+
+            // Collect error types - look for both ID and class selectors
+            $(this).find('select[id*="IdLoi"], select.error-type-select').each(function() {
+                const errorText = $(this).find('option:selected').text();
+                if (errorText && errorText !== 'Chọn lỗi') {
+                    errorTypes.push(errorText.trim());
+                }
+            });
+
+            // Collect error descriptions from all textareas in the form
+            $(this).find('.form-group:contains("Mô tả lỗi") textarea, textarea.error-desc-textarea').each(function() {
+                const descText = $(this).val().trim();
+                if (descText) {
+                    errorDescriptions.push(descText);
+                }
+            });
+        });
+
+        // Also collect from specific error containers if any
+        $('.selected-error').each(function() {
+            const errorText = $(this).text().trim();
+            if (errorText) {
+                errorDescriptions.push(errorText);
+            }
+        });
+
+        // If no devices found
+        if (deviceTypes.length === 0) {
+            deviceTypes.push('Chưa chọn');
+        }
+
+        // If no errors found
+        if (errorTypes.length === 0) {
+            errorTypes.push('Chưa chọn');
+        }
+
+        // If no descriptions found
+        if (errorDescriptions.length === 0) {
+            errorDescriptions.push('Không có mô tả');
+        }
+
+        // Format them with bullet points for display
+        const formattedDeviceTypes = deviceTypes.map(type => `• ${type}`).join('<br>');
+        const formattedErrorTypes = errorTypes.map(error => `• ${error}`).join('<br>');
+        const formattedDescriptions = errorDescriptions.map(desc => `• ${desc}`).join('<br>');
+
+        // Update the invoice
+        $('#invoice-device-type').html(formattedDeviceTypes);
+        $('#invoice-error-type').html(formattedErrorTypes);
+        $('#invoice-error-description').html(formattedDescriptions);
+        // Thông tin dịch vụ
+        const serviceType = $('.dropdown input[placeholder="Sửa chữa hoặc lắp đặt"]').val() || 'Chưa chọn';
+        $('#invoice-service-type').text(serviceType);
+        
+        const serviceLocation = $('.dropdown input[placeholder="Trực tiếp hoặc tại nhà"]').val() || 'Chưa chọn';
+        $('#invoice-service-location').text(serviceLocation);
+        
+        // Kỹ thuật viên
+        const technician = $('.selected-staff .staff-name').text();
+        $('#invoice-technician').text(technician);
+        // Thông tin ngày giờ
+        let startDateTime = $('#startDatetimePicker').val() || 'Chưa xác định';
+        let endDateTime = $('#endDatetimePicker').val() || 'Chưa xác định';
+        
+        // Make sure we get the actual current values from the inputs
+        if ($('#startDatetimePicker').length) {
+            startDateTime = $('#startDatetimePicker').val() || 'Chưa xác định';
+        }
+        
+        if ($('#endDatetimePicker').length) {
+            endDateTime = $('#endDatetimePicker').val() || 'Chưa xác định';
+        }
+        
+        // Format the date for better display
+        if (startDateTime !== 'Chưa xác định') {
+            startDateTime = startDateTime.trim();
+            console.log('Start date-time value: ' + startDateTime);
+        }
+        
+        if (endDateTime !== 'Chưa xác định') {
+            endDateTime = endDateTime.trim();
+            console.log('End date-time value: ' + endDateTime);
+        }
+        
+        // Set the values in the payment popup
+        $('#invoice-start-time').text(startDateTime);
+        $('#invoice-end-time').text(endDateTime);
+//         $('#invoice-start-time').text($('#startDatetimePicker').val() || 'Chưa xác định');
+// $('#invoice-end-time').text($('#endDatetimePicker').val() || 'Chưa xác định');
+
+        // Hiển thị danh sách linh kiện
+        const partsList = $('#invoice-parts-list');
+        partsList.empty();
+        
+        let partsCost = 0;
+        
+        // Lấy các linh kiện đã chọn
+        $('#selectedPartsContainer .selected-part').each(function() {
+    const partName = $(this).find('.part-name').text();
+    
+    // Extract price from text content instead of data-attribute
+    const priceText = $(this).find('.part-price').text();
+    const priceMatch = priceText.match(/[\d.,]+/); // Extract numeric part
+    const partPrice = priceMatch ? priceMatch[0].replace(/\./g, '').replace(/,/g, '') : '0';
+    //const formattedPrice = formatCurrency(parseInt(partPrice));
+      const formattedPrice = new Intl.NumberFormat('vi-VN').format(parseInt(partPrice));      
+            partsList.append(
+                `<div class="payment-part-item">
+                    <div class="payment-part-name">${partName}</div>
+                    <div class="payment-part-price">${formattedPrice} VND</div>
+                </div>`
+            );
+            
+            partsCost += parseInt(partPrice);
+        });
+        
+        if (partsList.children().length === 0) {
+            partsList.append('<div class="payment-part-item">Không có linh kiện thay thế</div>');
+        }
+
+        // Thông tin thanh toán
+        const errorCost = $('.price-input').eq(0).val() || '0 VND';
+        const totalCost = $('.price-input').eq(1).val() || '0 VND';
+        const advancePayment = $('#advancePayment').val() || '0';
+        // const formattedAdvancePayment = formatCurrency(parseInt(advancePayment));
+        // const formattedPartsCost = formatCurrency(partsCost);
+        // Replace formatCurrency with a simpler format that doesn't include the ₫ symbol
+const formattedAdvancePayment = new Intl.NumberFormat('vi-VN').format(parseInt(advancePayment));
+const formattedPartsCost = new Intl.NumberFormat('vi-VN').format(partsCost);
+
+        $('#invoice-error-cost').text(errorCost+ ' VND');
+        $('#invoice-parts-cost').text(formattedPartsCost + ' VND');
+        $('#invoice-advance-payment').text(formattedAdvancePayment + ' VND');
+        //$('#invoice-remaining-amount').text($('#remainingAmount').text());
+        const rawText = $('#remainingAmount').text();
+// const amountMatch = rawText.match(/[\d.,]+\s*VND/);
+// const amountOnly = amountMatch ? amountMatch[0] : '0 VND';
+const amountMatch = rawText.match(/[\d.,]+/);
+const amountOnly = amountMatch ? new Intl.NumberFormat('vi-VN').format(parseInt(amountMatch[0].replace(/\./g, '').replace(/,/g, ''))) + ' VND' : '0 VND';
+
+
+$('#invoice-remaining-amount').text(amountOnly);
+    }
+
+    // Đóng payment popup khi nhấn nút đóng hoặc nút Hủy
+    $('.payment-popup-close, .payment-cancel-btn').click(function() {
+        $('#paymentModal').fadeOut(200);
+    });
+
+    // Xử lý khi nhấn nút xác nhận thanh toán
+    $('.payment-confirm-btn').click(function() {
+        // Xử lý logic thanh toán ở đây
+        alert('Thanh toán thành công!');
+        $('#paymentModal').fadeOut(200);
+        
+        // Cập nhật số tiền ứng trước bằng tổng tiền để hiển thị tiền còn lại = 0
+        const totalPrice = $('.price-input').eq(1).val().replace(/[^\d]/g, '');
+        $('#advancePayment').val(totalPrice).trigger('input');
+    });
+
+    // Đóng popup khi click bên ngoài
+    $(window).click(function(event) {
+        const modal = $('#paymentModal')[0];
+        if (event.target === modal) {
+            $('#paymentModal').fadeOut(200);
+        }
+    });
 });
