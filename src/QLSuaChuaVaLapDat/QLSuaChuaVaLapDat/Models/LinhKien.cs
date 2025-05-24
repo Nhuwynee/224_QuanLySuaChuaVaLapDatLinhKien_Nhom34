@@ -15,11 +15,11 @@ public partial class LinhKien
 
     public decimal Gia { get; set; }
 
-    public string SoLuong { get; set; } = null!;
+    public int SoLuong { get; set; }
 
     public string? Anh { get; set; }
 
-    public DateOnly ThoiGianBaoHanh { get; set; }
+    public int ThoiGianBaoHanh { get; set; }
 
     public string DieuKienBaoHanh { get; set; } = null!;
 

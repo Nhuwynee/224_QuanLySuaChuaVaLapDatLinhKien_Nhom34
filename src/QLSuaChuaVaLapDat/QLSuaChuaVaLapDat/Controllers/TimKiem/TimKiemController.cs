@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using QLSuaChuaVaLapDat.Models;
 using QLSuaChuaVaLapDat.Models.Impl;
+using QLSuaChuaVaLapDat.Models.TimKiem;
+using QLSuaChuaVaLapDat.ViewModel;
 
 namespace QLSuaChuaVaLapDat.Controllers.TimKiem
 {
@@ -82,16 +84,125 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
             return View(dsKhachHang);
         }
 
-
-        public async Task<IActionResult> TimKiemLinhKien()
+        [HttpGet]
+        public async Task<IActionResult> TimKiemLinhKien( )
         {
-            var result = await _context.LinhKiens
+            var resultLinhKien = await _context.LinhKiens
                 .Include(d => d.IdLoaiLinhKienNavigation)
                 .Include(d => d.IdNsxNavigation)
                 .ToListAsync();
 
-            return View(result);
+            var resultNSX = await _context.NhaSanXuats.ToListAsync();
+            var resultLoaiLK = await _context.LoaiLinhKiens.ToListAsync();
+
+            TimKiemLinhKiemVM timKiemLinhKien = new TimKiemLinhKiemVM();
+            timKiemLinhKien.LinhKiens = resultLinhKien;
+            timKiemLinhKien.NhaSanXuats = resultNSX;
+            timKiemLinhKien.LoaiLinhKiens = resultLoaiLK;
+            return View(timKiemLinhKien);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> TimKiemLinhKien(TimKiemLinhKien timKiemLinhKien)
+        {
+            var query = _context.LinhKiens
+                .Include(d => d.IdLoaiLinhKienNavigation)
+                .Include(d => d.IdNsxNavigation)
+                .AsQueryable();
+            // Lọc theo tình trạng sản phẩm(hết/còn)
+            if(timKiemLinhKien.TTSanPham!=null  )
+            {
+                if(timKiemLinhKien.TTSanPham == 1)
+                    query = query.Where(l => l.SoLuong >= 1);
+                else
+                    query = query.Where(l => l.SoLuong == 0);
+
+            }
+           
+
+            // Lọc theo mã linh kiện
+            if (!string.IsNullOrEmpty(timKiemLinhKien.MaLinhKien))
+            {
+                query = query.Where(l => l.IdLinhKien == timKiemLinhKien.MaLinhKien);
+            }
+            // Lọc theo tên linh kiện
+            if (!string.IsNullOrEmpty(timKiemLinhKien.TenLinhKien))
+            {
+                query = query.Where(l => l.TenLinhKien.Contains(timKiemLinhKien.TenLinhKien));
+            }
+
+            // Lọc theo loại linh kiện
+            if (!string.IsNullOrEmpty(timKiemLinhKien.LoaiLinhKien))
+            {
+                query = query.Where(l => l.IdLoaiLinhKienNavigation.TenLoaiLinhKien == timKiemLinhKien.LoaiLinhKien);
+            }
+
+            // Lọc theo nhà sản xuất
+            if (!string.IsNullOrEmpty(timKiemLinhKien.NhaSanXuat))
+            {
+                query = query.Where(l => l.IdNsxNavigation.IdNsx == timKiemLinhKien.NhaSanXuat);
+            }
+
+            // Lọc theo giá từ và đến
+            if (timKiemLinhKien.GiaTu.HasValue)
+            {
+                if (timKiemLinhKien.GiaTu != 0) { 
+                    query = query.Where(l => l.Gia >= timKiemLinhKien.GiaTu);
+                }
+            }
+            if (timKiemLinhKien.GiaDen.HasValue)
+            {
+                if (timKiemLinhKien.GiaDen != 0)
+                {
+                    query = query.Where(l => l.Gia <= timKiemLinhKien.GiaDen);
+                }
+            }
+
+            // Lọc theo trạng thái bảo hành
+            if (timKiemLinhKien.BaoHanh!=null)
+            {
+                query = query.Where(l => l.ThoiGianBaoHanh == timKiemLinhKien.BaoHanh);
+            }
+
+            // Sắp xếp
+            if (!string.IsNullOrEmpty(timKiemLinhKien.SapXep))
+            {
+                switch (timKiemLinhKien.SapXep.ToLower())
+                {
+                    case "asc":
+                        query = query.OrderBy(l => l.TenLinhKien);
+                        break;
+                    case "desc":
+                        query = query.OrderByDescending(l => l.TenLinhKien);
+                        break;
+                    case "price_asc":
+                        query = query.OrderBy(l => l.Gia);
+                        break;
+                    case "price_desc":
+                        query = query.OrderByDescending(l => l.Gia);
+                        break;
+                    case "warranty_asc":
+                        query = query.OrderBy(l => l.ThoiGianBaoHanh);
+                        break;
+                    case "warranty_desc":
+                        query = query.OrderByDescending(l => l.ThoiGianBaoHanh);
+                        break;
+                }
+            }
+
+            var resultLinhKien = await query.ToListAsync();
+
+            var resultNSX = await _context.NhaSanXuats.ToListAsync();
+            var resultLoaiLK = await _context.LoaiLinhKiens.ToListAsync();
+
+            TimKiemLinhKiemVM timKiemLinhKienVM = new TimKiemLinhKiemVM();
+            timKiemLinhKienVM.LinhKiens = resultLinhKien;
+            timKiemLinhKienVM.NhaSanXuats = resultNSX;
+            timKiemLinhKienVM.LoaiLinhKiens = resultLoaiLK;
+            return View(timKiemLinhKienVM);
+        }
+
+
         public async Task<IActionResult> TimKiemBaoHanh()
         {
             try
