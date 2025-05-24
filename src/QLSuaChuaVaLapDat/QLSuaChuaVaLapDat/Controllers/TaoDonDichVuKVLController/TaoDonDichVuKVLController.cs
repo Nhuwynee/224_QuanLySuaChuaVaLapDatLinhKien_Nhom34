@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using QLSuaChuaVaLapDat.Models;
 using QLSuaChuaVaLapDat.Models.viewmodel;
+using Newtonsoft.Json;
 
 namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
 {
@@ -310,9 +311,19 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
         }
 
         // Handle form submission
+
         [HttpPost]
         public async Task<IActionResult> CreateServiceOrder([FromForm] ServiceOrderFormViewModel formData)
         {
+            // Deserialize ErrorDetails nếu là string
+            if ((formData.ErrorDetails == null || formData.ErrorDetails.Count == 0) && Request.Form.ContainsKey("ErrorDetails"))
+            {
+                var errorDetailsStr = Request.Form["ErrorDetails"];
+                if (!string.IsNullOrEmpty(errorDetailsStr))
+                {
+                    formData.ErrorDetails = JsonConvert.DeserializeObject<List<ErrorDetailViewModel>>(errorDetailsStr);
+                }
+            }
             try
             {
                 var userId = HttpContext.Session.GetString("IdUser");
@@ -338,12 +349,16 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                         // Commit transaction nếu mọi thao tác đều thành công
                         transaction.Commit();
 
-                        return Json(new
-                        {
-                            success = true,
-                            message = "Đơn dịch vụ đã được tạo thành công!",
-                            idDonDichVu = idDonDichVu
-                        });
+                        //return Json(new
+                        //{
+                        //    success = true,
+                        //    message = "Đơn dịch vụ đã được tạo thành công!",
+                        //    idDonDichVu = idDonDichVu
+                        //});
+                        // Trả về view IndexDSDDV với thông báo thành công
+
+                        var danhSachDon = _context.DonDichVus.ToList();
+                        return RedirectToAction("IndexDSDDV", "DanhSachDonDichVu");
                     }
                     catch (Exception ex)
                     {
@@ -463,6 +478,12 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
         // Tạo chi tiết đơn dịch vụ và hình ảnh
         private async Task TaoChiTietDonVaHinhAnh(ServiceOrderFormViewModel formData, string idDonDichVu)
         {
+            var donDichVu = await _context.DonDichVus.FindAsync(idDonDichVu);
+            var loaiDichVu = formData.LoaiDichVu ?? donDichVu?.LoaiDonDichVu ?? "Sửa chữa";
+            if (loaiDichVu != "Sửa chữa" && loaiDichVu != "Lắp đặt")
+            {
+                return;
+            }
             // Xử lý từng chi tiết lỗi
             if (formData.ErrorDetails != null && formData.ErrorDetails.Count > 0)
             {
@@ -472,48 +493,77 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                 }
             }
 
-            // Xử lý các linh kiện được chọn riêng (nếu có)
-            //if (formData.SelectedPartIds != null && formData.SelectedPartIds.Count > 0)
-            //{
-            //    foreach (var idLinhKien in formData.SelectedPartIds)
-            //    {
-            //        // Tạo chi tiết đơn hàng cho linh kiện được chọn riêng
-            //        string idCTDH = GenerateNextDetailId();
+            //Xử lý các linh kiện được chọn riêng(nếu có)
+            if (formData.SelectedPartIds != null && formData.SelectedPartIds.Count > 0)
+            {
+                //foreach (var idLinhKien in formData.SelectedPartIds)
+                for (int i = 0; i < formData.SelectedPartIds.Count; i++)
+                {
+                    string idLinhKien = formData.SelectedPartIds[i];
+                    string idLoi = null;
+                    // Tạo chi tiết đơn hàng cho linh kiện được chọn riêng
 
-            //        var chiTiet = new ChiTietDonDichVu
-            //        {
-            //            IdCtdh = idCTDH,
-            //            IdDonDichVu = idDonDichVu,
-            //            IdLinhKien = idLinhKien,
-            //            IdLoi = null, // Không liên kết với lỗi nào cụ thể
-            //            LoaiDichVu = formData.LoaiDonDichVu,
-            //            MoTa = formData.MoTa,
-            //            SoLuong = 1,
-            //            ThoiGianThemLinhKien = DateTime.Now,
-            //            HanBaoHanh = false // Mặc định là hết bảo hành
+                    // Lấy IdLoi tương ứng nếu có
+                    if (formData.SelectedPartLoiIds != null && formData.SelectedPartLoiIds.Count > i)
+                    {
+                        idLoi = formData.SelectedPartLoiIds[i];
+                    }
+                    if (string.IsNullOrEmpty(idLoi))
+                    {
+                        // Gán mã lỗi mặc định hoặc trả về lỗi tùy nghiệp vụ
+                        // idLoi = "LOI_MAC_DINH";
+                        return; // hoặc throw exception nếu bắt buộc phải có lỗi
+                    }
+                    var linhKien = await _context.LinhKiens.FindAsync(idLinhKien);
+                    //var linhKien = await _context.LinhKiens.FindAsync(idLinhKien);
+                    string idCTDH = GenerateNextDetailId();
 
-            //        };
+                    var chiTiet = new ChiTietDonDichVu
+                    {
+                        IdCtdh = idCTDH,
+                        IdDonDichVu = idDonDichVu,
+                        IdLinhKien = idLinhKien,
+                        IdLoi = idLoi, // Không liên kết với lỗi nào cụ thể
+                        LoaiDichVu = loaiDichVu,
+                        MoTa = formData.MoTa,
+                        SoLuong = 1,
+                        ThoiGianThemLinhKien = DateTime.Now,
+                        HanBaoHanh = false // Mặc định là hết bảo hành
 
-            //        // Lấy thông tin linh kiện để tính ngày kết thúc bảo hành
-            //        var linhKien = await _context.LinhKiens.FindAsync(idLinhKien);
-            //        if (linhKien != null)
-            //        {
-            //            var ngayHienTai = DateOnly.FromDateTime(DateTime.Now);
-            //            chiTiet.NgayKetThucBh = ngayHienTai.AddDays(linhKien.ThoiGianBaoHanh.DayNumber);
-            //        }
+                    };
 
-            //        _context.ChiTietDonDichVus.Add(chiTiet);
-            //        await _context.SaveChangesAsync();
-            //    }
-            //}
+                    // Lấy thông tin linh kiện để tính ngày kết thúc bảo hành
+                    
+                    if (linhKien != null)
+                    {
+                        var ngayHienTai = DateOnly.FromDateTime(DateTime.Now);
+                        chiTiet.NgayKetThucBh = ngayHienTai.AddDays(linhKien.ThoiGianBaoHanh.DayNumber);
+                    }
+
+                    _context.ChiTietDonDichVus.Add(chiTiet);
+                    await _context.SaveChangesAsync();
+                }
+            }
         }
 
         // Tạo một chi tiết đơn dịch vụ và các hình ảnh liên quan
         private async Task TaoMotChiTietDon(ServiceOrderFormViewModel formData, string idDonDichVu, ErrorDetailViewModel errorDetail)
         {
+            var donDichVu = await _context.DonDichVus.FindAsync(idDonDichVu);
+            var loaiDichVu = formData.LoaiDichVu ?? donDichVu?.LoaiDonDichVu ?? "Sửa chữa";
+  
+            if (loaiDichVu != "Sửa chữa" && loaiDichVu != "Lắp đặt")
+            {
+                return;
+            }
             // Tạo ID chi tiết đơn hàng mới
             string idCTDH = GenerateNextDetailId();
-
+            //var loaiDichVu = formData.LoaiDonDichVu?.Trim();
+            //if (loaiDichVu != "Sửa chữa" && loaiDichVu != "Lắp đặt")
+            //{
+            //    // Có thể trả về lỗi hoặc gán mặc định
+            //    loaiDichVu = "Sửa chữa"; // hoặc return lỗi
+            //}
             // Tạo đối tượng chi tiết đơn dịch vụ
             var chiTiet = new ChiTietDonDichVu
             {
@@ -521,7 +571,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                 IdDonDichVu = idDonDichVu,
                 IdLinhKien = errorDetail.IdLinhKien,
                 IdLoi = errorDetail.IdLoi,
-                LoaiDichVu = formData.LoaiDonDichVu,
+                LoaiDichVu = loaiDichVu,
                 MoTa = errorDetail.MoTaLoi,
                 SoLuong = errorDetail.SoLuong,
                 ThoiGianThemLinhKien = DateTime.Now,

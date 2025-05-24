@@ -13,7 +13,8 @@ public partial class ChiTietDonDichVu
 
     public string? IdLoi { get; set; }
 
-    public string LoaiDichVu { get; set; } = null!;
+    public string LoaiDichVu { get; set; }
+    // = null! cho biết rằng trường này không được phép null
 
     public string? MoTa { get; set; }
 

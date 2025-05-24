@@ -302,6 +302,7 @@
             opacity: 0;
             transform: translateY(-20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -315,13 +316,13 @@
         position: relative;
     }
 
-    .payment-popup-header h2 {
-        margin: 0;
-        padding: 0;
-        color: #333;
-        font-size: 24px;
-        text-align: center;
-    }
+        .payment-popup-header h2 {
+            margin: 0;
+            padding: 0;
+            color: #333;
+            font-size: 24px;
+            text-align: center;
+        }
 
     .payment-popup-close {
         position: absolute;
@@ -334,9 +335,9 @@
         transition: color 0.2s;
     }
 
-    .payment-popup-close:hover {
-        color: #555;
-    }
+        .payment-popup-close:hover {
+            color: #555;
+        }
 
     .payment-popup-body {
         max-height: 60vh;
@@ -352,13 +353,13 @@
         margin-bottom: 15px;
     }
 
-    .payment-invoice-section h3 {
-        color: #1890ff;
-        margin-top: 0;
-        font-size: 18px;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 8px;
-    }
+        .payment-invoice-section h3 {
+            color: #1890ff;
+            margin-top: 0;
+            font-size: 18px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
 
     .payment-invoice-row {
         display: flex;
@@ -391,9 +392,9 @@
         border-bottom: 1px solid #eee;
     }
 
-    .payment-part-item:last-child {
-        border-bottom: none;
-    }
+        .payment-part-item:last-child {
+            border-bottom: none;
+        }
 
     .payment-part-name {
         font-weight: 500;
@@ -417,17 +418,17 @@
         font-size: 16px;
     }
 
-    .payment-amount-row.total {
-        font-size: 18px;
-        font-weight: bold;
-        border-top: 1px dashed #bbb;
-        margin-top: 10px;
-        padding-top: 10px;
-    }
+        .payment-amount-row.total {
+            font-size: 18px;
+            font-weight: bold;
+            border-top: 1px dashed #bbb;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
 
-    .payment-amount-row.total .payment-amount-value {
-        color: #d9534f;
-    }
+            .payment-amount-row.total .payment-amount-value {
+                color: #d9534f;
+            }
 
     .payment-popup-footer {
         display: flex;
@@ -437,7 +438,7 @@
         margin-top: 15px;
     }
 
-    .payment-confirm-btn, 
+    .payment-confirm-btn,
     .payment-cancel-btn {
         padding: 10px 20px;
         border: none;
@@ -453,9 +454,9 @@
         margin-left: 10px;
     }
 
-    .payment-confirm-btn:hover {
-        background-color: #218838;
-    }
+        .payment-confirm-btn:hover {
+            background-color: #218838;
+        }
 
     .payment-cancel-btn {
         background-color: #f8f9fa;
@@ -463,394 +464,386 @@
         border: 1px solid #ddd;
     }
 
-    .payment-cancel-btn:hover {
-        background-color: #e2e6ea;
-    }
+        .payment-cancel-btn:hover {
+            background-color: #e2e6ea;
+        }
 
     /* Date-time styling in payment popup */
     #invoice-start-time, #invoice-end-time {
         font-weight: normal;
         color: #333;
     }
-    
+
     .payment-invoice-value {
-        word-break: break-word;  /* Allow long date strings to break properly */
+        word-break: break-word; /* Allow long date strings to break properly */
     }
 </style>
 
-            <!-- Main Content -->
-            <div class="main-content">
-                <h1 class="page-title">Đơn sửa chữa</h1>
+<!-- Main Content -->
+<div class="main-content">
+    <h1 class="page-title">Đơn sửa chữa</h1>
 
-                <div class="order-info">
-                    <div class="order-id">Mã đơn dịch vụ: <span class="highlight">@ViewBag.NextServiceOrderId</span></div>
-                    <input type="hidden" id="IdDonDichVu" name="IdDonDichVu" value="@ViewBag.NextServiceOrderId" />
-                    <div class="order-date">Ngày tạo: @ViewBag.OrderDate</div>
-        <div class="staff-name">Nhân viên: @Context.Session.GetString("HoTen")</div>
-                    <div class="turn-back"><a href="javascript:void(0);" onclick="confirmBack()" style="text-decoration: none;">Quay lại DS</a> </div>
-                </div>
+    <form method="post" action="@Url.Action("CreateServiceOrder", "TaoDonDichVuKVL")" enctype="multipart/form-data" id="serviceOrderForm">
+        <div class="order-info">
+            <div class="order-id">Mã đơn dịch vụ: <span class="highlight">@ViewBag.NextServiceOrderId</span></div>
+            <input type="hidden" id="IdDonDichVu" name="IdDonDichVu" value="@ViewBag.NextServiceOrderId" />
+            <div class="order-date">Ngày tạo: @ViewBag.OrderDate</div>
+            <div class="staff-name">Nhân viên: @Context.Session.GetString("HoTen")</div>
+            <div class="turn-back"><a href="javascript:void(0);" onclick="confirmBack()" style="text-decoration: none;">Quay lại DS</a> </div>
+        </div>
 
-                <div class="form-container">
-                    <!-- Customer Information Section -->
-                    <div class="section">
-                        <div class="section-title">Thông tin khách hàng</div>
-                        <div class="split">
+        <div class="form-container">
+            <!-- Customer Information Section -->
+            <div class="section">
+                <div class="section-title">Thông tin khách hàng</div>
+                <div class="split">
 
-                            <div class="flex-date-time">
-                                <div class="form-group">
-                                    <label>Họ và tên khách hàng: <span class="required">(*)</span></label>
-                                    <input type="text">
-                                </div>
-                                <div class="form-group">
-                                    <label>Số điện thoại: <span class="required">(*)</span></label>
-                                    <input type="text">
-                                </div>
-                                <div class="form-group">
-                                    <label>Email: <span class="required">(*)</span></label>
-                                    <input type="email">
-                                </div>
-                            </div>
-
-                            <div class="flex-date-time">
-                                <div class="form-group">
-                                    <label>Thành phố/Tỉnh: <span class="required">(*)</span></label>                                <div class="input-with-icon">
-                                        <input id="cityInput" type="text" placeholder="Chọn thành phố/tỉnh" readonly style="cursor: pointer; background-color: #fff;">
-                                        <input type="hidden" id="cityId" name="cityId" value="">
-                                        <i class="fa-solid fa-chevron-down location-dropdown-icon" id="cityDropdownIcon"></i>
-                                        <div id="cityDropdown" class="custom-dropdown">
-                                            <!-- Sẽ được tải từ database -->
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Quận/Huyện: <span class="required">(*)</span></label>                                <div class="input-with-icon">
-                                        <input id="districtInput" type="text" placeholder="Chọn quận/huyện" readonly style="cursor: pointer; background-color: #fff;">
-                                        <input type="hidden" id="districtId" name="districtId" value="">
-                                        <i class="fa-solid fa-chevron-down location-dropdown-icon" id="districtDropdownIcon"></i>
-                                        <div id="districtDropdown" class="custom-dropdown">
-                                            <!-- Sẽ được tải từ database dựa theo thành phố -->
-                                        </div>
-                                        <div id="districtError" class="error-message" style="display: none;"></div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Phường/Xã: <span class="required">(*)</span></label>                                <div class="input-with-icon">
-                                        <input id="wardInput" type="text" placeholder="Chọn phường/xã" readonly style="cursor: pointer; background-color: #fff;">
-                                        <input type="hidden" id="wardId" name="wardId" value="">
-                                        <i class="fa-solid fa-chevron-down location-dropdown-icon" id="wardDropdownIcon"></i>
-                                        <div id="wardDropdown" class="custom-dropdown">
-                                            <!-- Sẽ được tải từ database dựa theo quận/huyện -->
-                                        </div>
-                                        <div id="wardError" class="error-message" style="display: none;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Đường/Số nhà: <span class="required">(*)</span></label>
-                                <input type="text" placeholder="Số nhà, đường">
-                            </div>
-
-
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Họ và tên khách hàng: <span class="required">(*)</span></label>
+                            <input type="text" name="HoVaTen">
                         </div>
-
-
-                    </div>
-
-                    <!-- Product Information Section -->
-                    <div class="section">
-                        <div class="section-title">Thông tin thiết bị</div>
-                        <div class="split">
-                            <div class="flex-date-time">
-                                <div class="form-group">
-                                    <label>Loại thiết bị: <span class="required">(*)</span></label>
-                                    @Html.DropDownList("IdLoaiThietBi", ViewBag.LoaiThietBis as List<SelectListItem>, "Chọn loại thiết bị", new { @class = "form-control" })
-                                </div>
-                                <div class="form-group" style="padding-bottom: 10px;">
-                                    <label>
-                                        Tên thiết bị: <span class="required">(*)</span>
-                                    </label>
-                                    <input type="text">
-                                </div>
-                            </div>
-
-
-                            <div class="split-with-button">
-                                <div class="split">
-                                    <div class="form-group">
-                                        <label>Loại linh kiện: <span class="required">(*)</span></label>
-                                        @Html.DropDownList("IdLoaiLinhKien", ViewBag.LoaiLinhKiens as List<SelectListItem>, "Chọn loại linh kiện", new { @class = "form-control select-linhkien" })
-                                    </div>
-
-
-                                    <div class="flex-date-time">
-                                        <div class="form-group">
-                                            <label>Lỗi: <span class="required">(*)</span></label>
-                                            @Html.DropDownList("IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new { @class = "form-control error-type-select", @onchange = "layGiaTheoLoi(this.value)" })
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Đơn giá (VND): <span class="required">(*)</span></label>
-                                            <input type="text" id="donGia" name="donGia" value="0" readonly class="price-field">
-                                        </div>
-                                        <div class="form-group checkbox-group">
-                                            <label>Bảo hành: <span class="required">(*)</span></label>
-                                            <div class="checkbox-container">
-                                                <div class="checkbox">
-                                                    <input type="radio" id="warranty-yes" name="warranty" value="yes">
-                                                    <label for="warranty-yes">Còn bảo hành</label>
-                                                </div>
-                                                <div class="checkbox">
-                                                    <input type="radio" id="warranty-no" name="warranty" value="no" checked>
-                                                    <label for="warranty-no">Hết bảo hành</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-
-
-                                    <div class="flex-date-time">
-                                        <div class="form-group">
-                                            <label>Mô tả lỗi: <span class="required">(*)</span></label>
-                                            <textarea></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Ghi chú:</label>
-                                            <textarea></textarea>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="buttons-container">
-                                    <button class="add-part-btn" title="Thêm phần mới"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <div class="flex-date-time" style="margin-top: 20px;">
-                                <div class="form-group">
-                                    <label>Tải ảnh: <span class="required">(*)</span></label>
-                                    <div class="file-upload">
-                                        <input type="file" id="deviceImageInput" accept="image/*" style="display: none;" multiple />
-                                        <button class="file-btn" id="deviceImageButton">Chọn tệp</button>
-                                        <div class="file-preview" id="deviceImagePreview">
-                                            <!-- Ảnh sẽ được hiển thị ở đây sau khi tải lên -->
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Tải ảnh phiếu bảo hành:</label>
-                                    <div class="file-upload">
-                                        <input type="file" id="warrantyImageInput" accept="image/*" style="display: none;" multiple />
-                                        <button class="file-btn" id="warrantyImageButton">Chọn tệp</button>
-                                        <div class="file-preview" id="warrantyImagePreview">
-                                            <!-- Ảnh sẽ được hiển thị ở đây sau khi tải lên -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label>Số điện thoại: <span class="required">(*)</span></label>
+                            <input type="text" name="Sdt">
                         </div>
-
-
-
-
-                    </div>
-
-
-                    <!-- Service Type Section -->
-                    <div class="section">
-                        <div class="section-title">Loại dịch vụ</div>
-                        <div class="split">
-                            <div class="flex-date-time">
-                                <div class="form-group">
-                                    <label>Chọn loại dịch vụ: <span class="required">(*)</span></label>
-                                    <div class="dropdown">
-                                        <input type="text" placeholder="Sửa chữa hoặc lắp đặt" readonly>
-                                        <i class="fa-solid fa-chevron-down"></i>
-                                        <div class="dropdown-content">
-                                            <div class="dropdown-item">Sửa chữa</div>
-                                            <div class="dropdown-item">Lắp đặt</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Chọn nơi thực hiện: <span class="required">(*)</span></label>
-                                    <div class="dropdown">
-                                        <input type="text" placeholder="Trực tiếp hoặc tại nhà" readonly>
-                                        <i class="fa-solid fa-chevron-down"></i>
-                                        <div class="dropdown-content">
-                                            <div class="dropdown-item">Tại nhà</div>
-                                            <div class="dropdown-item">Trực tiếp</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                            </div>
-                        </div>
-
-
-                    </div>
-
-
-                    <!-- Staff Assignment Section -->
-                    <div class="section">
-                        <div class="section-title">Phân công nhân viên kỹ thuật</div>
-                        <div class="split">
-                            <div class="staff-selection">
-                                <div class="staff-action-buttons">
-                                    <button class="select-staff-btn">Chọn nhân viên</button>
-                                    <button class="clear-staff-btn" style="display: none;">Xóa</button>
-                                </div>
-                                <div class="selected-staff">
-                                    <span class="staff-name">Chưa chọn nhân viên</span>
-                                </div>
-                                <input type="hidden" id="selectedStaffId" name="selectedStaffId" value="">
-                            </div>
-                        </div>
-
-
-                    </div>
-
-
-                    <!-- Staff Assignment Popup -->
-                    <div class="staff-popup" id="staffPopup">
-                        <div class="popup-content">
-                            <div class="popup-header">
-                                <h2>Chọn chuyên môn:</h2>
-                                <div class="specialty-dropdown">
-                                    <select>
-                                        <option value="">Chọn chuyên môn</option>
-                                        <option value="hardware">Phần cứng điện tử</option>
-                                        <option value="software">Phần mềm</option>
-                                        <option value="network">Mạng</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="popup-divider"></div>
-                            <div class="staff-list-section">
-                                <h2>Danh sách nhân viên:</h2>
-                                <div class="staff-list">
-                                    <div class="staff-item available">
-                                        <span>Nguyễn Văn A - Sẵn sàng</span>
-                                    </div>
-                                    <div class="staff-item busy">
-                                        <span>Nguyễn Văn B - Đang bận</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label>Email: <span class="required">(*)</span></label>
+                            <input type="email" name="Email">
                         </div>
                     </div>
 
-                    <!-- Date and Time Section -->
-                    <div class="section">
-                        <div class="section-title">Ngày giờ</div>
-                        <div class="split">
-                            <div class="flex-date-time">
-                                <div class="form-group">
-                                    <label>Ngày giờ thực hiện:</label>
-                                    <div class="date-time-input">
-                                        <input id="startDatetimePicker" type="text" >
-                                        <i class="fa-regular fa-calendar date-icon"></i>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Ngày giờ hoàn thành:</label>
-                                    <div class="date-time-input">
-                                        <input id="endDatetimePicker" type="text" >
-                                        <i class="fa-regular fa-calendar date-icon"></i>
-                                    </div>
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Thành phố/Tỉnh: <span class="required">(*)</span></label>                                
+                            <div class="input-with-icon">
+                                <input id="cityInput" type="text" placeholder="Chọn thành phố/tỉnh" readonly style="cursor: pointer; background-color: #fff;">
+                                <input type="hidden" id="cityId" value="">
+                                <i class="fa-solid fa-chevron-down location-dropdown-icon" id="cityDropdownIcon"></i>
+                                <div id="cityDropdown" class="custom-dropdown">
+                                    <!-- Sẽ được tải từ database -->
                                 </div>
                             </div>
-
-                            <div class="note-text">
-                                *Lưu ý: Nhân viên phải thực hiện sửa chữa xong trong vòng 48 tiếng kể từ thời gian nhận yêu cầu !
+                        </div>
+                        <div class="form-group">
+                            <label>Quận/Huyện: <span class="required">(*)</span></label>                                <div class="input-with-icon">
+                                <input id="districtInput" type="text" placeholder="Chọn quận/huyện" readonly style="cursor: pointer; background-color: #fff;">
+                                <input type="hidden" id="districtId" value="">
+                                <i class="fa-solid fa-chevron-down location-dropdown-icon" id="districtDropdownIcon"></i>
+                                <div id="districtDropdown" class="custom-dropdown">
+                                    <!-- Sẽ được tải từ database dựa theo thành phố -->
+                                </div>
+                                <div id="districtError" class="error-message" style="display: none;"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Phường/Xã: <span class="required">(*)</span></label>                                <div class="input-with-icon">
+                                <input id="wardInput" type="text" placeholder="Chọn phường/xã" readonly style="cursor: pointer; background-color: #fff;">
+                                <input type="hidden" id="wardId" name="IdPhuong" value="">
+                                <i class="fa-solid fa-chevron-down location-dropdown-icon" id="wardDropdownIcon"></i>
+                                <div id="wardDropdown" class="custom-dropdown">
+                                    <!-- Sẽ được tải từ database dựa theo quận/huyện -->
+                                </div>
+                                <div id="wardError" class="error-message" style="display: none;"></div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Other Section -->
-                    <div class="section">
-                        <div class="section-title">Khác</div>
-                        <div class="split">
-                            <!-- First row: Chọn linh kiện and Tiền khách hàng ứng trước in one row -->
-                            <div class="two-column-row">
-                                @* <div class="form-group"> *@
-                                @*     <label>Chọn linh kiện thay thế:</label> *@
-                                @*     <div class="search-parts"> *@
-                                @*         <input type="text" id="partSearchInput" placeholder="Tìm kiếm linh kiện..."> *@
-                                @*         <i class="fa-solid fa-magnifying-glass search-icon"></i> *@
-                                @*         <div id="partsDropdown" class="parts-dropdown-content"> *@
-                                @*             <!-- Dropdown content will be populated by JavaScript --> *@
-                                @*         </div> *@
-                                @*     </div> *@
-                                @*     <div class="parts-list" id="selectedParts"> *@
-                                @*         <!-- Selected parts will appear here --> *@
-                                @*     </div> *@
-                                @* </div> *@                        
-                <div class="form-group">
-                                    <label>Chọn linh kiện thay thế:</label>
-                                    <div class="search-parts-container">
-                                        <input type="text" id="searchPartsInput" class="form-control" placeholder="Tìm kiếm linh kiện...">
-                                        <div id="partsDropdown" class="parts-dropdown-content" style="display: none;">
-                                            <!-- Kết quả tìm kiếm sẽ hiển thị ở đây -->
-                                        </div>
-                                        <div id="selectedPartsContainer" class="selected-parts-container">
-                                            <!-- Linh kiện đã chọn sẽ hiển thị ở đây -->
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div class="form-group">
-                                    <label>Tiền khách hàng ứng trước (VND):</label>
-                                    <input type="number" id="advancePayment">
-                                </div>
-                            </div>
-
-                            <!-- Second row: Giá tiền and Chọn trạng thái -->
-                            <div class="two-column-row">
-                                <div class="form-group">
-                                    <label>Tiền lỗi (VND):</label>
-                                    <input type="text" class="price-input" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>Tổng tiền (VND):</label>
-                                    <input type="text" class="price-input" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>Tiền còn lại (VND):</label>
-                                    <span id="remainingAmount" class="remaining-amount">0 VND</span>
-                                </div>
-
-                            </div>
-                            
-                            
-                            <div class="two-column-row">
-                                <div class="form-group">
-                                    <label>Chọn trạng thái: <span class="required">(*)</span></label>
-                                    <div class="dropdown" id="statusDropdown">
-                                        <input type="text" value="Chưa hoàn thành" readonly id="statusInput">
-                                        <i class="fa-solid fa-chevron-down"></i>
-                                        <div class="dropdown-content">
-                                            <div class="dropdown-item">Đã hoàn thành</div>
-                                            <div class="dropdown-item">Chưa hoàn thành</div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-actions2">
-                                    <button type="button" class="payment-btn">Thanh toán</button>
-                                </div>
-                            </div>
-                            
-                        </div>
+                    <div class="form-group">
+                        <label>Đường/Số nhà: <span class="required">(*)</span></label>
+                        <input type="text" placeholder="Số nhà, đường" name="DuongSoNha">
                     </div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="create-order-btn">Tạo đơn</button>
                 </div>
             </div>
+
+            <!-- Product Information Section -->
+            <div class="section">
+                <div class="section-title">Thông tin thiết bị</div>
+                <div class="split">
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Loại thiết bị: <span class="required">(*)</span></label>
+                            @Html.DropDownList("IdLoaiThietBi", ViewBag.LoaiThietBis as List<SelectListItem>, "Chọn loại thiết bị", new { @class = "form-control" })
+                        </div>
+                        <div class="form-group" style="padding-bottom: 10px;">
+                            <label>
+                                Tên thiết bị: <span class="required">(*)</span>
+                            </label>
+                            <input type="text" name="TenThietBi">
+                        </div>
+                    </div>
+
+
+                    <div class="split-with-button">
+                        <div class="split">
+                            <div class="form-group">
+                                <label>Loại linh kiện: <span class="required">(*)</span></label>
+                                @Html.DropDownList("IdLoaiLinhKien", ViewBag.LoaiLinhKiens as List<SelectListItem>, "Chọn loại linh kiện", new { @class = "form-control select-linhkien" })
+                            </div>
+
+
+                            <div class="flex-date-time">
+                                <div class="form-group">
+                                    <label>Lỗi: <span class="required">(*)</span></label>
+                                    @Html.DropDownList("IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new { @class = "form-control error-type-select error-loi-select", @onchange = "layGiaTheoLoi(this.value)" })
+                                </div>
+                                <div class="form-group">
+                                    <label>Đơn giá (VND): <span class="required">(*)</span></label>
+                                    <input type="text" id="donGia" name="donGia" value="0" readonly class="price-field">
+                                </div>
+                                <div class="form-group checkbox-group">
+                                    <label>Bảo hành: <span class="required">(*)</span></label>
+                                    <div class="checkbox-container">
+                                        <div class="checkbox">
+                                            <input type="radio" id="warranty-yes" name="ErrorDetails[0].ConBaoHanh" value="true">
+                                            <label for="warranty-yes">Còn bảo hành</label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <input type="radio" id="warranty-no" name="ErrorDetails[0].ConBaoHanh" value="false" checked>
+                                            <label for="warranty-no">Hết bảo hành</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="flex-date-time">
+                                <div class="form-group">
+                                    <label>Mô tả lỗi: <span class="required">(*)</span></label>
+                                    <textarea name="ErrorDetails[0].MoTaLoi"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ghi chú:</label>
+                                    <textarea name="ErrorDetails[0].GhiChu"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Hidden fields for error details -->
+                            <input type="hidden" name="ErrorDetails[0].IdLoi" id="ErrorLoi" value="">
+                            <input type="hidden" name="ErrorDetails[0].IdLinhKien" id="ErrorLinhKien" value="">
+                            <input type="hidden" name="ErrorDetails[0].SoLuong" value="1">
+
+                        </div>
+                        <div class="buttons-container">
+                            <button class="add-part-btn" title="Thêm phần mới"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="flex-date-time" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label>Tải ảnh: <span class="required">(*)</span></label>
+                            <div class="file-upload">
+                                <input type="file" id="deviceImageInput" name="DeviceImages" accept="image/*" style="display: none;" multiple />
+                                <button class="file-btn" type="button" id="deviceImageButton">Chọn tệp</button>
+                                <div class="file-preview" id="deviceImagePreview">
+                                    <!-- Ảnh sẽ được hiển thị ở đây sau khi tải lên -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tải ảnh phiếu bảo hành:</label>
+                            <div class="file-upload">
+                                <input type="file" id="warrantyImageInput" name="WarrantyImages" accept="image/*" style="display: none;" multiple />
+                                <button class="file-btn" type="button" id="warrantyImageButton">Chọn tệp</button>
+                                <div class="file-preview" id="warrantyImagePreview">
+                                    <!-- Ảnh sẽ được hiển thị ở đây sau khi tải lên -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Service Type Section -->
+            <div class="section">
+                <div class="section-title">Loại dịch vụ</div>
+                <div class="split">
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Chọn loại dịch vụ: <span class="required">(*)</span></label>
+                            <div class="dropdown">
+                                <input type="text" placeholder="Sửa chữa hoặc lắp đặt" readonly name="LoaiDonDichVu">
+                                <i class="fa-solid fa-chevron-down"></i>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-item">Sửa chữa</div>
+                                    <div class="dropdown-item">Lắp đặt</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Chọn nơi thực hiện: <span class="required">(*)</span></label>
+                            <div class="dropdown">
+                                <input type="text" placeholder="Trực tiếp hoặc tại nhà" readonly name="HinhThucDichVu">
+                                <i class="fa-solid fa-chevron-down"></i>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-item">Tại nhà</div>
+                                    <div class="dropdown-item">Trực tiếp</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Staff Assignment Section -->
+            <div class="section">
+                <div class="section-title">Phân công nhân viên kỹ thuật</div>
+                <div class="split">
+                    <div class="staff-selection">
+                        <div class="staff-action-buttons">
+                            <button type="button" class="select-staff-btn">Chọn nhân viên</button>
+                            <button type="button" class="clear-staff-btn" style="display: none;">Xóa</button>
+                        </div>
+                        <div class="selected-staff">
+                            <span class="staff-name">Chưa chọn nhân viên</span>
+                        </div>
+                        <input type="hidden" id="selectedStaffId" name="IdNhanVienKyThuat" value="">
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Staff Assignment Popup -->
+            <div class="staff-popup" id="staffPopup">
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h2>Chọn chuyên môn:</h2>
+                        <div class="specialty-dropdown">
+                            <select>
+                                <option value="">Chọn chuyên môn</option>
+                                <option value="hardware">Phần cứng điện tử</option>
+                                <option value="software">Phần mềm</option>
+                                <option value="network">Mạng</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="popup-divider"></div>
+                    <div class="staff-list-section">
+                        <h2>Danh sách nhân viên:</h2>
+                        <div class="staff-list">
+                            <div class="staff-item available">
+                                <span>Nguyễn Văn A - Sẵn sàng</span>
+                            </div>
+                            <div class="staff-item busy">
+                                <span>Nguyễn Văn B - Đang bận</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date and Time Section -->
+            <div class="section">
+                <div class="section-title">Ngày giờ</div>
+                <div class="split">
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Ngày giờ thực hiện:</label>
+                            <div class="date-time-input">
+                                <input id="startDatetimePicker" type="text">
+                                <i class="fa-regular fa-calendar date-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ngày giờ hoàn thành:</label>
+                            <div class="date-time-input">
+                                <input id="endDatetimePicker" type="text" name="NgayHoanThanh">
+                                <i class="fa-regular fa-calendar date-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="note-text">
+                        *Lưu ý: Nhân viên phải thực hiện sửa chữa xong trong vòng 48 tiếng kể từ thời gian nhận yêu cầu !
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other Section -->
+            <div class="section">
+                <div class="section-title">Khác</div>
+                <div class="split">
+                    <!-- First row: Chọn linh kiện and Tiền khách hàng ứng trước in one row -->
+                    <div class="two-column-row">
+                        @* <div class="form-group"> *@
+                        @*     <label>Chọn linh kiện thay thế:</label> *@
+                        @*     <div class="search-parts"> *@
+                        @*         <input type="text" id="partSearchInput" placeholder="Tìm kiếm linh kiện..."> *@
+                        @*         <i class="fa-solid fa-magnifying-glass search-icon"></i> *@
+                        @*         <div id="partsDropdown" class="parts-dropdown-content"> *@
+                        @*             <!-- Dropdown content will be populated by JavaScript --> *@
+                        @*         </div> *@
+                        @*     </div> *@
+                        @*     <div class="parts-list" id="selectedParts"> *@
+                        @*         <!-- Selected parts will appear here --> *@
+                        @*     </div> *@
+                        @* </div> *@                        
+                <div class="form-group">
+                            <label>Chọn linh kiện thay thế:</label>
+                            <div class="search-parts-container">
+                                <input type="text" id="searchPartsInput" class="form-control" placeholder="Tìm kiếm linh kiện..." name="IdLinhKien">
+                                <div id="partsDropdown" class="parts-dropdown-content" style="display: none;">
+                                    <!-- Kết quả tìm kiếm sẽ hiển thị ở đây -->
+                                </div>
+                                <div id="selectedPartsContainer" class="selected-parts-container">
+                                    <!-- Linh kiện đã chọn sẽ hiển thị ở đây -->
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label>Tiền khách hàng ứng trước (VND):</label>
+                            <input type="number" id="advancePayment" name="TienKhachHangUngTruoc">
+                        </div>
+                    </div>
+
+                    <!-- Second row: Giá tiền and Chọn trạng thái -->
+                    <div class="two-column-row">
+                        <div class="form-group">
+                            <label>Tiền lỗi (VND):</label>
+                            <input type="text" class="price-input" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Tổng tiền (VND):</label>
+                            <input type="text" class="price-input" id="tongTienInput" name="TongTien" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Tiền còn lại (VND):</label>
+                            <span id="remainingAmount" class="remaining-amount">0</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="two-column-row">
+                        <div class="form-group">
+                            <label>Chọn trạng thái: <span class="required">(*)</span></label>
+                            <div class="dropdown" id="statusDropdown">
+                                <input type="text" value="Chưa hoàn thành" readonly id="statusInput" name="TrangThaiDon">
+                                <i class="fa-solid fa-chevron-down"></i>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-item">Đã hoàn thành</div>
+                                    <div class="dropdown-item">Chưa hoàn thành</div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions2">
+                            <button type="button" class="payment-btn">Thanh toán</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="create-order-btn">Tạo đơn</button>
+            </div>
+    </form>
+</div>
 
 
 <!-- Modal để hiển thị ảnh khi bấm vào -->
@@ -978,8 +971,8 @@
     </div>
 </div>
 
-@section Scripts{
-    
+@section Scripts {
+
 
     <!-- Định nghĩa URLs cho JavaScript -->
     <!--Định nghĩa các URLs cho tddvkvl2.js -->
@@ -992,14 +985,12 @@
         var layDanhSachQuanUrl = '@Url.Action("LayDanhSachQuan", "TaoDonDichVuKVL")';
         var layDanhSachPhuongUrl = '@Url.Action("LayDanhSachPhuong", "TaoDonDichVuKVL")';
         var createServiceOrderUrl = '@Url.Action("CreateServiceOrder", "TaoDonDichVuKVL")';
-    </script>
-
-    <!-- Tải script JS bên ngoài -->
+    </script>    <!-- Tải script JS bên ngoài -->
     <script src="/js/tddvkvl2.js"></script>
 
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
 }
-   
+
 

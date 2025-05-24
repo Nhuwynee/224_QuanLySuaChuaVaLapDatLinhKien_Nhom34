@@ -21,9 +21,11 @@ namespace QLSuaChuaVaLapDat.Models.viewmodel
         // Thông tin lỗi và linh kiện
         public List<ErrorDetailViewModel> ErrorDetails { get; set; }
         public List<string> SelectedPartIds { get; set; }
-        
+        public List<string> SelectedPartLoiIds { get; set; }
+
         // Thông tin dịch vụ
         public string LoaiDonDichVu { get; set; } // Sửa chữa hoặc lắp đặt
+        public string LoaiDichVu { get; set; } // ở ctddv
         public string HinhThucDichVu { get; set; } // Tại nhà hoặc trực tiếp
         
         // Thông tin nhân viên
