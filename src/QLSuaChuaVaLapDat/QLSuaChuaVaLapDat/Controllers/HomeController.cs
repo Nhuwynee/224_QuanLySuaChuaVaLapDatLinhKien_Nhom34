@@ -67,7 +67,7 @@ public class HomeController : Controller
             {
 
                 // Lưu thông tin session
-
+                HttpContext.Session.SetString("IdUser", user.IdUser);
                 HttpContext.Session.SetString("Username", username);
                 HttpContext.Session.SetString("HoTen", user.HoVaTen);
                 HttpContext.Session.SetString("Password", password); // không nên lưu password thật trong session

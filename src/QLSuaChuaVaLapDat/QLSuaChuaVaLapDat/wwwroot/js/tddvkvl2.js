@@ -1051,56 +1051,131 @@ function populateWardDropdown(wards) {
 }
 
 // Event handler for the Create Order button
+// ...existing code...
+
+// Event handler for the Create Order button
 document.addEventListener('DOMContentLoaded', function() {
-    const createOrderBtn = document.querySelector('.create-order-btn');    if (createOrderBtn) {
+    const createOrderBtn = document.querySelector('.create-order-btn');
+    if (createOrderBtn) {
         createOrderBtn.addEventListener('click', function() {
             // Get the service order ID from the hidden input
             const serviceOrderId = document.getElementById('IdDonDichVu').value;
             
-            // Collect all form data
-            const formData = new FormData();
-            formData.append('IdDonDichVu', serviceOrderId);
-            
-            // Add other form fields (this would need to be expanded based on the actual form fields)
-            // Example: Customer info, device info, service details, etc.
-            const customerName = document.getElementById('customerName').value;
-            const customerPhone = document.getElementById('customerPhone').value;
-            const customerEmail = document.getElementById('customerEmail').value;
+            // Validate form fields
+            if (!validateOrderForm()) {
+                return; // Stop if validation fails
+            }
             
             // For demonstration, show a confirmation that includes the ID
             if(confirm(`Xác nhận tạo đơn dịch vụ ${serviceOrderId}?`)) {
-                // In a production environment, we would submit all the form data
-                // For now, we'll just show success and redirect
+                // Collect form data
+                const formData = new FormData();
                 
-                // Example of form submission (commented out since we don't have the complete form)
-                /*
-                fetch(createServiceOrderUrl, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Đơn dịch vụ đã được tạo thành công!');
-                        window.location.href = backToListUrl;
-                    } else {
-                        alert('Có lỗi xảy ra: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi tạo đơn dịch vụ!');
+                // Add service order ID
+                formData.append('IdDonDichVu', serviceOrderId);
+                
+                // Customer information
+                formData.append('HoVaTen', $('.form-group:contains("Họ và tên khách hàng") input').val());
+                formData.append('Sdt', $('.form-group:contains("Số điện thoại") input').val());
+                formData.append('Email', $('.form-group:contains("Email") input').val());
+                formData.append('IdPhuong', $('#wardId').val());
+                formData.append('DuongSoNha', $('input[placeholder="Số nhà, đường"]').val());
+                
+                // Device information
+                formData.append('IdLoaiThietBi', $('#IdLoaiThietBi').val());
+                formData.append('TenThietBi', $('.form-group:contains("Tên thiết bị") input').val());
+                
+                // Service type information
+                formData.append('LoaiDonDichVu', $('.section:contains("Loại dịch vụ") .dropdown input').eq(0).val());
+                formData.append('HinhThucDichVu', $('.section:contains("Loại dịch vụ") .dropdown input').eq(1).val());
+                
+                // Staff information: LẤY ĐÚNG ID NHÂN VIÊN KỸ THUẬT ĐÃ CHỌN
+                formData.append('IdNhanVienKyThuat', $('#selectedStaffId').val());
+                
+                // Collect error details
+                const errorDetails = [];
+                $('.split-with-button').each(function(index) {
+                    const detail = {
+                        IdLoi: $(this).find('select[id^="IdLoi"]').val(),
+                        MoTaLoi: $(this).find('textarea').first().val(),
+                        IdLinhKien: $(this).find('select.select-linhkien').val() || '',
+                        SoLuong: 1,
+                        ConBaoHanh: $(this).find('input[name^="warranty"]:checked').val() === 'yes'
+                    };
+                    errorDetails.push(detail);
                 });
-                */
                 
-                // For this demonstration, we'll just show a success message and redirect
-                alert(`Đơn dịch vụ ${serviceOrderId} đã được tạo thành công!`);
-                window.location.href = backToListUrl;
+                formData.append('ErrorDetails', JSON.stringify(errorDetails));
+                
+                // Handle device images
+                if ($('#deviceImageInput')[0]?.files.length > 0) {
+                    for (let i = 0; i < $('#deviceImageInput')[0].files.length; i++) {
+                        formData.append('DeviceImages', $('#deviceImageInput')[0].files[i]);
+                    }
+                }
+                
+                // Handle warranty images
+                if ($('#warrantyImageInput')[0]?.files.length > 0) {
+                    for (let i = 0; i < $('#warrantyImageInput')[0].files.length; i++) {
+                        formData.append('WarrantyImages', $('#warrantyImageInput')[0].files[i]);
+                    }
+                }
+
+                formData.append('NgayHoanThanh', $('#endDatetimePicker').val());
+                let tongTien = $('#tongTienInput').val() || $('.price-input').eq(1).val(); // hoặc lấy đúng input tổng tiền
+tongTien = tongTien.replace(/[^\d.]/g, ''); // Loại bỏ mọi ký tự không phải số hoặc dấu chấm
+formData.append('TongTien', tongTien);
+
+
+                // Show loading overlay
+                showLoadingOverlay('Đang tạo đơn dịch vụ...');
+                
+                // Submit form data to server
+                $.ajax({
+                    url: createServiceOrderUrl,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        hideLoadingOverlay();
+                        if (response.success) {
+                            alert('Đơn dịch vụ đã được tạo thành công!');
+                            window.location.href = backToListUrl;
+                        } else {
+                            let errorMessage = response.message || 'Có lỗi xảy ra khi tạo đơn dịch vụ.';
+                            if (response.detailedMessage) {
+                                console.error(response.detailedMessage);
+                                console.error('Inner exception:', response.innerException);
+                            }
+                            alert(errorMessage);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoadingOverlay();
+                        console.error('Error status:', status);
+                        console.error('Error details:', error);
+                        let errorMessage = 'Có lỗi xảy ra khi tạo đơn dịch vụ!';
+                        try {
+                            const responseJson = xhr.responseJSON;
+                            if (responseJson && responseJson.message) {
+                                errorMessage = responseJson.message;
+                                if (responseJson.innerException) {
+                                    console.error('Inner exception:', responseJson.innerException);
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Không thể phân tích phản hồi từ máy chủ:', e);
+                        }
+                        alert(errorMessage);
+                    }
+                });
             }
         });
     }
 });
 
+// ...existing code...
 // Xử lý sự kiện khi chọn trạng thái đơn hàng
 $(document).ready(function() {
     // Trạng thái dropdown
@@ -1386,3 +1461,99 @@ $('#invoice-remaining-amount').text(amountOnly);
         }
     });
 });
+
+// Function to validate order form
+function validateOrderForm() {
+    let isValid = true;
+    let errorMessage = '';
+    
+    // Validate customer information
+    if ($('.form-group:contains("Họ và tên khách hàng") input').val().trim() === '') {
+        errorMessage += '- Vui lòng nhập họ và tên khách hàng\n';
+        isValid = false;
+    }
+    
+    if ($('.form-group:contains("Số điện thoại") input').val().trim() === '') {
+        errorMessage += '- Vui lòng nhập số điện thoại\n';
+        isValid = false;
+    }
+    
+    if ($('#wardId').val() === '') {
+        errorMessage += '- Vui lòng chọn phường/xã\n';
+        isValid = false;
+    }
+    
+    // Validate device information
+    if ($('#IdLoaiThietBi').val() === '' || $('#IdLoaiThietBi option:selected').text() === 'Chọn loại thiết bị') {
+        errorMessage += '- Vui lòng chọn loại thiết bị\n';
+        isValid = false;
+    }
+    
+    if ($('.form-group:contains("Tên thiết bị") input').val().trim() === '') {
+        errorMessage += '- Vui lòng nhập tên thiết bị\n';
+        isValid = false;
+    }
+    
+    // Validate error details
+    let hasValidError = false;
+    $('.split-with-button').each(function() {
+        const errorSelect = $(this).find('select[id^="IdLoi"]');
+        const errorDesc = $(this).find('textarea').first();
+        
+        if (errorSelect.val() && errorSelect.val() !== '' && errorDesc.val().trim() !== '') {
+            hasValidError = true;
+        }
+    });
+    
+    if (!hasValidError) {
+        errorMessage += '- Vui lòng chọn ít nhất một loại lỗi và mô tả lỗi\n';
+        isValid = false;
+    }
+    
+    // Validate service type
+    if ($('.section:contains("Loại dịch vụ") .dropdown input').eq(0).val().trim() === '') {
+        errorMessage += '- Vui lòng chọn loại dịch vụ\n';
+        isValid = false;
+    }
+    
+    if ($('.section:contains("Loại dịch vụ") .dropdown input').eq(1).val().trim() === '') {
+        errorMessage += '- Vui lòng chọn hình thức dịch vụ\n';
+        isValid = false;
+    }
+    
+    // Validate staff assignment
+    if ($('#selectedStaffId').val() === '') {
+        errorMessage += '- Vui lòng chọn nhân viên kỹ thuật\n';
+        isValid = false;
+    }
+    
+    // Show error messages if validation fails
+    if (!isValid) {
+        alert('Vui lòng điền đầy đủ thông tin:\n' + errorMessage);
+    }
+    
+    return isValid;
+}
+
+// Function to show loading overlay
+function showLoadingOverlay(message) {
+    // Create loading overlay if it doesn't exist
+    if ($('#loadingOverlay').length === 0) {
+        $('body').append(`
+            <div id="loadingOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+                <div style="background: white; padding: 20px; border-radius: 5px; text-align: center;">
+                    <div class="loading-spinner" style="margin: 0 auto 10px;"></div>
+                    <p id="loadingMessage">${message || 'Đang xử lý...'}</p>
+                </div>
+            </div>
+        `);
+    } else {
+        $('#loadingMessage').text(message || 'Đang xử lý...');
+        $('#loadingOverlay').show();
+    }
+}
+
+// Function to hide loading overlay
+function hideLoadingOverlay() {
+    $('#loadingOverlay').hide();
+}

@@ -578,7 +578,7 @@
                                 <div class="split">
                                     <div class="form-group">
                                         <label>Loại linh kiện: <span class="required">(*)</span></label>
-                                        @Html.DropDownList("IdLoaiLinhKien", ViewBag.LoaiLinhKiens as List<SelectListItem>, "Chọn loại linh kiện", new { @class = "form-control" })
+                                        @Html.DropDownList("IdLoaiLinhKien", ViewBag.LoaiLinhKiens as List<SelectListItem>, "Chọn loại linh kiện", new { @class = "form-control select-linhkien" })
                                     </div>
 
 
@@ -853,7 +853,133 @@
             </div>
 
 
+<!-- Modal để hiển thị ảnh khi bấm vào -->
+<div id="imageModal" class="image-modal">
+    <span class="modal-close">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>
 
+<!-- Payment Modal -->
+<div id="paymentModal" class="payment-popup">
+    <div class="payment-popup-content">
+        <div class="payment-popup-header">
+            <h2>Hóa đơn thanh toán</h2>
+            <span class="payment-popup-close">&times;</span>
+        </div>
+        <div class="payment-popup-body">
+            <!-- Invoice Information -->
+            <div class="payment-invoice-section">
+                <h3>Thông tin đơn hàng</h3>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Mã đơn dịch vụ:</div>
+                    <div class="payment-invoice-value" id="invoice-order-id"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Ngày tạo:</div>
+                    <div class="payment-invoice-value" id="invoice-order-date"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Nhân viên:</div>
+                    <div class="payment-invoice-value" id="invoice-staff-name"></div>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="payment-invoice-section">
+                <h3>Thông tin khách hàng</h3>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Họ và tên:</div>
+                    <div class="payment-invoice-value" id="invoice-customer-name"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Số điện thoại:</div>
+                    <div class="payment-invoice-value" id="invoice-customer-phone"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Địa chỉ:</div>
+                    <div class="payment-invoice-value" id="invoice-customer-address"></div>
+                </div>
+            </div>
+            <!-- Device Information -->
+            <div class="payment-invoice-section">
+                <h3>Thông tin thiết bị</h3>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Loại thiết bị:</div>
+                    <div class="payment-invoice-value" id="invoice-device-type"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Lỗi:</div>
+                    <div class="payment-invoice-value" id="invoice-error-type"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Mô tả lỗi:</div>
+                    <div class="payment-invoice-value" id="invoice-error-description"></div>
+                </div>
+            </div>
+
+            <!-- Service Information -->
+            <div class="payment-invoice-section">
+                <h3>Thông tin dịch vụ</h3>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Loại dịch vụ:</div>
+                    <div class="payment-invoice-value" id="invoice-service-type"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Nơi thực hiện:</div>
+                    <div class="payment-invoice-value" id="invoice-service-location"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Nhân viên kỹ thuật:</div>
+                    <div class="payment-invoice-value" id="invoice-technician"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Ngày giờ thực hiện:</div>
+                    <div class="payment-invoice-value" id="invoice-start-time"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Ngày giờ hoàn thành:</div>
+                    <div class="payment-invoice-value" id="invoice-end-time"></div>
+                </div>
+            </div>
+
+            <!-- Parts Information -->
+            <div class="payment-invoice-section">
+                <h3>Linh kiện thay thế</h3>
+                <div id="invoice-parts-list" class="payment-parts-list">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Payment Information -->
+            <div class="payment-amount-section">
+                <h3>Thông tin thanh toán</h3>
+                <div class="payment-amount-row">
+                    <div class="payment-invoice-label">Tiền lỗi:</div>
+                    <div class="payment-invoice-value" id="invoice-error-cost"></div>
+                </div>
+                <div class="payment-amount-row">
+                    <div class="payment-invoice-label">Tiền linh kiện:</div>
+                    <div class="payment-invoice-value" id="invoice-parts-cost"></div>
+                </div>
+                <div class="payment-amount-row">
+                    <div class="payment-invoice-label">Tiền ứng trước:</div>
+                    <div class="payment-invoice-value" id="invoice-advance-payment"></div>
+                </div>
+                <div class="payment-amount-row total">
+                    <div class="payment-invoice-label">Tổng tiền cần thanh toán:</div>
+                    <div class="payment-amount-value" id="invoice-remaining-amount"></div>
+                </div>
+            </div>
+        </div>
+        <div class="payment-popup-footer">
+            <button class="payment-cancel-btn">Đóng</button>
+            <button class="payment-confirm-btn">Xác nhận thanh toán</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    
 
     <!-- Định nghĩa URLs cho JavaScript -->
     <!--Định nghĩa các URLs cho tddvkvl2.js -->
@@ -874,130 +1000,6 @@
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
-
-    <!-- Modal để hiển thị ảnh khi bấm vào -->
-    <div id="imageModal" class="image-modal">
-        <span class="modal-close">&times;</span>
-        <img class="modal-content" id="modalImage">
-    </div>
-    
-    <!-- Payment Modal -->
-    <div id="paymentModal" class="payment-popup">
-        <div class="payment-popup-content">
-            <div class="payment-popup-header">
-                <h2>Hóa đơn thanh toán</h2>
-                <span class="payment-popup-close">&times;</span>
-            </div>
-            <div class="payment-popup-body">
-                <!-- Invoice Information -->
-                <div class="payment-invoice-section">
-                    <h3>Thông tin đơn hàng</h3>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Mã đơn dịch vụ:</div>
-                        <div class="payment-invoice-value" id="invoice-order-id"></div>
-                    </div>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Ngày tạo:</div>
-                        <div class="payment-invoice-value" id="invoice-order-date"></div>
-                    </div>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Nhân viên:</div>
-                        <div class="payment-invoice-value" id="invoice-staff-name"></div>
-                    </div>
-                </div>
-
-                <!-- Customer Information -->
-                <div class="payment-invoice-section">
-                    <h3>Thông tin khách hàng</h3>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Họ và tên:</div>
-                        <div class="payment-invoice-value" id="invoice-customer-name"></div>
-                    </div>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Số điện thoại:</div>
-                        <div class="payment-invoice-value" id="invoice-customer-phone"></div>
-                    </div>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Địa chỉ:</div>
-                        <div class="payment-invoice-value" id="invoice-customer-address"></div>
-                    </div>
-                </div>                
-                <!-- Device Information -->
-                <div class="payment-invoice-section">
-                    <h3>Thông tin thiết bị</h3>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Loại thiết bị:</div>
-                        <div class="payment-invoice-value" id="invoice-device-type"></div>
-                    </div>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Lỗi:</div>
-                        <div class="payment-invoice-value" id="invoice-error-type"></div>
-                    </div>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Mô tả lỗi:</div>
-                        <div class="payment-invoice-value" id="invoice-error-description"></div>
-                    </div>
-                </div>
-
-                <!-- Service Information -->
-                <div class="payment-invoice-section">
-                    <h3>Thông tin dịch vụ</h3>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Loại dịch vụ:</div>
-                        <div class="payment-invoice-value" id="invoice-service-type"></div>
-                    </div>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Nơi thực hiện:</div>
-                        <div class="payment-invoice-value" id="invoice-service-location"></div>
-                    </div>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Nhân viên kỹ thuật:</div>
-                        <div class="payment-invoice-value" id="invoice-technician"></div>
-                    </div>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Ngày giờ thực hiện:</div>
-                        <div class="payment-invoice-value" id="invoice-start-time"></div>
-                    </div>
-                    <div class="payment-invoice-row">
-                        <div class="payment-invoice-label">Ngày giờ hoàn thành:</div>
-                        <div class="payment-invoice-value" id="invoice-end-time"></div>
-                    </div>
-                </div>
-
-                <!-- Parts Information -->
-                <div class="payment-invoice-section">
-                    <h3>Linh kiện thay thế</h3>
-                    <div id="invoice-parts-list" class="payment-parts-list">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
-                </div>
-
-                <!-- Payment Information -->
-                <div class="payment-amount-section">
-                    <h3>Thông tin thanh toán</h3>
-                    <div class="payment-amount-row">
-                        <div class="payment-invoice-label">Tiền lỗi:</div>
-                        <div class="payment-invoice-value" id="invoice-error-cost"></div>
-                    </div>
-                    <div class="payment-amount-row">
-                        <div class="payment-invoice-label">Tiền linh kiện:</div>
-                        <div class="payment-invoice-value" id="invoice-parts-cost"></div>
-                    </div>
-                    <div class="payment-amount-row">
-                        <div class="payment-invoice-label">Tiền ứng trước:</div>
-                        <div class="payment-invoice-value" id="invoice-advance-payment"></div>
-                    </div>
-                    <div class="payment-amount-row total">
-                        <div class="payment-invoice-label">Tổng tiền cần thanh toán:</div>
-                        <div class="payment-amount-value" id="invoice-remaining-amount"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="payment-popup-footer">
-                <button class="payment-cancel-btn">Đóng</button>
-                <button class="payment-confirm-btn">Xác nhận thanh toán</button>
-            </div>
-        </div>
-    </div>
-
+}
+   
 
