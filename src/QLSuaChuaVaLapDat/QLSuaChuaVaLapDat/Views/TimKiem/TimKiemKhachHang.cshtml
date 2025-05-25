@@ -1,5 +1,6 @@
 ﻿@model QLSuaChuaVaLapDat.Models.KhachHang
 
+<form id="searchForm" method="post" asp-action="TimKiemKhachHang">
 <div class="search-container" id="customers">
     <div class="search-header">
         <div class="search-title">Tìm kiếm Khách hàng</div>
@@ -155,3 +156,80 @@
         <div class="page-item">10</div>
     </div>
 </div>
+</form>
+
+<script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('searchForm');
+        const resetBtn = document.getElementById('resetBtn');
+        const rangeMin = document.getElementById('rangeMin');
+        const rangeMax = document.getElementById('rangeMax');
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const hiddenGiaTu = document.getElementById('hiddenGiaTu');
+        const hiddenGiaDen = document.getElementById('hiddenGiaDen');
+
+        // Giá trị mặc định cho slider
+        const DEFAULT_MIN_VALUE = 0;
+        const DEFAULT_MAX_VALUE = 0;
+
+        // Sync slider with price inputs
+        function updatePriceDisplay() {
+            let minVal = parseInt(rangeMin.value);
+            let maxVal = parseInt(rangeMax.value);
+
+            // Đảm bảo min không vượt quá max
+            if (minVal > maxVal) {
+                [minVal, maxVal] = [maxVal, minVal];
+                rangeMin.value = minVal;
+                rangeMax.value = maxVal;
+            }
+
+            // Hiển thị giá trị định dạng trên input text
+            minPrice.value = minVal.toLocaleString('vi-VN') + 'đ';
+            maxPrice.value = maxVal.toLocaleString('vi-VN') + 'đ';
+
+            // Cập nhật giá trị thô vào input hidden
+            hiddenGiaTu.value = minVal;
+            hiddenGiaDen.value = maxVal;
+        }
+
+        // Khởi tạo giá trị ban đầu
+        function initializeValues() {
+            rangeMin.value = DEFAULT_MIN_VALUE;
+            rangeMax.value = DEFAULT_MAX_VALUE;
+            updatePriceDisplay();
+        }
+
+        // Xử lý sự kiện input cho slider
+        rangeMin.addEventListener('input', updatePriceDisplay);
+        rangeMax.addEventListener('input', updatePriceDisplay);
+
+        // Reset form
+        resetBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            form.reset();
+            initializeValues();
+
+            // Reset các dropdown select
+            document.getElementById('comp-type').selectedIndex = 0;
+            document.getElementById('comp-manu').selectedIndex = 0;
+            document.getElementById('comp-warranty').selectedIndex = 0;
+            document.querySelector('select[name="Tình trạng"]').selectedIndex = 0;
+            document.querySelector('select[name="SapXep"]').selectedIndex = 0;
+
+            // Reset các input text
+            document.getElementById('comp-name').value = "";
+            document.getElementById('comp-id').value = "";
+        });
+
+        // Khởi tạo giá trị ban đầu khi trang được tải
+        // initializeValues();
+
+        // Xử lý submit form
+        form.addEventListener('submit', function (e) {
+            // Đảm bảo giá trị hidden được cập nhật lần cuối trước khi submit
+            // updatePriceDisplay();
+        });
+    });
+</script>

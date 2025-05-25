@@ -1,6 +1,6 @@
 ﻿namespace QLSuaChuaVaLapDat.Models.TimKiem
 {
-    public class TimKiemLinhKien
+    public class LinhKienSearch
     {
         public string MaLinhKien { get; set; } 
         public string TenLinhKien { get; set; } 
@@ -13,7 +13,7 @@
         public string SapXep { get; set; } 
         public int TTSanPham { set; get; }
 
-        public TimKiemLinhKien()
+        public LinhKienSearch()
         {
             LoaiLinhKien = "Tất cả";
             NhaSanXuat = "Tất cả";

@@ -697,26 +697,26 @@ VALUES
 -- Thêm chi tiết đơn dịch vụ cho 10 đơn trên (mỗi đơn 2 chi tiết)
 INSERT INTO ChiTietDonDichVu (idCTDH, idDonDichVu, idLinhKien, idLoi, loaiDichVu, moTa, soLuong, ngayKetThucBH, thoiGianThemLinhKien, hanBaoHanh)
 VALUES
-('CT001', 'DDV001', NULL, 'L021', 'Sửa chữa', 'Sửa lỗi không lên hình', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
-('CT002', 'DDV001', 'LK001', NULL, 'Lắp đặt', 'Thay tụ điện mới', 1, NULL, '2025-01-02 10:00:00.000', 1),
-('CT003', 'DDV002', NULL, 'L025', 'Sửa chữa', 'Khắc phục lỗi không lên màn hình', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
-('CT004', 'DDV002', 'LK002', NULL, 'Lắp đặt', 'Thay điện trở công suất', 2, NULL, '2025-01-02 10:00:00.000', 1),
-('CT005', 'DDV003', 'LK016', NULL, 'Lắp đặt', 'Thay jack nguồn cho màn hình', 1, NULL, '2025-01-02 10:00:00.000', 1),
-('CT006', 'DDV003', NULL, 'L028', 'Sửa chữa', 'Cài đặt driver màn hình', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
-('CT007', 'DDV004', NULL, 'L030', 'Sửa chữa', 'Sửa lỗi liệt phím', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
-('CT008', 'DDV004', 'LK004', NULL, 'Lắp đặt', 'Thay diode bàn phím', 3, NULL, '2025-01-02 10:00:00.000', 1),
-('CT009', 'DDV005', NULL, 'L032', 'Sửa chữa', 'Sửa lỗi không nhận chuột', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
-('CT010', 'DDV005', 'LK005', NULL, 'Lắp đặt', 'Thay triac cảm biến', 1, NULL, '2025-01-02 10:00:00.000', 1),
-('CT011', 'DDV006', NULL, 'L034', 'Sửa chữa', 'Sửa lỗi không phát âm thanh', 1, '2025-05-06', '2025-01-02 10:00:00.000', 0),
-('CT012', 'DDV006', 'LK006', NULL, 'Lắp đặt', 'Thay MOSFET khuếch đại', 1, NULL, '2025-01-02 10:00:00.000', 1),
-('CT013', 'DDV007', NULL, 'L036', 'Sửa chữa', 'Sửa lỗi không kết nối Bluetooth', 1, '2025-05-06', '2025-01-02 10:00:00.000', 0),
-('CT014', 'DDV007', 'LK007', NULL, 'Lắp đặt', 'Thay IC nguồn', 1, NULL, '2025-01-02 10:00:00.000', 1),
-('CT015', 'DDV008', 'LK008', NULL, 'Lắp đặt', 'Lắp đặt SSD mới', 1, NULL, '2025-01-02 10:00:00.000', 1),
-('CT016', 'DDV008', NULL, 'L038', 'Sửa chữa', 'Cài đặt hệ điều hành', 1, '2025-05-09', '2025-01-02 10:00:00.000', 0),
-('CT017', 'DDV009', NULL, 'L039', 'Sửa chữa', 'Khôi phục dữ liệu ổ cứng', 1, '2025-05-09', '2025-01-02 10:00:00.000', 0),
-('CT018', 'DDV009', 'LK009', NULL, 'Lắp đặt', 'Thay relay điều khiển', 1, NULL, '2025-01-02 10:00:00.000', 1),
-('CT019', 'DDV010', 'LK010', NULL, 'Lắp đặt', 'Lắp đặt RAM mới', 1, NULL, '2025-01-02 10:00:00.000', 1),
-('CT020', 'DDV010', NULL, 'L040', 'Sửa chữa', 'Kiểm tra tương thích RAM', 1, '2025-05-09', '2025-01-02 10:00:00.000', 0);
+('CT001', 'DDV001', NULL, 'L021', N'Sửa chữa', N'Sửa lỗi không lên hình', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
+('CT002', 'DDV001', 'LK001', NULL, N'Lắp đặt', N'Thay tụ điện mới', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT003', 'DDV002', NULL, 'L025', N'Sửa chữa', N'Khắc phục lỗi không lên màn hình', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
+('CT004', 'DDV002', 'LK002', NULL, N'Lắp đặt', N'Thay điện trở công suất', 2, NULL, '2025-01-02 10:00:00.000', 1),
+('CT005', 'DDV003', 'LK016', NULL, N'Lắp đặt', N'Thay jack nguồn cho màn hình', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT006', 'DDV003', NULL, 'L028', N'Sửa chữa', N'Cài đặt driver màn hình', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
+('CT007', 'DDV004', NULL, 'L030', N'Sửa chữa', N'Sửa lỗi liệt phím', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
+('CT008', 'DDV004', 'LK004', NULL, N'Lắp đặt', N'Thay diode bàn phím', 3, NULL, '2025-01-02 10:00:00.000', 1),
+('CT009', 'DDV005', NULL, 'L032', N'Sửa chữa', N'Sửa lỗi không nhận chuột', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
+('CT010', 'DDV005', 'LK005', NULL, N'Lắp đặt', N'Thay triac cảm biến', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT011', 'DDV006', NULL, 'L034', N'Sửa chữa', N'Sửa lỗi không phát âm thanh', 1, '2025-05-06', '2025-01-02 10:00:00.000', 0),
+('CT012', 'DDV006', 'LK006', NULL, N'Lắp đặt', N'Thay MOSFET khuếch đại', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT013', 'DDV007', NULL, 'L036', N'Sửa chữa', N'Sửa lỗi không kết nối Bluetooth', 1, '2025-05-06', '2025-01-02 10:00:00.000', 0),
+('CT014', 'DDV007', 'LK007', NULL, N'Lắp đặt', N'Thay IC nguồn', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT015', 'DDV008', 'LK008', NULL, N'Lắp đặt', N'Lắp đặt SSD mới', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT016', 'DDV008', NULL, 'L038', N'Sửa chữa', N'Cài đặt hệ điều hành', 1, '2025-05-09', '2025-01-02 10:00:00.000', 0),
+('CT017', 'DDV009', NULL, 'L039', N'Sửa chữa', N'Khôi phục dữ liệu ổ cứng', 1, '2025-05-09', '2025-01-02 10:00:00.000', 0),
+('CT018', 'DDV009', 'LK009', NULL, N'Lắp đặt', N'Thay relay điều khiển', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT019', 'DDV010', 'LK010', NULL, N'Lắp đặt', N'Lắp đặt RAM mới', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT020', 'DDV010', NULL, 'L040', N'Sửa chữa', N'Kiểm tra tương thích RAM', 1, '2025-05-09', '2025-01-02 10:00:00.000', 0);
 
 
 -- select * from [User]

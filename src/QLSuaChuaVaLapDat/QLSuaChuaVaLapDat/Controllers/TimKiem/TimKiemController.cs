@@ -25,6 +25,8 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
 
             return View(result);
         }
+
+        [HttpGet]
         public async Task<IActionResult> TimKiemDonDichVu()
         {
             var result = await _context.DonDichVus
@@ -33,6 +35,96 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 .Include(d => d.IdKhachVangLaiNavigation)
                 .Include(d => d.IdLoaiThietBiNavigation)
                 .ToListAsync();
+            return View(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> TimKiemDonDichVu(DonDichVuSearch donDichVuSearch)
+        {
+            var query = _context.DonDichVus
+                .Include(d => d.ChiTietDonDichVus)
+                .Include(d => d.IdUserTaoDonNavigation)
+                .Include(d=>d.IdNhanVienKyThuatNavigation)
+                .Include(d => d.IdKhachVangLaiNavigation)
+                .Include(d => d.IdLoaiThietBiNavigation)
+                .AsQueryable();
+
+      
+            if (!string.IsNullOrEmpty(donDichVuSearch.MaDonDichVu))
+            {
+                query = query.Where(d => d.IdDonDichVu.Contains(donDichVuSearch.MaDonDichVu));
+            }
+
+            if (!string.IsNullOrEmpty(donDichVuSearch.SDTKhachHang))
+            {
+                query = query.Where(d => (d.IdKhachVangLaiNavigation != null && d.IdKhachVangLaiNavigation.HoVaTen.Contains(donDichVuSearch.SDTKhachHang)) ||
+                                         (d.IdUserTaoDonNavigation != null && d.IdUserTaoDonNavigation.HoVaTen.Contains(donDichVuSearch.SDTKhachHang)));
+            }
+
+            if (!string.IsNullOrEmpty(donDichVuSearch.IDKyThuatVien))
+            {
+                query = query.Where(d => d.IdNhanVienKyThuat.Contains(donDichVuSearch.IDKyThuatVien));
+            }
+
+            if (!string.IsNullOrEmpty(donDichVuSearch.TrangThaiDV))
+            {
+                string trangThai = donDichVuSearch.TrangThaiDV switch
+                {
+                    "processing" => "Đang sửa chữa",
+                    "completed" => "Hoàn thành",
+                    _ => donDichVuSearch.TrangThaiDV
+                };
+                query = query.Where(d => d.TrangThaiDon == trangThai || (trangThai == "Đang xử lý" && d.TrangThaiDon == "Đang sửa chữa"));
+            }
+
+            if (!string.IsNullOrEmpty(donDichVuSearch.TuNgay) && DateTime.TryParse(donDichVuSearch.TuNgay, out var tuNgay))
+            {
+                query = query.Where(d => d.NgayTaoDon >= tuNgay);
+            }
+
+            if (!string.IsNullOrEmpty(donDichVuSearch.DenNgay) && DateTime.TryParse(donDichVuSearch.DenNgay, out var denNgay))
+            {
+                query = query.Where(d => d.NgayTaoDon <= denNgay);
+            }
+
+            if (!string.IsNullOrEmpty(donDichVuSearch.LoaiThiếtBi))
+            {
+                query = query.Where(d => d.IdLoaiThietBiNavigation.TenLoaiThietBi == donDichVuSearch.LoaiThiếtBi);
+            }
+
+            if (!string.IsNullOrEmpty(donDichVuSearch.LoaiDichVu))
+            {
+                query = query.Where(d => d.LoaiDonDichVu == donDichVuSearch.LoaiDichVu);
+            }
+
+// Sắp xếp theo 
+            if (!string.IsNullOrEmpty(donDichVuSearch.SapXepTheo))
+            {
+                switch (donDichVuSearch.SapXepTheo)
+                {
+                    case "NgayTaoDesc":
+                        query = query.OrderByDescending(d => d.NgayTaoDon);
+                        break;
+                    case "NgayTaoAsc":
+                        query = query.OrderBy(d => d.NgayTaoDon);
+                        break;
+                    case "TongTienDesc":
+                        query = query.OrderByDescending(d => d.TongTien);
+                        break;
+                    case "TongTienAsc":
+                        query = query.OrderBy(d => d.TongTien);
+                        break;
+                    default:
+                        query = query.OrderByDescending(d => d.NgayTaoDon);
+                        break;
+                }
+            }
+            else
+            {
+                query = query.OrderByDescending(d => d.NgayTaoDon); 
+            }
+
+            var result = await query.ToListAsync();
             return View(result);
         }
 
@@ -103,7 +195,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
         }
 
         [HttpPost]
-        public async Task<IActionResult> TimKiemLinhKien(TimKiemLinhKien timKiemLinhKien)
+        public async Task<IActionResult> TimKiemLinhKien(LinhKienSearch timKiemLinhKien)
         {
             var query = _context.LinhKiens
                 .Include(d => d.IdLoaiLinhKienNavigation)
