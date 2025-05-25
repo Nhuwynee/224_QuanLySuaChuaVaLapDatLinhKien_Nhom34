@@ -23,7 +23,7 @@ $(document).ready(function () {
     // Add event handler for the add-part-btn
     $(document).on('click', '.add-part-btn', function () {
         // Clone the first split-with-button element (without its events)
-        let newComponentSection = $('.split-with-button').first().clone(false);
+        let newComponentSection = $('.split-with-button').first().clone(true);
 
         // Clear any input values in the cloned section
         newComponentSection.find('input[type="text"]').val('');
@@ -376,9 +376,16 @@ function updateTotalPrice() {
     let totalPrice = 0;
 
     // Tính tổng giá từ tất cả các thành phần
+    //donGiaFields.forEach(field => {
+    //    // Chuyển đổi chuỗi giá có định dạng (ví dụ: "1.000.000") thành số
+    //    const priceText = field.value.replace(/\./g, '').replace(/,/g, '');
+    //    const price = parseInt(priceText) || 0;
+    //    totalPrice += price;
+    //});
     donGiaFields.forEach(field => {
-        // Chuyển đổi chuỗi giá có định dạng (ví dụ: "1.000.000") thành số
-        const priceText = field.value.replace(/\./g, '').replace(/,/g, '');
+        // Chuyển đổi chuỗi giá Việt (ví dụ: "1.000.000") thành số nguyên
+        const raw = field.value || '';
+        const priceText = raw.replace(/\./g, '').replace(/,/g, ''); // bỏ định dạng
         const price = parseInt(priceText) || 0;
         totalPrice += price;
     });
@@ -394,9 +401,13 @@ function updateTotalPrice() {
     const selectedParts = document.querySelectorAll('.selected-part');
     selectedParts.forEach(part => {
         const priceText = part.querySelector('.part-price').textContent;
-        const priceMatch = priceText.match(/[\d,.]+/);
+        const priceMatch = priceText.match(/[\d.,]+/);
         if (priceMatch) {
-            const price = parseFloat(priceMatch[0].replace(/\./g, '').replace(/,/g, '.')) || 0;
+            //const price = parseFloat(priceMatch[0].replace(/\./g, '').replace(/,/g, '.')) || 0;
+            // Xử lý chuỗi giá linh kiện từ định dạng Việt → số thực
+            const raw = priceMatch[0];
+            const normalized = raw.replace(/\./g, '').replace(/,/g, '.'); // ví dụ: 1.200.000 → 1200000
+            const price = parseFloat(normalized) || 0;
             partPrice += price;
         }
     });
@@ -412,7 +423,11 @@ function updateTotalPrice() {
 
     // Tính tiền còn lại = Tổng tiền - Tiền ứng trước
     const advancePaymentInput = document.getElementById('advancePayment');
-    const advancePayment = parseInt(advancePaymentInput.value) || 0;
+    //const advancePayment = parseInt(advancePaymentInput.value) || 0;
+    const advanceText = advancePaymentInput?.value || '';
+    const advanceNormalized = advanceText.replace(/\./g, '').replace(/,/g, '');
+    const advancePayment = parseInt(advanceNormalized) || 0;
+
     const remainingAmount = finalPrice - advancePayment;
 
     // Cập nhật hiển thị tiền còn lại
@@ -428,6 +443,50 @@ $(document).ready(function () {
         updateTotalPrice();
     });
 });
+
+// Add this function to ensure part IDs are correctly stored in hidden fields
+
+//function updateErrorDetailPartIds() {
+//    // Create an array to store all error detail forms
+//    const errorDetailContainers = document.querySelectorAll('.split-with-button');
+
+//    // For each container, find the associated active part and set the ID
+//    errorDetailContainers.forEach((container, index) => {
+//        // Get the active selected part ID for this error container
+//        const activePart = document.querySelector('.selected-part.active');
+//        if (activePart) {
+//            const partId = activePart.getAttribute('data-id');
+
+//            // Create or update hidden field for this error detail
+//            let hiddenField = container.querySelector(`input[name="ErrorDetails[${index}].IdLinhKien"]`);
+//            if (!hiddenField) {
+//                hiddenField = document.createElement('input');
+//                hiddenField.type = 'hidden';
+//                hiddenField.name = `ErrorDetails[${index}].IdLinhKien`;
+//                container.appendChild(hiddenField);
+//            }
+//            hiddenField.value = partId;
+//        }
+//    });
+//}
+
+//// Add this to document ready function - call before form submit
+//$(document).ready(function () {
+//    // Existing code...
+
+//    // Make sure to call this before form submission
+//    document.getElementById('serviceOrderForm').addEventListener('submit', function (e) {
+//        updateErrorDetailPartIds();
+//        // Continue with form submission
+//    });
+//});
+
+
+
+
+
+
+
 
 // Staff Assignment Popup Functionality
 $(document).ready(function () {
@@ -1099,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const detail = {
                         IdLoi: $(this).find('.error-loi-select').val(),
                         MoTaLoi: $(this).find('textarea').first().val(),
-                        IdLinhKien: $(this).find('#searchPartsInput').val() || '',
+                        IdLinhKien: '',
 
                         SoLuong: 1,
                         LoaiDichVu: $('.section:contains("Loại dịch vụ") .dropdown input').eq(0).val(),
@@ -1109,7 +1168,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 formData.append('ErrorDetails', JSON.stringify(errorDetails));
+                const selectedPartIds = [];
+                const selectedPartLoiIds = [];
 
+                $('#selectedPartsContainer .selected-part').each(function () {
+                    const partId = $(this).attr('data-id');
+                    if (partId) {
+                        selectedPartIds.push(partId);
+                        // Get associated error ID if any (or empty string)
+                        selectedPartLoiIds.push($(this).attr('data-error-id') || '');
+                    }
+                });
+                // Add selected parts as JSON strings
+                formData.append('SelectedPartIds', JSON.stringify(selectedPartIds));
+                formData.append('SelectedPartLoiIds', JSON.stringify(selectedPartLoiIds));
                 // Handle device images
                 if ($('#deviceImageInput')[0]?.files.length > 0) {
                     for (let i = 0; i < $('#deviceImageInput')[0].files.length; i++) {
@@ -1125,14 +1197,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 formData.append('NgayHoanThanh', $('#endDatetimePicker').val());
-                let tongTien = $('#tongTienInput').val() || $('.price-input').eq(1).val(); // hoặc lấy đúng input tổng tiền
-                tongTien = tongTien.replace(/\./g, '').replace(/,/g, ''); // Loại bỏ mọi ký tự không phải số hoặc dấu chấm
-                formData.append('TongTien', tongTien);
+                //let tongTien = $('#tongTienInput').val() || $('.price-input').eq(1).val(); // hoặc lấy đúng input tổng tiền
+                //tongTien = tongTien.replace(/\./g, '').replace(/,/g, ''); // Loại bỏ mọi ký tự không phải số hoặc dấu chấm
+                //formData.append('TongTien', tongTien);
 
-                //let tongTien = $('#tongTienInput').val() || $('.price-input').eq(1).val();
-                //tongTien = tongTien.replace(/\./g, '').replace(/,/g, ''); // Bỏ dấu chấm ngăn cách nghìn
-                //const tongTienNumber = parseFloat(tongTien) || 0;
-                //formData.append('TongTien', tongTienNumber.toFixed(2)); // lưu 300000.00
+                let tongTien = $('#tongTienInput').val() || $('.price-input').eq(1).val() || '0';
+                tongTien = tongTien.replace(/\./g, '').replace(/,/g, '').replace(/\s/g, ''); // Bỏ dấu chấm ngăn cách nghìn
+                const tongTienNumber = parseInt(tongTien) || 0;
+                formData.append('TongTien', tongTienNumber); // lưu 300000.00
 
 
                 // Show loading overlay
@@ -1182,8 +1254,48 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+// Add this function to associate error IDs with parts
+function associateErrorWithPart(partId, errorId) {
+    const partElement = $(`.selected-part[data-id="${partId}"]`);
+    if (partElement.length) {
+        // Store the error ID as data attribute
+        partElement.attr('data-error-id', errorId);
 
-// ...existing code...
+        // Visual indication that error is assigned
+        const errorText = errorId ? $('#IdLoi option[value="' + errorId + '"]').text() : '';
+
+        if (errorText) {
+            let errorBadge = partElement.find('.error-badge');
+            if (!errorBadge.length) {
+                errorBadge = $('<span class="error-badge"></span>');
+                partElement.append(errorBadge);
+            }
+            errorBadge.text('Lỗi: ' + errorText);
+        }
+    }
+}
+
+// Add this code to your existing part selection logic
+$(document).ready(function () {
+    // Add button to associate errors with parts
+    $('.link-error-btn').click(function () {
+        const selectedPartId = $('.selected-part.active').data('id');
+        const selectedErrorId = $('.error-loi-select').val();
+
+        if (selectedPartId && selectedErrorId) {
+            associateErrorWithPart(selectedPartId, selectedErrorId);
+            alert('Đã liên kết linh kiện với lỗi thành công!');
+        } else {
+            alert('Vui lòng chọn một linh kiện và một loại lỗi để liên kết');
+        }
+    });
+
+    // Make parts selectable
+    $(document).on('click', '.selected-part', function () {
+        $('.selected-part').removeClass('active');
+        $(this).addClass('active');
+    });
+});
 // Xử lý sự kiện khi chọn trạng thái đơn hàng
 $(document).ready(function () {
     // Trạng thái dropdown
@@ -1405,7 +1517,7 @@ $(document).ready(function () {
             const priceText = $(this).find('.part-price').text();
             const priceMatch = priceText.match(/[\d.,]+/); // Extract numeric part
             const raw = priceMatch ? priceMatch[0].replace(/\./g, '').replace(/,/g, '') : '0';
-const partPrice = parseFloat(raw);
+            const partPrice = parseFloat(raw);
             //const formattedPrice = formatCurrency(parseInt(partPrice));
             const formattedPrice = new Intl.NumberFormat('vi-VN').format(parseInt(partPrice));
             partsList.append(
@@ -1511,6 +1623,8 @@ function validateOrderForm() {
 
         if (errorSelect.val() && errorSelect.val() !== '' && errorDesc.val().trim() !== '') {
             hasValidError = true;
+            // Store the error ID in a data attribute for later submission
+            $(this).attr('data-error-id', errorSelect.val());
         }
     });
 

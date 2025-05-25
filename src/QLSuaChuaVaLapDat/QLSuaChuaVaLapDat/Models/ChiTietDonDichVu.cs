@@ -20,7 +20,7 @@ public partial class ChiTietDonDichVu
 
     public int SoLuong { get; set; }
 
-    public DateOnly? NgayKetThucBh { get; set; }
+    public DateOnly? NgayKetThucBh { get; set; } = new DateOnly(2025, 12, 31);
 
     public DateTime? ThoiGianThemLinhKien { get; set; }
 

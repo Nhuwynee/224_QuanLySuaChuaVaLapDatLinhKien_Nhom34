@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using QLSuaChuaVaLapDat.Models;
 using QLSuaChuaVaLapDat.Models.viewmodel;
 using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
 {
@@ -315,13 +317,73 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
         [HttpPost]
         public async Task<IActionResult> CreateServiceOrder([FromForm] ServiceOrderFormViewModel formData)
         {
+            // Parse all form fields to ensure we get all data
+            foreach (var key in Request.Form.Keys)
+            {
+                if (key.StartsWith("ErrorDetails[") && key.Contains("].IdLinhKien"))
+                {
+                    // Extract the index from the key (e.g., "ErrorDetails[0].IdLinhKien")
+                    var match = Regex.Match(key, @"ErrorDetails\[(\d+)\]");
+                    if (match.Success && int.TryParse(match.Groups[1].Value, out int index))
+                    {
+                        // Ensure ErrorDetails list is initialized and has enough items
+                        if (formData.ErrorDetails == null)
+                        {
+                            formData.ErrorDetails = new List<ErrorDetailViewModel>();
+                        }
+
+                        while (formData.ErrorDetails.Count <= index)
+                        {
+                            formData.ErrorDetails.Add(new ErrorDetailViewModel());
+                        }
+
+                        // Set the IdLinhKien value
+                        formData.ErrorDetails[index].IdLinhKien = Request.Form[key].ToString();
+                    }
+                }
+            }
+
             // Deserialize ErrorDetails nếu là string
             if ((formData.ErrorDetails == null || formData.ErrorDetails.Count == 0) && Request.Form.ContainsKey("ErrorDetails"))
             {
                 var errorDetailsStr = Request.Form["ErrorDetails"];
-                if (!string.IsNullOrEmpty(errorDetailsStr))
+                if (!string.IsNullOrEmpty(errorDetailsStr.ToString()))
                 {
-                    formData.ErrorDetails = JsonConvert.DeserializeObject<List<ErrorDetailViewModel>>(errorDetailsStr);
+                    formData.ErrorDetails = JsonConvert.DeserializeObject<List<ErrorDetailViewModel>>(errorDetailsStr.ToString());
+                    // Populate navigation properties for each error detail
+                    if (formData.ErrorDetails != null)
+                    {
+                        foreach (var errorDetail in formData.ErrorDetails)
+                        {
+                            if (!string.IsNullOrEmpty(errorDetail.IdLoi))
+                            {
+                                errorDetail.Loi = await _context.LoaiLois.FindAsync(errorDetail.IdLoi);
+                            }
+
+                            if (!string.IsNullOrEmpty(errorDetail.IdLinhKien))
+                            {
+                                errorDetail.LinhKien = await _context.LinhKiens.FindAsync(errorDetail.IdLinhKien);
+                            }
+                        }
+                    }
+                }
+            }
+            // Get SelectedPartIds
+            if ((formData.SelectedPartIds == null || formData.SelectedPartIds.Count == 0) && Request.Form.ContainsKey("SelectedPartIds"))
+            {
+                var partIdsStr = Request.Form["SelectedPartIds"];
+                if (!string.IsNullOrEmpty(partIdsStr.ToString()))
+                {
+                    formData.SelectedPartIds = JsonConvert.DeserializeObject<List<string>>(partIdsStr.ToString());
+                }
+            }
+            // Get SelectedPartLoiIds
+            if ((formData.SelectedPartLoiIds == null || formData.SelectedPartLoiIds.Count == 0) && Request.Form.ContainsKey("SelectedPartLoiIds"))
+            {
+                var partLoiIdsStr = Request.Form["SelectedPartLoiIds"];
+                if (!string.IsNullOrEmpty(partLoiIdsStr.ToString()))
+                {
+                    formData.SelectedPartLoiIds = JsonConvert.DeserializeObject<List<string>>(partLoiIdsStr.ToString());
                 }
             }
             try
@@ -358,14 +420,17 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                         // Trả về view IndexDSDDV với thông báo thành công
 
                         var danhSachDon = _context.DonDichVus.ToList();
+                        //thông báo đã tạo thành công với popup alert
+                     
+                        TempData["SuccessMessage"] = "Đơn dịch vụ đã được tạo thành công!";
                         return RedirectToAction("IndexDSDDV", "DanhSachDonDichVu");
                     }
                     catch (Exception ex)
                     {
-                        // Rollback transaction nếu có lỗi
-                        //transaction.Rollback();
-                        //throw ex;
-                        return Json(new { success = false, message = "Có lỗi xảy ra khi tạo đơn dịch vụ.", detailedMessage = ex.Message, innerException = ex.InnerException?.Message });
+                        //Rollback transaction nếu có lỗi
+                        transaction.Rollback();
+                        throw ex;
+                        //return Json(new { success = false, message = "Có lỗi xảy ra khi tạo đơn dịch vụ.", detailedMessage = ex.Message, innerException = ex.InnerException?.Message });
                     }
                 }
             }
@@ -433,6 +498,39 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
 
             return newId;
         }
+
+        // Phương thức hỗ trợ để lấy địa chỉ đầy đủ
+        private async Task<string> GetDiaChiDayDu(string idPhuong)
+        {
+            string diaChi = "";
+            var phuong = await _context.Phuongs.FindAsync(idPhuong);
+
+            if (phuong != null)
+            {
+                diaChi = phuong.TenPhuong;
+
+                var quan = await _context.Quans.FindAsync(phuong.IdQuan);
+                if (quan != null)
+                {
+                    diaChi += $", {quan.TenQuan}";
+
+                    var thanhPho = await _context.ThanhPhos.FindAsync(quan.IdThanhPho);
+                    if (thanhPho != null)
+                    {
+                        diaChi += $", {thanhPho.TenThanhPho}";
+                    }
+                }
+            }
+
+            return diaChi;
+        }
+
+        // Phương thức hỗ trợ kết hợp địa chỉ
+        private string CombineAddress(string duongSoNha, string diaChi)
+        {
+            duongSoNha = duongSoNha?.Trim() ?? "";
+            return string.IsNullOrEmpty(duongSoNha) ? diaChi : $"{duongSoNha}, {diaChi}";
+        }
         // Tạo đơn dịch vụ
         private async Task<string> TaoDonDichVu(ServiceOrderFormViewModel formData, string idKhachVangLai)
         {
@@ -446,7 +544,15 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
             {
                 trangThai = "Hoàn thành";
             }
+            // Convert total price from string if needed and ensure it's correctly formatted
+            decimal tongTien = formData.TongTien;
 
+            // If the amount seems suspiciously small (likely missing decimal places)
+            if (tongTien > 0 && tongTien < 1000)
+            {
+                // Multiply by 1000 to fix common formatting issue
+                tongTien *= 1000;
+            }
             // Tạo đối tượng DonDichVu
             var donDichVu = new DonDichVu
             {
@@ -508,13 +614,17 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                     {
                         idLoi = formData.SelectedPartLoiIds[i];
                     }
-                    if (string.IsNullOrEmpty(idLoi))
+                    if (string.IsNullOrEmpty(idLinhKien))
                     {
                         // Gán mã lỗi mặc định hoặc trả về lỗi tùy nghiệp vụ
                         // idLoi = "LOI_MAC_DINH";
-                        return; // hoặc throw exception nếu bắt buộc phải có lỗi
+                        continue; // hoặc throw exception nếu bắt buộc phải có lỗi
                     }
                     var linhKien = await _context.LinhKiens.FindAsync(idLinhKien);
+                    if (linhKien == null)
+                    {
+                        continue; // Bỏ qua nếu linh kiện không tồn tại
+                    }
                     //var linhKien = await _context.LinhKiens.FindAsync(idLinhKien);
                     string idCTDH = GenerateNextDetailId();
 
@@ -523,22 +633,24 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                         IdCtdh = idCTDH,
                         IdDonDichVu = idDonDichVu,
                         IdLinhKien = idLinhKien,
-                        IdLoi = idLoi, // Không liên kết với lỗi nào cụ thể
+                        IdLoi = idLoi, 
                         LoaiDichVu = loaiDichVu,
                         MoTa = formData.MoTa,
                         SoLuong = 1,
                         ThoiGianThemLinhKien = DateTime.Now,
+                        NgayKetThucBh = formData.NgayKetThucBaoHanh, // Ngày kết thúc bảo hành từ form
                         HanBaoHanh = false // Mặc định là hết bảo hành
 
                     };
 
                     // Lấy thông tin linh kiện để tính ngày kết thúc bảo hành
-                    
-                    if (linhKien != null)
-                    {
-                        var ngayHienTai = DateOnly.FromDateTime(DateTime.Now);
-                        chiTiet.NgayKetThucBh = ngayHienTai.AddDays(linhKien.ThoiGianBaoHanh.DayNumber);
-                    }
+
+                    //var ngayHienTai = DateOnly.FromDateTime(DateTime.Now);
+                    //if (linhKien.ThoiGianBaoHanh != null)
+                    //{
+                    //    // Sử dụng trực tiếp giá trị ThoiGianBaoHanh làm ngày kết thúc bảo hành
+                    //    chiTiet.NgayKetThucBh = linhKien.ThoiGianBaoHanh;
+                    //}
 
                     _context.ChiTietDonDichVus.Add(chiTiet);
                     await _context.SaveChangesAsync();
@@ -547,59 +659,107 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
         }
 
         // Tạo một chi tiết đơn dịch vụ và các hình ảnh liên quan
+        // Update the TaoMotChiTietDon method
+
         private async Task TaoMotChiTietDon(ServiceOrderFormViewModel formData, string idDonDichVu, ErrorDetailViewModel errorDetail)
         {
             var donDichVu = await _context.DonDichVus.FindAsync(idDonDichVu);
             var loaiDichVu = formData.LoaiDichVu ?? donDichVu?.LoaiDonDichVu ?? "Sửa chữa";
-  
+
             if (loaiDichVu != "Sửa chữa" && loaiDichVu != "Lắp đặt")
             {
                 return;
             }
+
+            // Direct connection to database to verify IDs exist before assignment
+            string validIdLinhKien = null;
+            string validIdLoi = null;
+
+            // Validate IdLinhKien by directly checking the database
+            if (!string.IsNullOrEmpty(errorDetail.IdLinhKien))
+            {
+                var linhKien = await _context.LinhKiens.FirstOrDefaultAsync(lk => lk.IdLinhKien == errorDetail.IdLinhKien.Trim());
+                if (linhKien != null)
+                {
+                    validIdLinhKien = linhKien.IdLinhKien;
+                    errorDetail.LinhKien = linhKien;
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: LinhKien ID not found: {errorDetail.IdLinhKien}");
+                }
+            }
+
+            // Validate IdLoi by directly checking the database
+            if (!string.IsNullOrEmpty(errorDetail.IdLoi))
+            {
+                var loi = await _context.LoaiLois.FirstOrDefaultAsync(l => l.IdLoi == errorDetail.IdLoi.Trim());
+                if (loi != null)
+                {
+                    validIdLoi = loi.IdLoi;
+                    errorDetail.Loi = loi;
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: Loi ID not found: {errorDetail.IdLoi}");
+                }
+            }
+
+            // Skip creating this record if both IDs are invalid
+            if (string.IsNullOrEmpty(validIdLinhKien) && string.IsNullOrEmpty(validIdLoi))
+            {
+                Console.WriteLine("Warning: Both IdLinhKien and IdLoi are invalid. Skipping this record.");
+                return;
+            }
+
             // Tạo ID chi tiết đơn hàng mới
             string idCTDH = GenerateNextDetailId();
-            //var loaiDichVu = formData.LoaiDonDichVu?.Trim();
-            //if (loaiDichVu != "Sửa chữa" && loaiDichVu != "Lắp đặt")
-            //{
-            //    // Có thể trả về lỗi hoặc gán mặc định
-            //    loaiDichVu = "Sửa chữa"; // hoặc return lỗi
-            //}
-            // Tạo đối tượng chi tiết đơn dịch vụ
+
+            // Create the ChiTietDonDichVu with validated IDs
             var chiTiet = new ChiTietDonDichVu
             {
                 IdCtdh = idCTDH,
                 IdDonDichVu = idDonDichVu,
-                IdLinhKien = errorDetail.IdLinhKien,
-                IdLoi = errorDetail.IdLoi,
+                IdLinhKien = validIdLinhKien, // Use validated ID
+                IdLoi = validIdLoi, // Use validated ID
                 LoaiDichVu = loaiDichVu,
                 MoTa = errorDetail.MoTaLoi,
                 SoLuong = errorDetail.SoLuong,
                 ThoiGianThemLinhKien = DateTime.Now,
+                NgayKetThucBh = errorDetail.NgayKetThucBaoHanh, // Ngày kết thúc bảo hành từ form
                 HanBaoHanh = errorDetail.ConBaoHanh
             };
 
-            // Tính ngày kết thúc bảo hành nếu có linh kiện thay thế
-            if (!string.IsNullOrEmpty(errorDetail.IdLinhKien))
+            // Calculate warranty end date if we have a valid linh kien
+            //if (!string.IsNullOrEmpty(validIdLinhKien) && errorDetail.LinhKien != null)
+            //{
+            //    // Sử dụng trực tiếp giá trị ThoiGianBaoHanh từ linh kiện
+            //    chiTiet.NgayKetThucBh = errorDetail.LinhKien.ThoiGianBaoHanh;
+            //}
+            //else if (errorDetail.NgayKetThucBaoHanh.HasValue)
+            //{
+            //    chiTiet.NgayKetThucBh = errorDetail.NgayKetThucBaoHanh;
+            //}
+
+            // Add to database and save
+            _context.ChiTietDonDichVus.Add(chiTiet);
+            try
             {
-                var linhKien = await _context.LinhKiens.FindAsync(errorDetail.IdLinhKien);
-                if (linhKien != null)
+                await _context.SaveChangesAsync();
+
+                // Process images only after successfully saving the record
+                await LuuHinhAnh(formData.DeviceImages, idCTDH, "thiết bị linh kiện");
+
+                // Process warranty images if applicable
+                if (errorDetail.ConBaoHanh)
                 {
-                    var ngayHienTai = DateOnly.FromDateTime(DateTime.Now);
-                    chiTiet.NgayKetThucBh = ngayHienTai.AddDays(linhKien.ThoiGianBaoHanh.DayNumber);
+                    await LuuHinhAnh(formData.WarrantyImages, idCTDH, "bảo hành");
                 }
             }
-
-            // Lưu chi tiết đơn hàng
-            _context.ChiTietDonDichVus.Add(chiTiet);
-            await _context.SaveChangesAsync();
-
-            // Xử lý các hình ảnh
-            await LuuHinhAnh(formData.DeviceImages, idCTDH, "thiết bị linh kiện");
-
-            // Xử lý hình ảnh bảo hành (nếu còn bảo hành)
-            if (errorDetail.ConBaoHanh)
+            catch (Exception ex)
             {
-                await LuuHinhAnh(formData.WarrantyImages, idCTDH, "bảo hành");
+                Console.WriteLine($"Error saving ChiTietDonDichVu: {ex.Message}");
+                throw; // Re-throw to be caught by the transaction
             }
         }
 

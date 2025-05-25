@@ -161,6 +161,7 @@ namespace QLSuaChuaVaLapDat.Controllers.DanhSachDonDichVuController
         [HttpPost]
         public IActionResult XoaDonDichVu(string id)
         {
+            using var transaction = _context.Database.BeginTransaction();
             try
             {
                 // Find the service order
@@ -170,37 +171,45 @@ namespace QLSuaChuaVaLapDat.Controllers.DanhSachDonDichVuController
                     return Json(new { success = false, message = "Không tìm thấy đơn dịch vụ" });
                 }
 
-                // Find and delete related ChiTietDonDichVu records first
+                // 1. Xóa hình ảnh trước (nếu có foreign key tới ChiTietDonDichVu)
                 var chiTietList = _context.ChiTietDonDichVus.Where(ct => ct.IdDonDichVu == id).ToList();
-
                 foreach (var chiTiet in chiTietList)
                 {
-                    // Check if there are any HinhAnh records linked to this ChiTietDonDichVu
                     var hinhAnhList = _context.HinhAnhs.Where(h => h.IdCtdh == chiTiet.IdCtdh).ToList();
                     if (hinhAnhList.Any())
                     {
                         _context.HinhAnhs.RemoveRange(hinhAnhList);
                     }
-
-                    _context.ChiTietDonDichVus.Remove(chiTiet);
                 }
 
-                // Check if there are any DanhGia records linked to this DonDichVu
+                // 2. Xóa đánh giá (nếu có foreign key tới DonDichVu)
                 var danhGiaList = _context.DanhGia.Where(dg => dg.IdDonDichVu == id).ToList();
                 if (danhGiaList.Any())
                 {
                     _context.DanhGia.RemoveRange(danhGiaList);
                 }
 
-                // Remove the service order
+                // 3. Xóa chi tiết đơn dịch vụ
+                if (chiTietList.Any())
+                {
+                    _context.ChiTietDonDichVus.RemoveRange(chiTietList);
+                }
+
+                // 4. Cuối cùng mới xóa đơn dịch vụ
                 _context.DonDichVus.Remove(donDichVu);
+
+                // Save tất cả thay đổi
                 _context.SaveChanges();
 
-                return Json(new { success = true });
+                // Commit transaction
+                transaction.Commit();
+
+                return Json(new { success = true, message = "Xóa đơn dịch vụ thành công" });
             }
             catch (Exception ex)
             {
-                // Log the exception if needed
+                // Rollback nếu có lỗi
+                transaction.Rollback();
                 return Json(new { success = false, message = "Lỗi khi xóa đơn dịch vụ: " + ex.Message });
             }
         }

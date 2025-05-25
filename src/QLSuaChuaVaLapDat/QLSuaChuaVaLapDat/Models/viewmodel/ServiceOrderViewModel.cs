@@ -33,7 +33,9 @@ namespace QLSuaChuaVaLapDat.Models.viewmodel
         
         // Thông tin ngày giờ
         public DateTime? NgayHoanThanh { get; set; }
-        
+
+        public DateOnly? NgayKetThucBaoHanh { get; set; } // Ngày kết thúc bảo hành
+
         // Thông tin thanh toán
         public decimal TongTien { get; set; }
         public decimal TienKhachHangUngTruoc { get; set; }
@@ -51,11 +53,15 @@ namespace QLSuaChuaVaLapDat.Models.viewmodel
 
     public class ErrorDetailViewModel
     {
-        public string IdLoi { get; set; }
+        public string IdLoi{ get; set; }
         public string MoTaLoi { get; set; }
-        public string IdLinhKien { get; set; }
+        public string? IdLinhKien { get; set; }
         public int SoLuong { get; set; } = 1;
         public bool ConBaoHanh { get; set; }
+        public DateOnly? NgayKetThucBaoHanh { get; set; } = new DateOnly(2025, 12, 31);// Ngày kết thúc bảo hành
         public string GhiChu { get; set; }
+        // Navigation properties to provide stronger typing
+        public virtual LoaiLoi? Loi { get; set; }
+        public virtual LinhKien? LinhKien { get; set; }
     }
 }
