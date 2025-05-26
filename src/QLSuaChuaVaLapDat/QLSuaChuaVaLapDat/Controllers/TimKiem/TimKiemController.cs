@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QLSuaChuaVaLapDat.Models;
 using QLSuaChuaVaLapDat.Models.Impl;
@@ -566,29 +567,168 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
             return View(timKiemLinhKienVM);
         }
 
-
+        [HttpGet]
         public async Task<IActionResult> TimKiemBaoHanh()
         {
-            try
-            {
-                var result = await _context.DonDichVus
-                    .Include(d=>d.IdKhachVangLaiNavigation)
-                    .Include(d=>d.IdUserNavigation)
-                    .Include(d => d.ChiTietDonDichVus)
-                        .ThenInclude(ct => ct.IdLinhKienNavigation)
-                    .Include(d => d.ChiTietDonDichVus)
-                    .ThenInclude(ct => ct.IdLoiNavigation)
-                    .ToListAsync();
+            
+            // Query ChiTietDonDichVu directly
+            var chiTietDonDichVus = await _context.ChiTietDonDichVus
+                .Include(ct => ct.IdDonDichVuNavigation)
+                    .ThenInclude(d => d.IdKhachVangLaiNavigation)
+                .Include(ct => ct.IdDonDichVuNavigation)
+                    .ThenInclude(d => d.IdUserNavigation)
+                .Include(ct => ct.IdLinhKienNavigation)
+                    .ThenInclude(lk => lk.IdNsxNavigation)
+                .Include(ct => ct.IdLoiNavigation)
+                .ToListAsync();
 
-                return View(result);
-            }
-            catch (Exception ex)
+            var chiTietDonHangDtos = chiTietDonDichVus.Select(ct => new ChiTietDonHangDTO
             {
-                return BadRequest($"Lỗi: {ex.Message}");
-            }
+                IDChiTietDonDichVu = ct.IdCtdh,
+                idDonDichVu = ct.IdDonDichVuNavigation.IdDonDichVu,
+                MaLinhKien = ct.IdLinhKienNavigation?.IdLinhKien ?? null,
+                MaLoi = ct.IdLoiNavigation?.IdLoi ?? null,
+                TenLinhKien = ct.IdLinhKienNavigation?.TenLinhKien ?? "Không có linh kiện", // Add null check
+                TenLoi = ct.IdLoiNavigation?.MoTaLoi ?? "Không có lỗi",
+                LoaiDichVu = ct.IdDonDichVuNavigation.LoaiDonDichVu ?? "N/A",
+                TenKhachHang = ct.IdDonDichVuNavigation.IdKhachVangLaiNavigation?.HoVaTen ?? ct.IdDonDichVuNavigation.IdUserNavigation?.TenUser ?? "Khách vãng lai",
+                NgayKichHoat = ct.ThoiGianThemLinhKien,
+                NgayHetHan = ct.NgayKetThucBh.HasValue
+          ? ct.NgayKetThucBh.Value.ToDateTime(TimeOnly.MinValue)
+          : (ct.ThoiGianThemLinhKien.HasValue ? ct.ThoiGianThemLinhKien.Value.AddMonths(ct.IdLinhKienNavigation?.ThoiGianBaoHanh ?? 0) : (DateTime?)null),
+                TrangThaiBaoHanh = (bool)ct.HanBaoHanh,
+                DieuKien = ct.IdLinhKienNavigation?.DieuKienBaoHanh?? null
+            }).ToList();
+
+            chiTietDonHangDtos = chiTietDonHangDtos.OrderBy(dto => dto.idDonDichVu).ToList();
+
+            var loaiLK = await _context.LoaiLinhKiens.ToListAsync();
+            var NhaSX = await _context.NhaSanXuats.ToListAsync();
+
+            BaoHanhSearchVM baohanhView = new BaoHanhSearchVM
+            {
+                ChiTietDonHangs = chiTietDonHangDtos,
+                nhaSanXuats = NhaSX,
+                linhKiens = loaiLK
+            };
+
+            return View(baohanhView);
+            
+            
         }
 
 
-        // Các action khác có thể sử dụng _context
+        [HttpPost]
+        public async Task<IActionResult> TimKiemBaoHanh(BaoHanhSearch baoHanhSearch)
+        {
+            // Query ChiTietDonDichVu directly to simplify mapping
+            var query = _context.ChiTietDonDichVus
+                .Include(ct => ct.IdDonDichVuNavigation)
+                    .ThenInclude(d => d.IdKhachVangLaiNavigation)
+                .Include(ct => ct.IdDonDichVuNavigation)
+                    .ThenInclude(d => d.IdUserNavigation)
+                .Include(ct => ct.IdLinhKienNavigation)
+                    .ThenInclude(lk => lk.IdNsxNavigation)
+                .Include(ct => ct.IdLoiNavigation)
+                .AsQueryable();
+
+            // Apply filters
+            if (!string.IsNullOrEmpty(baoHanhSearch.MaDonDichVu))
+            {
+                query = query.Where(ct => ct.IdDonDichVuNavigation.IdDonDichVu.Contains(baoHanhSearch.MaDonDichVu));
+            }
+
+            if (!string.IsNullOrEmpty(baoHanhSearch.MaLinhKien))
+            {
+                query = query.Where(ct => ct.IdLinhKienNavigation.IdLinhKien == baoHanhSearch.MaLinhKien);
+            }
+
+            if (!string.IsNullOrEmpty(baoHanhSearch.SoDienThoaiKhachHang))
+            {
+                query = query.Where(ct => (ct.IdDonDichVuNavigation.IdKhachVangLaiNavigation != null && ct.IdDonDichVuNavigation.IdKhachVangLaiNavigation.Sdt.Contains(baoHanhSearch.SoDienThoaiKhachHang)) ||
+                                          (ct.IdDonDichVuNavigation.IdUserNavigation != null && ct.IdDonDichVuNavigation.IdUserNavigation.Sdt.Contains(baoHanhSearch.SoDienThoaiKhachHang)));
+            }
+
+            if (baoHanhSearch.TrangThai != null)
+            {
+                query = query.Where(ct => ct.IdDonDichVuNavigation.TrangThaiDon == baoHanhSearch.TrangThai);
+            }
+
+            if (baoHanhSearch.TuNgay.HasValue)
+            {
+                query = query.Where(ct => ct.ThoiGianThemLinhKien >= baoHanhSearch.TuNgay.Value);
+            }
+
+            if (baoHanhSearch.DenNgay.HasValue)
+            {
+                query = query.Where(ct => ct.ThoiGianThemLinhKien <= baoHanhSearch.DenNgay.Value);
+            }
+
+            if (baoHanhSearch.LoaiLinhKien != null)
+            {
+                query = query.Where(ct => ct.IdLinhKienNavigation.IdLoaiLinhKien == baoHanhSearch.LoaiLinhKien);
+            }
+
+            if (!string.IsNullOrEmpty(baoHanhSearch.NhaSanXuat))
+            {
+                query = query.Where(ct => ct.IdLinhKienNavigation.IdNsxNavigation.IdNsx == baoHanhSearch.NhaSanXuat);
+            }
+
+            // Fetch the results and map to ChiTietDonHangDTO
+            var chiTietDonDichVus = await query.ToListAsync();
+
+            var chiTietDonHangDtos = chiTietDonDichVus.Select(ct => new ChiTietDonHangDTO
+            {
+                IDChiTietDonDichVu = ct.IdCtdh,
+                idDonDichVu = ct.IdDonDichVuNavigation.IdDonDichVu,
+                MaLinhKien = ct.IdLinhKienNavigation?.IdLinhKien ?? null,
+                MaLoi = ct.IdLoiNavigation?.IdLoi ?? null,
+                TenLinhKien = ct.IdLinhKienNavigation?.TenLinhKien ?? "Không có linh kiện", // Add null check
+                TenLoi = ct.IdLoiNavigation?.MoTaLoi ?? "Không có lỗi",
+                LoaiDichVu = ct.IdDonDichVuNavigation.LoaiDonDichVu ?? "N/A",
+                TenKhachHang = ct.IdDonDichVuNavigation.IdKhachVangLaiNavigation?.HoVaTen ?? ct.IdDonDichVuNavigation.IdUserNavigation?.TenUser ?? "Khách vãng lai",
+                NgayKichHoat = ct.ThoiGianThemLinhKien,
+                NgayHetHan = ct.NgayKetThucBh.HasValue
+           ? ct.NgayKetThucBh.Value.ToDateTime(TimeOnly.MinValue)
+           : (ct.ThoiGianThemLinhKien.HasValue ? ct.ThoiGianThemLinhKien.Value.AddMonths(ct.IdLinhKienNavigation?.ThoiGianBaoHanh ?? 0) : (DateTime?)null),
+                TrangThaiBaoHanh = (bool)ct.HanBaoHanh,
+                DieuKien = ct.IdLinhKienNavigation?.DieuKienBaoHanh ?? null
+            }).ToList();
+
+            // Sorting
+            if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheo))
+            {
+                switch (baoHanhSearch.SapXepTheo)
+                {
+                    case "datedesc":
+                        chiTietDonHangDtos = chiTietDonHangDtos.OrderByDescending(dto => dto.NgayKichHoat).ToList();
+                        break;
+                    case "dateasc":
+                        chiTietDonHangDtos = chiTietDonHangDtos.OrderBy(dto => dto.NgayKichHoat).ToList();
+                        break;
+                    default:
+                        chiTietDonHangDtos = chiTietDonHangDtos.OrderBy(dto => dto.idDonDichVu).ToList();
+                        break;
+                }
+            }
+            else
+            {
+                chiTietDonHangDtos = chiTietDonHangDtos.OrderBy(dto => dto.idDonDichVu).ToList();
+            }
+
+            // Fetch additional data for the view
+            var loaiLK = await _context.LoaiLinhKiens.ToListAsync();
+            var NhaSX = await _context.NhaSanXuats.ToListAsync();
+
+            // Update BaoHanhSearchVM to use the DTO list
+            BaoHanhSearchVM baohanhView = new BaoHanhSearchVM
+            {
+                ChiTietDonHangs = chiTietDonHangDtos, // Update BaoHanhSearchVM to use List<ChiTietDonHangDTO>
+                nhaSanXuats = NhaSX,
+                linhKiens = loaiLK
+            };
+
+            return View(baohanhView);
+        }
     }
 }
