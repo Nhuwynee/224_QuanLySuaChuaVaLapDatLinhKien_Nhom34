@@ -128,9 +128,10 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
             return View(result);
         }
 
+        [HttpGet]
         public async Task<IActionResult> TimKiemKhachHang()
         {
-            // TvT
+            
             var dsKH = await _context.Users
                  .Where(u => u.IdUser.StartsWith("KH"))
                  .Include(u => u.IdPhuongNavigation)
@@ -143,7 +144,8 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                      (user, orders) => new
                      {
                          User = user,
-                         TongGiaTri = orders.Sum(o => o.TongTien)
+                         TongGiaTri = orders.Sum(o => o.TongTien),
+                         TongDon = orders.Count()
                      })
                  .Select(result => new NguoiDung
                  {
@@ -159,21 +161,291 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                      + result.User.IdPhuongNavigation != null && result.User.IdPhuongNavigation.IdQuanNavigation != null
                          && result.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
                          ? result.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho: null,
-                     tongDonHang = (double)result.TongGiaTri
+                     tongDonHang = (double)result.TongGiaTri,
+                     TongDon = result.TongDon
                  }).ToListAsync();
 
 
             var dsKVL = await _context.KhachVangLais
-                    .Include(d => d.IdPhuongNavigation)
-                    .ThenInclude(d => d.IdQuanNavigation)
-                    .ThenInclude(d => d.IdThanhPhoNavigation)
-                .ToListAsync();
+             .Include(k => k.IdPhuongNavigation)
+                 .ThenInclude(p => p.IdQuanNavigation)
+                     .ThenInclude(q => q.IdThanhPhoNavigation)
+             .GroupJoin(
+                 _context.DonDichVus,
+                 khachVangLai => khachVangLai.IdKhachVangLai,
+                 order => order.IdKhachVangLai,
+                 (khachVangLai, orders) => new
+                 {
+                     KhachVangLai = khachVangLai,
+                     TongGiaTri = orders.Sum(o => o.TongTien),
+                     TongDon = orders.Count() // Optional: Include total number of orders
+                 })
+             .Select(result => new KhachVangLaiImpl
+             {
+                 IdKhachVangLai = result.KhachVangLai.IdKhachVangLai,
+                 HoVaTen = result.KhachVangLai.HoVaTen,
+                 Sdt = result.KhachVangLai.Sdt,
+                 DiaChi = result.KhachVangLai.DiaChi +
+                          (result.KhachVangLai.IdPhuongNavigation != null ? ", " + result.KhachVangLai.IdPhuongNavigation.TenPhuong : "") +
+                          (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
+                              ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.TenQuan : "") +
+                          (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
+                              && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
+                              ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
+                 IdPhuong = result.KhachVangLai.IdPhuong,
+                 TongDonHang = (double)result.TongGiaTri
+             })
+             .ToListAsync();
+
+            var ThanhPhos = _context.ThanhPhos
+                .Select(tp => new ThanhPhoDTO
+                {
+                    IdThanhPho = tp.IdThanhPho,
+                    TenThanhPho = tp.TenThanhPho
+                })
+                .ToList();
+            var Quans = _context.Quans
+                .Select(q => new QuanDTO
+                {
+                    IdQuan = q.IdQuan,
+                    IdThanhPho = q.IdThanhPho,
+                    TenQuan = q.TenQuan
+                })
+                .ToList();
+            var Phuongs = _context.Phuongs
+                .Select(p => new PhuongDTO
+                {
+                    IdPhuong = p.IdPhuong,
+                    IdQuan = p.IdQuan,
+                    IdThanhPho = p.IdThanhPho,
+                    TenPhuong = p.TenPhuong
+                })
+                .ToList();
+
 
             KhachHang dsKhachHang = new KhachHang();
             dsKhachHang.KhachVangLais = dsKVL;
             dsKhachHang.Users = dsKH;
+            KhachHangSearchVM viewKH = new KhachHangSearchVM();
+            viewKH.Phuongs = Phuongs;
+            viewKH.Quans = Quans;
+            viewKH.ThanhPhos = ThanhPhos;
+            viewKH.KhachHangs = dsKhachHang;
+            return View(viewKH);
+        }
 
-            return View(dsKhachHang);
+        [HttpPost]
+        [HttpPost]
+        public async Task<IActionResult> TimKiemKhachHang(KhachHangSearch khachHangSearch)
+        {
+            // Initialize queries for Users and KhachVangLais
+            var userQuery = _context.Users
+                .Where(u => u.IdUser.StartsWith("KH"))
+                .Include(u => u.IdPhuongNavigation)
+                    .ThenInclude(p => p.IdQuanNavigation)
+                        .ThenInclude(q => q.IdThanhPhoNavigation)
+                .GroupJoin(
+                    _context.DonDichVus,
+                    user => user.IdUser,
+                    order => order.IdUser,
+                    (user, orders) => new
+                    {
+                        User = user,
+                        TongGiaTri = orders.Sum(o => o.TongTien ?? 0),
+                        TongDon = orders.Count()
+                    })
+                .AsQueryable();
+
+            var khachVangLaiQuery = _context.KhachVangLais
+                .Include(k => k.IdPhuongNavigation)
+                    .ThenInclude(p => p.IdQuanNavigation)
+                        .ThenInclude(q => q.IdThanhPhoNavigation)
+                .GroupJoin(
+                    _context.DonDichVus,
+                    khachVangLai => khachVangLai.IdKhachVangLai,
+                    order => order.IdKhachVangLai,
+                    (khachVangLai, orders) => new
+                    {
+                        KhachVangLai = khachVangLai,
+                        TongGiaTri = orders.Sum(o => o.TongTien ?? 0)
+                    })
+                .AsQueryable();
+
+            // Apply filters based on KhachHangSearch
+            if (!string.IsNullOrEmpty(khachHangSearch.TenKhachHang))
+            {
+                userQuery = userQuery.Where(u => u.User.HoVaTen.Contains(khachHangSearch.TenKhachHang));
+                khachVangLaiQuery = khachVangLaiQuery.Where(k => k.KhachVangLai.HoVaTen.Contains(khachHangSearch.TenKhachHang));
+            }
+
+            if (!string.IsNullOrEmpty(khachHangSearch.SoDienThoai))
+            {
+                userQuery = userQuery.Where(u => u.User.Sdt.Contains(khachHangSearch.SoDienThoai));
+                khachVangLaiQuery = khachVangLaiQuery.Where(k => k.KhachVangLai.Sdt.Contains(khachHangSearch.SoDienThoai));
+            }
+
+
+            if (!string.IsNullOrEmpty(khachHangSearch.ThanhPho))
+            {
+                userQuery = userQuery.Where(u => u.User.IdPhuongNavigation != null &&
+                                                 u.User.IdPhuongNavigation.IdQuanNavigation != null &&
+                                                 u.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPho == khachHangSearch.ThanhPho);
+                khachVangLaiQuery = khachVangLaiQuery.Where(k => k.KhachVangLai.IdPhuongNavigation != null &&
+                                                                 k.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null &&
+                                                                 k.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPho == khachHangSearch.ThanhPho);
+            }
+
+            if (!string.IsNullOrEmpty(khachHangSearch.QuanHuyen))
+            {
+                userQuery = userQuery.Where(u => u.User.IdPhuongNavigation != null &&
+                                                 u.User.IdPhuongNavigation.IdQuan == khachHangSearch.QuanHuyen);
+                khachVangLaiQuery = khachVangLaiQuery.Where(k => k.KhachVangLai.IdPhuongNavigation != null &&
+                                                                 k.KhachVangLai.IdPhuongNavigation.IdQuan == khachHangSearch.QuanHuyen);
+            }
+
+            if (!string.IsNullOrEmpty(khachHangSearch.PhuongXa))
+            {
+                userQuery = userQuery.Where(u => u.User.IdPhuong == khachHangSearch.PhuongXa);
+                khachVangLaiQuery = khachVangLaiQuery.Where(k => k.KhachVangLai.IdPhuong == khachHangSearch.PhuongXa);
+            }
+
+            // Filter by LoaiKhachHang
+            if (!string.IsNullOrEmpty(khachHangSearch.LoaiKhachHang))
+            {
+                if (khachHangSearch.LoaiKhachHang == "Users")
+                {
+                    khachVangLaiQuery = khachVangLaiQuery.Where(k => false); // Exclude KhachVangLai
+                }
+                else if (khachHangSearch.LoaiKhachHang == "KhachVangLais")
+                {
+                    userQuery = userQuery.Where(u => false); // Exclude Users
+                }
+            }
+
+            // Sorting
+            if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheo))
+            {
+                switch (khachHangSearch.SapXepTheo)
+                {
+                    case "asc":
+                        userQuery = userQuery.OrderBy(u => u.User.HoVaTen);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.HoVaTen);
+                        break;
+                    case "desc":
+                        userQuery = userQuery.OrderByDescending(u => u.User.HoVaTen);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.KhachVangLai.HoVaTen);
+                        break;
+                    case "ddvdesc":
+                        userQuery = userQuery.OrderByDescending(u => u.TongDon);
+                        break;
+                    case "ddvasc":
+                        userQuery = userQuery.OrderBy(u => u.TongDon);
+                        break;
+                    case "ctasc":
+                        userQuery = userQuery.OrderBy(u => u.TongGiaTri);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.TongGiaTri);
+                        break;
+                    case "ctdesc":
+                        userQuery = userQuery.OrderByDescending(u => u.TongGiaTri);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.TongGiaTri);
+                        break;
+                    default:
+                        userQuery = userQuery.OrderBy(u => u.User.HoVaTen);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.HoVaTen);
+                        break;
+                }
+            }
+            else
+            {
+                userQuery = userQuery.OrderBy(u => u.User.HoVaTen);
+                khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.HoVaTen);
+            }
+
+            // Execute queries
+            var dsKH = await userQuery
+                .Select(result => new NguoiDung
+                {
+                    IdUser = result.User.IdUser,
+                    TenUser = result.User.TenUser,
+                    HoVaTen = result.User.HoVaTen,
+                    Sdt = result.User.Sdt,
+                    NgaySinh = result.User.NgaySinh,
+                    TrangThai = result.User.TrangThai,
+                    GioiTinh = result.User.GioiTinh,
+                    DiaChi = result.User.DiaChi +
+                             (result.User.IdPhuongNavigation != null ? ", " + result.User.IdPhuongNavigation.TenPhuong : "") +
+                             (result.User.IdPhuongNavigation != null && result.User.IdPhuongNavigation.IdQuanNavigation != null
+                                 ? ", " + result.User.IdPhuongNavigation.IdQuanNavigation.TenQuan : "") +
+                             (result.User.IdPhuongNavigation != null && result.User.IdPhuongNavigation.IdQuanNavigation != null
+                                 && result.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
+                                 ? ", " + result.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
+                    tongDonHang = (double)result.TongGiaTri,
+                    TongDon = result.TongDon
+                })
+                .ToListAsync();
+
+            var dsKVL = await khachVangLaiQuery
+                .Select(result => new KhachVangLaiImpl
+                {
+                    IdKhachVangLai = result.KhachVangLai.IdKhachVangLai,
+                    HoVaTen = result.KhachVangLai.HoVaTen,
+                    Sdt = result.KhachVangLai.Sdt,
+                    DiaChi = result.KhachVangLai.DiaChi +
+                             (result.KhachVangLai.IdPhuongNavigation != null ? ", " + result.KhachVangLai.IdPhuongNavigation.TenPhuong : "") +
+                             (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
+                                 ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.TenQuan : "") +
+                             (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
+                                 && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
+                                 ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
+                    IdPhuong = result.KhachVangLai.IdPhuong,
+                    TongDonHang = (double)result.TongGiaTri
+                })
+                .ToListAsync();
+
+            // Populate DTOs for dropdowns
+            var thanhPhos = await _context.ThanhPhos
+                .Select(tp => new ThanhPhoDTO
+                {
+                    IdThanhPho = tp.IdThanhPho,
+                    TenThanhPho = tp.TenThanhPho
+                })
+                .ToListAsync();
+
+            var quans = await _context.Quans
+                .Select(q => new QuanDTO
+                {
+                    IdQuan = q.IdQuan,
+                    IdThanhPho = q.IdThanhPho,
+                    TenQuan = q.TenQuan
+                })
+                .ToListAsync();
+
+            var phuongs = await _context.Phuongs
+                .Select(p => new PhuongDTO
+                {
+                    IdPhuong = p.IdPhuong,
+                    IdQuan = p.IdQuan,
+                    IdThanhPho = p.IdThanhPho,
+                    TenPhuong = p.TenPhuong
+                })
+                .ToListAsync();
+
+            // Prepare ViewModel
+            var khachHang = new KhachHang
+            {
+                Users = dsKH,
+                KhachVangLais = dsKVL // Cast to base class
+            };
+
+            var viewKH = new KhachHangSearchVM
+            {
+                Phuongs = phuongs,
+                Quans = quans,
+                ThanhPhos = thanhPhos,
+                KhachHangs = khachHang
+            };
+
+            return View(viewKH);
         }
 
         [HttpGet]
