@@ -444,6 +444,15 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
         // Tạo khách vãng lai
         private async Task<string> TaoKhachVangLaiMoi(ServiceOrderFormViewModel formData)
         {
+            var existing = await _context.KhachVangLais
+                .FirstOrDefaultAsync(k => k.Sdt == formData.Sdt.Trim());
+
+            if (existing != null)
+            {
+                // Nếu đã tồn tại, trả về IdKhachVangLai cũ
+                return existing.IdKhachVangLai;
+            }
+
             // Tạo idKhachVangLai mới (ví dụ: KVL001, KVL002,...)
             var last = _context.KhachVangLais.OrderByDescending(x => x.IdKhachVangLai).FirstOrDefault();
             string newId = "KVL001";
@@ -769,32 +778,46 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
             if (images == null || images.Count == 0)
                 return;
 
-            // Tạo thư mục lưu ảnh nếu chưa tồn tại
             string uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, "images");
             if (!Directory.Exists(uploadPath))
             {
                 Directory.CreateDirectory(uploadPath);
             }
 
-            foreach (var image in images)
+            // Lấy ID hình ảnh lớn nhất hiện tại
+            var latestId = _context.HinhAnhs
+                .Where(ha => ha.IdHinhAnh.StartsWith("HA"))
+                .OrderByDescending(ha => ha.IdHinhAnh)
+                .Select(ha => ha.IdHinhAnh)
+                .FirstOrDefault();
+
+            int baseNumber = 1;
+            if (!string.IsNullOrEmpty(latestId))
             {
+                string numericPart = latestId.Substring(2);
+                if (int.TryParse(numericPart, out int lastNumber))
+                {
+                    baseNumber = lastNumber + 1;
+                }
+            }
+
+            for (int i = 0; i < images.Count; i++)
+            {
+                var image = images[i];
                 if (image.Length <= 0)
                     continue;
 
-                // Tạo tên file độc nhất
-                string fileName = $"{Guid.NewGuid().ToString()}_{Path.GetFileName(image.FileName)}";
+                string fileName = $"{Guid.NewGuid()}_{Path.GetFileName(image.FileName)}";
                 string filePath = Path.Combine(uploadPath, fileName);
 
-                // Lưu file vào thư mục
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await image.CopyToAsync(stream);
                 }
 
-                // Tạo ID hình ảnh mới
-                string idHinhAnh = GenerateNextImageId();
+                // Sinh ID không bị trùng
+                string idHinhAnh = $"HA{(baseNumber + i):D5}";
 
-                // Lưu thông tin vào database
                 var hinhAnh = new HinhAnh
                 {
                     IdHinhAnh = idHinhAnh,
