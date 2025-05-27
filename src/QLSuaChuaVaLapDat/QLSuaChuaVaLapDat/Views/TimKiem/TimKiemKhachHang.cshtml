@@ -164,13 +164,17 @@
         </tbody>
     </table>
 
-    <div class="pagination">
-        <div class="page-item active">1</div>
-        <div class="page-item">2</div>
-        <div class="page-item">3</div>
-        <div class="page-item">...</div>
-        <div class="page-item">10</div>
-    </div>
+        <div class="pagination">
+            @{
+                int totalPage = Model.Paging.TotalPage;
+                int currentPage = Model.Paging.PageActive;
+            }
+
+            @for (int i = 1; i <= totalPage; i++)
+            {
+                <div class="page-item @(i == currentPage ? "active" : "")">@i</div>
+            }
+        </div>
 </div>
 </form>
 
@@ -234,7 +238,27 @@
         });
     });
 
-     function submitForm() {
+      const pageItems = document.querySelectorAll('.page-item');
+
+      pageItems.forEach(item => {
+          item.addEventListener('click', () => {
+              // Xóa class active khỏi tất cả
+              pageItems.forEach(i => i.classList.remove('active'));
+              // Thêm class active cho item được click
+              item.classList.add('active');
+
+              // Lấy số trang từ text của item
+              const pageNumber = item.innerText.trim();
+
+              // Gán vào input hidden
+              document.getElementById('page_active').value = pageNumber;
+
+              // Gửi form
+             submitForm();
+          });
+      }); 
+
+      function submitForm() {
         document.getElementById("searchForm").submit();
     }
 

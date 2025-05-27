@@ -1,4 +1,4 @@
-﻿@model IEnumerable<QLSuaChuaVaLapDat.Models.DonDichVu>
+﻿@model QLSuaChuaVaLapDat.ViewModel.TimKiemDichVuVM
 @{
     ViewData["Title"] = "Tìm kiếm";
 }
@@ -15,49 +15,111 @@
         <div class="search-fields">
             <div class="form-group">
                 <label for="so-id">Mã đơn dịch vụ</label>
-                <input type="text" id="so-id" name="MaDonDichVu" placeholder="Nhập mã đơn...">
+                <input type="text" id="so-id" name="MaDonDichVu"
+                @(Model.donDichVuSearch.MaDonDichVu != null
+                                                    ? $"value={Model.donDichVuSearch.MaDonDichVu}"
+                                                    : "")
+                placeholder="Nhập mã đơn...">
+
             </div>
 
             <div class="form-group">
                 <label for="so-customer">Khách hàng</label>
-                <input type="text" id="so-customer" name="SDTKhachHang" placeholder="Nhập tên hoặc SĐT...">
+                <input type="text" id="so-customer" name="TenKhachHang"
+                @(Model.donDichVuSearch.TenKhachHang != null
+                                                    ? $"value={Model.donDichVuSearch.TenKhachHang}"
+                                                    : "")
+                placeholder="Nhập tên hoặc SĐT...">
             </div>
 
             <div class="form-group">
                 <label for="so-technician">Kỹ thuật viên</label>
-                <input type="text" id="so-technician" name="IDKyThuatVien" placeholder="Nhập id kỹ thuật viên...">
+                <input type="text" id="so-technician" name="IDKyThuatVien"
+                @(Model.donDichVuSearch.IDKyThuatVien != null
+                                                    ? $"value={Model.donDichVuSearch.IDKyThuatVien}"
+                                                    : "")
+                placeholder="Nhập id kỹ thuật viên...">
             </div>
-
+            @{
+                var trangthai = Model.donDichVuSearch.TrangThaiDV;
+            }
             <div class="form-group">
                 <label for="so-status">Trạng thái</label>
-                <select id="so-status" name="TrangThaiDV" onchange="submitForm()">
-                    <option value="">Tất cả</option>
-                    <option value="processing">Đang xử lý</option>
-                    <option value="completed">Hoàn thành</option>
+                <select id="so-status" name="TrangThaiDV" >
+                    @if (trangthai == null)
+                    {
+                        <option value="" selected>Tất cả</option>
+                    }
+                    else
+                    {
+                        <option value="">Tất cả</option>
+                    }
+                    @if (trangthai == "processing")
+                    {
+                        <option value="processing" selected> 
+                            Đang xử lý 
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="processing">
+                            Đang xử lý
+                        </option>
+                    }
+                    @if (trangthai == "completed")
+                    {
+                        <option value="completed" selected>
+                            Hoàn thành
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="completed">
+                            Hoàn thành
+                        </option>
+                    }
+
                 </select>
             </div>
 
+
             <div class="form-group">
                 <label for="so-date-from">Từ ngày</label>
-                <input type="date" id="so-date-from" name="TuNgay">
+                <input type="date" id="so-date-from" name="TuNgay" @(Model.donDichVuSearch.TuNgay != null
+                       ? $"value={Model.donDichVuSearch.TuNgay}"
+                       : "")>
             </div>
 
             <div class="form-group">
                 <label for="so-date-to">Đến ngày</label>
-                <input type="date" id="so-date-to" name="DenNgay">
+                <input type="date" id="so-date-to" name="DenNgay" @(Model.donDichVuSearch.DenNgay != null
+                       ? $"value={Model.donDichVuSearch.DenNgay}"
+                       : "")>
             </div>
         </div>
 
         <div class="filter-sort">
             <div class="filter-section">
                 <span>Lọc theo:</span>
-                <select name="LoaiThiếtBi" onchange="submitForm()">
-                    <option value="">Loại thiết bị</option>
-                    <option value="Máy tính">Máy tính</option>
-                    <option value="Điện thoại">Điện thoại</option>
-                    <option value="Thiết bị văn phòng">Thiết bị văn phòng</option>
+                <select name="IdLoaiThietBi" onchange="submitForm()">
+                    @{
+                        var idTB = Model.donDichVuSearch.IdLoaiThietBi;
+                    }
+                    <option value="">Tất cả</option>
+                    @foreach (var item in Model.loaiTB)
+                    {
+                        if (item.IdLoaiThietBi == idTB)
+                        {
+                            <option value="@item.IdLoaiThietBi" selected>@item.TenLoaiThietBi</option>
+                        }
+                        else
+                        {
+                            <option value="@item.IdLoaiThietBi">@item.TenLoaiThietBi</option>
+                        }
+
+                    } 
                 </select>
-                <select name="LoaiDichVu" onchange="submitForm()">
+                <select name="LoaiDichVu"">
                     <option value="">Loại dịch vụ</option>
                     <option value="Sửa chữa">Sửa chữa</option>
                     <option value="Lắp đặt">Lắp đặt</option>
@@ -66,7 +128,7 @@
 
             <div class="sort-section">
                 <span>Sắp xếp theo:</span>
-                <select name="SapXepTheo" onchange="submitForm()">
+                <select name="SapXepTheo" ">
                     <option value="">Theo</option>
                     <option value="NgayTaoDesc">Ngày tạo (mới nhất)</option>
                     <option value="NgayTaoAsc">Ngày tạo (cũ nhất)</option>
@@ -78,7 +140,7 @@
 
         <div class="select-all-container">
             <label for="select-all-service-orders" style="margin-top: 15px;">
-                <input type="checkbox" id="select-all-service-orders" class="select-all" data-table="service-orders"> Chọn tất cả
+                Chọn tất cả
             </label>
         </div>
 
@@ -98,7 +160,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in Model.DonDichVu)
                 {
                     <tr>
                         <td><input type="checkbox" class="row-checkbox"></td>
@@ -139,29 +201,58 @@
         </table>
 
         <div class="pagination">
-            <div class="page-item active">1</div>
-            <div class="page-item">2</div>
-            <div class="page-item">3</div>
-            <div class="page-item">...</div>
-            <div class="page-item">10</div>
+            @{
+                int totalPage = Model.Paging.TotalPage;
+                int currentPage = Model.Paging.PageActive;
+            }
+
+            @for (int i = 1; i <= totalPage; i++)
+            {
+                <div class="page-item @(i == currentPage ? "active" : "")">@i</div>
+            }
         </div>
+
     </div>
+    <input type="hidden" id="page_active" name="PageActive" value="1" />
 </form>
 
 <script>
 
-   const pageItems = document.querySelectorAll('.page-item');
+    const pageItems = document.querySelectorAll('.page-item');
 
-    pageItems.forEach(item => {
-      item.addEventListener('click', () => {
-        pageItems.forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-         // submitForm();
+      pageItems.forEach(item => {
+          item.addEventListener('click', () => {
+              // Xóa class active khỏi tất cả
+              pageItems.forEach(i => i.classList.remove('active'));
+              // Thêm class active cho item được click
+              item.classList.add('active');
+
+              // Lấy số trang từ text của item
+              const pageNumber = item.innerText.trim();
+
+              // Gán vào input hidden
+              document.getElementById('page_active').value = pageNumber;
+
+              // Gửi form
+             submitForm();
+          });
       });
-    });
 
     function resetForm() {
-        document.getElementById("searchForm").reset();
+
+        const inputs = document.querySelectorAll('#searchForm input, #searchForm select');
+
+        inputs.forEach(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+                input.checked = false; 
+            } else {
+                input.value = ''; 
+            }
+        });
+
+        document.getElementById('page_active').value = '1';
+
+        submitForm();
     }
 
     function submitForm() {
