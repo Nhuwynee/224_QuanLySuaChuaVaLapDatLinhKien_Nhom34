@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Data;
 
 namespace QLSuaChuaVaLapDat.Models;
 
 public partial class User
 {
-    [Key]
     public string IdUser { get; set; } = null!;
 
     public string? IdRole { get; set; }
@@ -40,4 +37,7 @@ public partial class User
 
     public virtual ICollection<DonDichVu> DonDichVuIdUserTaoDonNavigations { get; set; } = new List<DonDichVu>();
 
+    public virtual Phuong? IdPhuongNavigation { get; set; }
+
+    public virtual Role? IdRoleNavigation { get; set; }
 }

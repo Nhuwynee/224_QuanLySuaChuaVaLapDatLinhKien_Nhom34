@@ -1,4 +1,4 @@
-﻿const toggleButton = document.getElementById('toggle-btn')
+﻿﻿const toggleButton = document.getElementById('toggle-btn')
 const sidebar = document.getElementById('sidebar')
 
 function toggleSidebar() {
@@ -29,3 +29,4 @@ function closeAllSubMenus() {
         ul.previousElementSibling.classList.remove('rotate')
     })
 }
+

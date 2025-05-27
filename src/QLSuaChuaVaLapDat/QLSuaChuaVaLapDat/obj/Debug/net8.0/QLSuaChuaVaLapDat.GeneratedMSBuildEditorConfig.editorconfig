@@ -1,0 +1,87 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = QLSuaChuaVaLapDat
+build_property.RootNamespace = QLSuaChuaVaLapDat
+build_property.ProjectDir = D:\loc2\hk6\gitcoquyen\224_QuanLySuaChuaVaLapDatLinhKien_Nhom34\src\QLSuaChuaVaLapDat\QLSuaChuaVaLapDat\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = D:\loc2\hk6\gitcoquyen\224_QuanLySuaChuaVaLapDatLinhKien_Nhom34\src\QLSuaChuaVaLapDat\QLSuaChuaVaLapDat
+build_property._RazorSourceGeneratorDebug = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/LinhKien/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGluaEtpZW5cQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/LinhKien/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGluaEtpZW5cRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/LinhKien/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGluaEtpZW5cRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/LinhKien/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGluaEtpZW5cRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/LinhKien/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGluaEtpZW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/QuanLI/ChiTietDoanhThuThang.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUXVhbkxJXENoaVRpZXREb2FuaFRodVRoYW5nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/QuanLI/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUXVhbkxJXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/QuanLI/linhKien.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUXVhbkxJXGxpbmhLaWVuLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/QuanLI/thongKe.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUXVhbkxJXHRob25nS2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/Shared/_layoutQuanLI.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9sYXlvdXRRdWFuTEkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/loc2/hk6/gitcoquyen/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/src/QLSuaChuaVaLapDat/QLSuaChuaVaLapDat/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-ath9fan9ej

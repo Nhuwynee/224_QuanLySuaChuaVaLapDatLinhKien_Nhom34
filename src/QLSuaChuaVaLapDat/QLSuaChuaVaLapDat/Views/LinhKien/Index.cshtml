@@ -1,0 +1,114 @@
+﻿@model PaginatedList<QLSuaChuaVaLapDat.Models.LinhKien>
+
+@{
+    Layout = "~/Views/Shared/_LayoutQuanLi.cshtml";
+    ViewData["Title"] = "Quản lý Linh kiện";
+}
+
+<div class="container">
+    <h3>Quản lý Linh kiện</h3>
+    
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div style="background-color: #d4edda; color: #155724; padding: 12px; border: 1px solid #c3e6cb; border-radius: 4px; margin-bottom: 20px;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+        <form asp-action="Index" method="get" style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Tìm kiếm theo tên hoặc ID..." style="padding: 8px 12px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm); min-width: 250px;" />
+            <input type="hidden" name="sortOrder" value="@ViewData["CurrentSort"]" />
+            <button type="submit" style="padding: 8px 16px; background-color: var(--accent-clr); color: white; border: none; border-radius: var(--border-radius-sm); cursor: pointer;">Tìm kiếm</button>
+            <a asp-action="Index" style="padding: 8px 16px; background-color: var(--light-grey-bg); color: var(--text-clr); text-decoration: none; border-radius: var(--border-radius-sm); border: 1px solid var(--line-clr);">Xóa bộ lọc</a>
+        </form>
+        
+        <a asp-action="Create" style="padding: 10px 20px; background-color: var(--success-clr); color: white; text-decoration: none; border-radius: var(--border-radius-sm); font-weight: 500;">+ Thêm linh kiện mới</a>
+    </div>
+
+    <div style="overflow-x: auto; border: 1px solid var(--line-clr); border-radius: var(--border-radius-md);">
+        <table style="width: 100%; border-collapse: collapse; background-color: var(--base-clr);">
+            <thead style="background-color: var(--light-grey-bg);">
+                <tr>
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--line-clr); font-weight: 600;">
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: var(--secondary-text-clr); text-decoration: none;">
+                            Tên linh kiện
+                            @if (ViewData["CurrentSort"]?.ToString() == "name_desc") { <span>↓</span> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "") { <span>↑</span> }
+                        </a>
+                    </th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--line-clr); font-weight: 600;">Loại</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--line-clr); font-weight: 600;">Nhà sản xuất</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--line-clr); font-weight: 600;">
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["PriceSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: var(--secondary-text-clr); text-decoration: none;">
+                            Giá
+                            @if (ViewData["CurrentSort"]?.ToString() == "price_desc") { <span>↓</span> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "Price") { <span>↑</span> }
+                        </a>
+                    </th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--line-clr); font-weight: 600;">
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["QuantitySortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: var(--secondary-text-clr); text-decoration: none;">
+                            Số lượng
+                            @if (ViewData["CurrentSort"]?.ToString() == "quantity_desc") { <span>↓</span> }
+                            else if (ViewData["CurrentSort"]?.ToString() == "Quantity") { <span>↑</span> }
+                        </a>
+                    </th>
+                    <th style="padding: 12px; text-align: center; border-bottom: 1px solid var(--line-clr); font-weight: 600;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr style="border-bottom: 1px solid var(--line-clr);">
+                        <td style="padding: 12px;">
+                            <div style="font-weight: 500; color: var(--secondary-text-clr);">@Html.DisplayFor(modelItem => item.TenLinhKien)</div>
+                            <div style="font-size: 0.85em; color: var(--text-clr);">ID: @Html.DisplayFor(modelItem => item.IdLinhKien)</div>
+                        </td>
+                        <td style="padding: 12px;">@Html.DisplayFor(modelItem => item.IdLoaiLinhKienNavigation.TenLoaiLinhKien)</td>
+                        <td style="padding: 12px;">@Html.DisplayFor(modelItem => item.IdNsxNavigation.TenNsx)</td>
+                        <td style="padding: 12px; font-weight: 500; color: var(--accent-clr);">@item.Gia.ToString("N0") VNĐ</td>
+                        <td style="padding: 12px;">
+                            <span style="padding: 4px 8px; background-color: @(item.SoLuong > 0 ? "var(--success-clr)" : "var(--danger-clr)"); color: white; border-radius: var(--border-radius-sm); font-size: 0.85em;">
+                                @Html.DisplayFor(modelItem => item.SoLuong)
+                            </span>
+                        </td>
+                        <td style="padding: 12px; text-align: center;">
+                            <div style="display: flex; gap: 8px; justify-content: center;">
+                                <a asp-action="Details" asp-route-id="@item.IdLinhKien" style="padding: 6px 12px; background-color: var(--info-clr); color: white; text-decoration: none; border-radius: var(--border-radius-sm); font-size: 0.85em;">Chi tiết</a>
+                                <a asp-action="Edit" asp-route-id="@item.IdLinhKien" style="padding: 6px 12px; background-color: var(--warning-clr); color: white; text-decoration: none; border-radius: var(--border-radius-sm); font-size: 0.85em;">Sửa</a>
+                                <a asp-action="Delete" asp-route-id="@item.IdLinhKien" style="padding: 6px 12px; background-color: var(--danger-clr); color: white; text-decoration: none; border-radius: var(--border-radius-sm); font-size: 0.85em;">Xóa</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "pointer-events: none; opacity: 0.5;" : "";
+        var nextDisabled = !Model.HasNextPage ? "pointer-events: none; opacity: 0.5;" : "";
+    }
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+        <div style="color: var(--text-clr);">
+            Trang @(Model.PageIndex) / @(Model.TotalPages) (Tổng: @(Model.Count()) mục)
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a asp-action="Index"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
+               asp-route-currentFilter="@ViewData["CurrentFilter"]"
+               style="padding: 8px 16px; background-color: var(--accent-clr); color: white; text-decoration: none; border-radius: var(--border-radius-sm); @prevDisabled">
+                ← Trước
+            </a>
+            <a asp-action="Index"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
+               asp-route-currentFilter="@ViewData["CurrentFilter"]"
+               style="padding: 8px 16px; background-color: var(--accent-clr); color: white; text-decoration: none; border-radius: var(--border-radius-sm); @nextDisabled">
+                Sau →
+            </a>
+        </div>
+    </div>
+</div>

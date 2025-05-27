@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace QLSuaChuaVaLapDat.Models;
 
 public partial class DonDichVu
 {
-    [Key]
     public string IdDonDichVu { get; set; } = null!;
 
     public string? IdUser { get; set; }
@@ -39,4 +37,17 @@ public partial class DonDichVu
 
     public DateTime? NgayChinhSua { get; set; }
 
+    public virtual ICollection<ChiTietDonDichVu> ChiTietDonDichVus { get; set; } = new List<ChiTietDonDichVu>();
+
+    public virtual ICollection<DanhGia> DanhGia { get; set; } = new List<DanhGia>();
+
+    public virtual KhachVangLai? IdKhachVangLaiNavigation { get; set; }
+
+    public virtual ThietBi IdLoaiThietBiNavigation { get; set; } = null!;
+
+    public virtual User IdNhanVienKyThuatNavigation { get; set; } = null!;
+
+    public virtual User? IdUserNavigation { get; set; }
+
+    public virtual User IdUserTaoDonNavigation { get; set; } = null!;
 }
