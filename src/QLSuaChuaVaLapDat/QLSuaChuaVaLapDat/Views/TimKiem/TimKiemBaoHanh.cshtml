@@ -22,7 +22,7 @@
 
             <div class="form-group">
                 <label for="war-customer">Khách hàng</label>
-                <input name="SoDienThoaiKhachHang" type="text" id="war-customer" placeholder="Nhập tên hoặc SĐT KH...">
+                <input name="SoDienThoaiKhachHang" type="text" id="war-customer" placeholder="Nhập SĐT khách hàng...">
             </div>
 
             <div class="form-group">
@@ -87,6 +87,7 @@
                     <th><input type="checkbox" class="select-all" data-table="warranty"></th>
                     <th>Mã BH</th>
                     <th>Mã đơn</th>
+                    <th>Số ĐT</th>
                     <th>Mã linh kiện/ lỗi</th>
                     <th>Linh kiện/ Loại lỗi</th>
                     <th>Loại dịch vụ</th>
@@ -105,6 +106,7 @@
                         <td><input type="checkbox" class="row-checkbox"></td>
                         <td>@item.idDonDichVu</td>
                         <td>@item.IDChiTietDonDichVu</td>
+                        <td>@item.SDT</td>
                         @if (@item.MaLinhKien != null && item.MaLoi == null)
                         {
                             <td>@item.MaLinhKien</td>

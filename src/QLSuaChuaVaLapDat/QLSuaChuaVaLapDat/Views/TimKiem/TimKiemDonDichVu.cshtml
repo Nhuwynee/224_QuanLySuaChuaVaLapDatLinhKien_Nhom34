@@ -109,7 +109,7 @@
                         }
                         else
                         {
-                            <td>@item.IdUserTaoDonNavigation.HoVaTen</td>
+                            <td>@item.IdUserNavigation.HoVaTen</td>
                         }
                         <td>@item.IdLoaiThietBiNavigation.TenLoaiThietBi</td>
                         <td>@item.LoaiDonDichVu</td>
@@ -149,6 +149,17 @@
 </form>
 
 <script>
+
+   const pageItems = document.querySelectorAll('.page-item');
+
+    pageItems.forEach(item => {
+      item.addEventListener('click', () => {
+        pageItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+         // submitForm();
+      });
+    });
+
     function resetForm() {
         document.getElementById("searchForm").reset();
     }

@@ -1,10 +1,12 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QLSuaChuaVaLapDat.Models;
 using QLSuaChuaVaLapDat.Models.Impl;
 using QLSuaChuaVaLapDat.Models.TimKiem;
 using QLSuaChuaVaLapDat.ViewModel;
+using System.Collections.Generic;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+
 
 namespace QLSuaChuaVaLapDat.Controllers.TimKiem
 {
@@ -32,7 +34,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
         {
             var result = await _context.DonDichVus
                 .Include(d=>d.ChiTietDonDichVus)
-                .Include(d => d.IdUserTaoDonNavigation)
+                .Include(d => d.IdUserNavigation)
                 .Include(d => d.IdKhachVangLaiNavigation)
                 .Include(d => d.IdLoaiThietBiNavigation)
                 .ToListAsync();
@@ -44,7 +46,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
         {
             var query = _context.DonDichVus
                 .Include(d => d.ChiTietDonDichVus)
-                .Include(d => d.IdUserTaoDonNavigation)
+                .Include(d => d.IdUserNavigation)
                 .Include(d=>d.IdNhanVienKyThuatNavigation)
                 .Include(d => d.IdKhachVangLaiNavigation)
                 .Include(d => d.IdLoaiThietBiNavigation)
@@ -56,11 +58,8 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 query = query.Where(d => d.IdDonDichVu.Contains(donDichVuSearch.MaDonDichVu));
             }
 
-            if (!string.IsNullOrEmpty(donDichVuSearch.SDTKhachHang))
-            {
-                query = query.Where(d => (d.IdKhachVangLaiNavigation != null && d.IdKhachVangLaiNavigation.HoVaTen.Contains(donDichVuSearch.SDTKhachHang)) ||
-                                         (d.IdUserTaoDonNavigation != null && d.IdUserTaoDonNavigation.HoVaTen.Contains(donDichVuSearch.SDTKhachHang)));
-            }
+         
+
 
             if (!string.IsNullOrEmpty(donDichVuSearch.IDKyThuatVien))
             {
@@ -126,7 +125,37 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
             }
 
             var result = await query.ToListAsync();
+            if (!string.IsNullOrEmpty(donDichVuSearch.SDTKhachHang))
+            {
+                var keyword = RemoveDiacritics(donDichVuSearch.SDTKhachHang.ToLower());
+                result = result.Where(d =>
+                    (d.IdKhachVangLaiNavigation != null &&
+                     d.IdKhachVangLaiNavigation.HoVaTen != null &&
+                     RemoveDiacritics(d.IdKhachVangLaiNavigation.HoVaTen.ToLower()).Contains(keyword)) ||
+
+                    (d.IdUserNavigation != null &&
+                     d.IdUserNavigation.HoVaTen != null &&
+                     RemoveDiacritics(d.IdUserNavigation.HoVaTen.ToLower()).Contains(keyword))
+                ).ToList();
+            }
             return View(result);
+        }
+
+        private string RemoveDiacritics(string input)
+        {
+            var normalizedString = input.Normalize(System.Text.NormalizationForm.FormD);
+            var stringBuilder = new System.Text.StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
         }
 
         [HttpGet]
@@ -179,7 +208,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                  {
                      KhachVangLai = khachVangLai,
                      TongGiaTri = orders.Sum(o => o.TongTien),
-                     TongDon = orders.Count() // Optional: Include total number of orders
+                     TongDon = orders.Count() 
                  })
              .Select(result => new KhachVangLaiImpl
              {
@@ -236,7 +265,6 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
         }
 
         [HttpPost]
-        [HttpPost]
         public async Task<IActionResult> TimKiemKhachHang(KhachHangSearch khachHangSearch)
         {
             // Initialize queries for Users and KhachVangLais
@@ -272,12 +300,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                     })
                 .AsQueryable();
 
-            // Apply filters based on KhachHangSearch
-            if (!string.IsNullOrEmpty(khachHangSearch.TenKhachHang))
-            {
-                userQuery = userQuery.Where(u => u.User.HoVaTen.Contains(khachHangSearch.TenKhachHang));
-                khachVangLaiQuery = khachVangLaiQuery.Where(k => k.KhachVangLai.HoVaTen.Contains(khachHangSearch.TenKhachHang));
-            }
+           
 
             if (!string.IsNullOrEmpty(khachHangSearch.SoDienThoai))
             {
@@ -384,24 +407,33 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                     TongDon = result.TongDon
                 })
                 .ToListAsync();
+                var dsKVL = await khachVangLaiQuery
+                    .Select(result => new KhachVangLaiImpl
+                    {
+                        IdKhachVangLai = result.KhachVangLai.IdKhachVangLai,
+                        HoVaTen = result.KhachVangLai.HoVaTen,
+                        Sdt = result.KhachVangLai.Sdt,
+                        DiaChi = result.KhachVangLai.DiaChi +
+                                 (result.KhachVangLai.IdPhuongNavigation != null ? ", " + result.KhachVangLai.IdPhuongNavigation.TenPhuong : "") +
+                                 (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
+                                     ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.TenQuan : "") +
+                                 (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
+                                     && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
+                                     ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
+                        IdPhuong = result.KhachVangLai.IdPhuong,
+                        TongDonHang = (double)result.TongGiaTri
+                    })
+                    .ToListAsync();
 
-            var dsKVL = await khachVangLaiQuery
-                .Select(result => new KhachVangLaiImpl
-                {
-                    IdKhachVangLai = result.KhachVangLai.IdKhachVangLai,
-                    HoVaTen = result.KhachVangLai.HoVaTen,
-                    Sdt = result.KhachVangLai.Sdt,
-                    DiaChi = result.KhachVangLai.DiaChi +
-                             (result.KhachVangLai.IdPhuongNavigation != null ? ", " + result.KhachVangLai.IdPhuongNavigation.TenPhuong : "") +
-                             (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
-                                 ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.TenQuan : "") +
-                             (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
-                                 && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
-                                 ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
-                    IdPhuong = result.KhachVangLai.IdPhuong,
-                    TongDonHang = (double)result.TongGiaTri
-                })
-                .ToListAsync();
+                    if (!string.IsNullOrEmpty(khachHangSearch.TenKhachHang))
+                    {
+                        string keyword = RemoveDiacritics(khachHangSearch.TenKhachHang.ToLower());
+                        dsKH = dsKH.Where(u => RemoveDiacritics(u.HoVaTen.ToLower()).Contains(keyword)).ToList();
+                        dsKVL = dsKVL.Where(k => RemoveDiacritics(k.HoVaTen.ToLower()).Contains(keyword)).ToList();
+                    }
+
+
+            
 
             // Populate DTOs for dropdowns
             var thanhPhos = await _context.ThanhPhos
@@ -490,11 +522,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
             {
                 query = query.Where(l => l.IdLinhKien == timKiemLinhKien.MaLinhKien);
             }
-            // Lọc theo tên linh kiện
-            if (!string.IsNullOrEmpty(timKiemLinhKien.TenLinhKien))
-            {
-                query = query.Where(l => l.TenLinhKien.Contains(timKiemLinhKien.TenLinhKien));
-            }
+           
 
             // Lọc theo loại linh kiện
             if (!string.IsNullOrEmpty(timKiemLinhKien.LoaiLinhKien))
@@ -557,6 +585,13 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
 
             var resultLinhKien = await query.ToListAsync();
 
+            // Lọc theo tên linh kiện
+            if (!string.IsNullOrEmpty(timKiemLinhKien.TenLinhKien))
+            {
+                string keyword = RemoveDiacritics(timKiemLinhKien.TenLinhKien.ToLower());
+                resultLinhKien = resultLinhKien.Where(u => RemoveDiacritics(u.TenLinhKien.ToLower()).Contains(keyword)).ToList();
+            }
+
             var resultNSX = await _context.NhaSanXuats.ToListAsync();
             var resultLoaiLK = await _context.LoaiLinhKiens.ToListAsync();
 
@@ -587,6 +622,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 IDChiTietDonDichVu = ct.IdCtdh,
                 idDonDichVu = ct.IdDonDichVuNavigation.IdDonDichVu,
                 MaLinhKien = ct.IdLinhKienNavigation?.IdLinhKien ?? null,
+                SDT = ct.IdDonDichVuNavigation.IdKhachVangLaiNavigation?.Sdt ?? ct.IdDonDichVuNavigation.IdUserNavigation?.Sdt ?? "1900 1858",
                 MaLoi = ct.IdLoiNavigation?.IdLoi ?? null,
                 TenLinhKien = ct.IdLinhKienNavigation?.TenLinhKien ?? "Không có linh kiện", // Add null check
                 TenLoi = ct.IdLoiNavigation?.MoTaLoi ?? "Không có lỗi",
@@ -681,6 +717,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
             {
                 IDChiTietDonDichVu = ct.IdCtdh,
                 idDonDichVu = ct.IdDonDichVuNavigation.IdDonDichVu,
+                SDT = ct.IdDonDichVuNavigation.IdKhachVangLaiNavigation?.Sdt ?? ct.IdDonDichVuNavigation.IdUserNavigation?.Sdt ?? "1900 1858",
                 MaLinhKien = ct.IdLinhKienNavigation?.IdLinhKien ?? null,
                 MaLoi = ct.IdLoiNavigation?.IdLoi ?? null,
                 TenLinhKien = ct.IdLinhKienNavigation?.TenLinhKien ?? "Không có linh kiện", // Add null check
