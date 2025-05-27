@@ -86,8 +86,14 @@ namespace QLSuaChuaVaLapDat.Controllers
                 .Where(d => d.NgayTaoDon.HasValue &&
                             d.NgayTaoDon.Value.Year == dateFocus.Year &&
                             d.NgayTaoDon.Value.Month == dateFocus.Month)
-                .ToList(); 
+                .ToList();
 
+            var ordersInFocusedYear = _context.DonDichVus
+                .Where(d => d.NgayTaoDon.HasValue &&
+                            d.NgayTaoDon.Value.Year == dateFocus.Year)
+                .ToList();
+
+            viewModel.TongDonCN = ordersInFocusedYear.Count(d => d.TrangThaiDon.ToLower() == "hoàn thành");
             viewModel.ThangHT = dateFocus.ToString("MMMM yyyy", new CultureInfo("vi-VN"));
             viewModel.TongDon = ordersInFocusedMonth.Count(d => d.TrangThaiDon.ToLower() == "hoàn thành");
             viewModel.TongDoanhThuThangHT = ordersInFocusedMonth

@@ -16,6 +16,7 @@ namespace QLSuaChuaVaLapDat.Models
 	public class ThongKeModel
     {
 		public int TongDon { get; set; }
+        public int TongDonCN { get; set; }
         public decimal TongDoanhTHu { get; set; }
         public int TongNhanVien { get; set; }
         public string ThangHT { get; set; }

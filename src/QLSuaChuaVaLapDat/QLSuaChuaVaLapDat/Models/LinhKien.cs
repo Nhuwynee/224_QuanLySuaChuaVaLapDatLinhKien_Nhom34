@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QLSuaChuaVaLapDat.Models;
 
@@ -32,4 +33,7 @@ public partial class LinhKien
     public virtual NhaSanXuat? IdNsxNavigation { get; set; }
 
     public virtual ICollection<PhiLapDat> PhiLapDats { get; set; } = new List<PhiLapDat>();
+
+    [NotMapped] 
+    public IFormFile? ImageFile { get; set; } 
 }
