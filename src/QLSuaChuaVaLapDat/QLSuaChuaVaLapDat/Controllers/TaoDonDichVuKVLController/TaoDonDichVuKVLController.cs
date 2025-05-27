@@ -318,30 +318,45 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
         public async Task<IActionResult> CreateServiceOrder([FromForm] ServiceOrderFormViewModel formData)
         {
             // Parse all form fields to ensure we get all data
-            foreach (var key in Request.Form.Keys)
-            {
-                if (key.StartsWith("ErrorDetails[") && key.Contains("].IdLinhKien"))
-                {
-                    // Extract the index from the key (e.g., "ErrorDetails[0].IdLinhKien")
-                    var match = Regex.Match(key, @"ErrorDetails\[(\d+)\]");
-                    if (match.Success && int.TryParse(match.Groups[1].Value, out int index))
-                    {
-                        // Ensure ErrorDetails list is initialized and has enough items
-                        if (formData.ErrorDetails == null)
-                        {
-                            formData.ErrorDetails = new List<ErrorDetailViewModel>();
-                        }
+            //foreach (var key in Request.Form.Keys)
+            //{
+            //    // id lỗi
+            //    if (key.StartsWith("ErrorDetails[") && key.Contains("].IdLoi"))
+            //    {
+            //        var match = Regex.Match(key, @"ErrorDetails\[(\d+)\]");
+            //        if (match.Success && int.TryParse(match.Groups[1].Value, out int index))
+            //        {
+            //            if (formData.ErrorDetails == null)
+            //                formData.ErrorDetails = new List<ErrorDetailViewModel>();
+            //            while (formData.ErrorDetails.Count <= index)
+            //                formData.ErrorDetails.Add(new ErrorDetailViewModel());
+            //            formData.ErrorDetails[index].IdLoi = Request.Form[key].ToString();
+            //        }
+            //    }
 
-                        while (formData.ErrorDetails.Count <= index)
-                        {
-                            formData.ErrorDetails.Add(new ErrorDetailViewModel());
-                        }
+            //    //id linh kiện
+            //    if (key.StartsWith("ErrorDetails[") && key.Contains("].IdLinhKien"))
+            //    {
+            //        // Extract the index from the key (e.g., "ErrorDetails[0].IdLinhKien")
+            //        var match = Regex.Match(key, @"ErrorDetails\[(\d+)\]");
+            //        if (match.Success && int.TryParse(match.Groups[1].Value, out int index))
+            //        {
+            //            // Ensure ErrorDetails list is initialized and has enough items
+            //            if (formData.ErrorDetails == null)
+            //            {
+            //                formData.ErrorDetails = new List<ErrorDetailViewModel>();
+            //            }
 
-                        // Set the IdLinhKien value
-                        formData.ErrorDetails[index].IdLinhKien = Request.Form[key].ToString();
-                    }
-                }
-            }
+            //            while (formData.ErrorDetails.Count <= index)
+            //            {
+            //                formData.ErrorDetails.Add(new ErrorDetailViewModel());
+            //            }
+
+            //            // Set the IdLinhKien value
+            //            formData.ErrorDetails[index].IdLinhKien = Request.Form[key].ToString();
+            //        }
+            //    }
+            //}
 
             // Deserialize ErrorDetails nếu là string
             if ((formData.ErrorDetails == null || formData.ErrorDetails.Count == 0) && Request.Form.ContainsKey("ErrorDetails"))
@@ -409,7 +424,8 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                         await TaoChiTietDonVaHinhAnh(formData, idDonDichVu);
 
                         // Commit transaction nếu mọi thao tác đều thành công
-                        transaction.Commit();
+                        //await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
 
                         //return Json(new
                         //{
@@ -427,32 +443,24 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                     }
                     catch (Exception ex)
                     {
-                        //Rollback transaction nếu có lỗi
-                        transaction.Rollback();
-                        throw ex;
-                        //return Json(new { success = false, message = "Có lỗi xảy ra khi tạo đơn dịch vụ.", detailedMessage = ex.Message, innerException = ex.InnerException?.Message });
+                       await transaction.RollbackAsync();
+                        TempData["ErrorMessage"] = "Có lỗi xảy ra khi tạo đơn dịch vụ: " + ex.Message;
+                        return RedirectToAction("IndexDSDDV", "DanhSachDonDichVu");
                     }
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Lỗi khi tạo đơn dịch vụ: " + ex.ToString());
-                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+                TempData["ErrorMessage"] = "Có lỗi xảy ra: " + ex.Message;
+                return RedirectToAction("IndexDSDDV", "DanhSachDonDichVu");
             }
         }
 
         // Tạo khách vãng lai
         private async Task<string> TaoKhachVangLaiMoi(ServiceOrderFormViewModel formData)
         {
-            var existing = await _context.KhachVangLais
-                .FirstOrDefaultAsync(k => k.Sdt == formData.Sdt.Trim());
-
-            if (existing != null)
-            {
-                // Nếu đã tồn tại, trả về IdKhachVangLai cũ
-                return existing.IdKhachVangLai;
-            }
-
+           
             // Tạo idKhachVangLai mới (ví dụ: KVL001, KVL002,...)
             var last = _context.KhachVangLais.OrderByDescending(x => x.IdKhachVangLai).FirstOrDefault();
             string newId = "KVL001";
@@ -575,7 +583,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                 LoaiKhachHang = "Khách vãng lai",
                 NgayTaoDon = DateTime.Now,
                 NgayHoanThanh = formData.NgayHoanThanh,
-                TongTien = formData.TongTien,
+                TongTien = tongTien,
                 HinhThucDichVu = formData.HinhThucDichVu,
                 LoaiDonDichVu = formData.LoaiDonDichVu,
                 PhuongThucThanhToan = null, // Sẽ được cập nhật khi thanh toán
@@ -715,11 +723,11 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
             }
 
             // Skip creating this record if both IDs are invalid
-            if (string.IsNullOrEmpty(validIdLinhKien) && string.IsNullOrEmpty(validIdLoi))
-            {
-                Console.WriteLine("Warning: Both IdLinhKien and IdLoi are invalid. Skipping this record.");
-                return;
-            }
+            //if (string.IsNullOrEmpty(validIdLinhKien) && string.IsNullOrEmpty(validIdLoi))
+            //{
+            //    Console.WriteLine("Warning: Both IdLinhKien and IdLoi are invalid. Skipping this record.");
+            //    return;
+            //}
 
             // Tạo ID chi tiết đơn hàng mới
             string idCTDH = GenerateNextDetailId();

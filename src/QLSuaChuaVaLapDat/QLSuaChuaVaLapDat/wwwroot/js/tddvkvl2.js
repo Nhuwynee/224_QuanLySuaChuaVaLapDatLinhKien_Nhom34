@@ -28,7 +28,7 @@ $(document).ready(function () {
         // Clear any input values in the cloned section
         newComponentSection.find('input[type="text"]').val('');
         newComponentSection.find('textarea').val('');
-        newComponentSection.find('input[type="radio"]').prop('checked', true);
+        newComponentSection.find('input[type="radio"]').prop('checked', false);
         newComponentSection.find('select').val('');
         newComponentSection.find('input[type="text"]').val('0');
 
@@ -40,14 +40,18 @@ $(document).ready(function () {
             $(this).attr('id', newId);
             $(this).attr('name', 'warranty-' + timestamp);
             $(this).next('label').attr('for', newId);
+            // Set default "hết bảo hành" option as checked
+            if ($(this).val() === 'false') {
+                $(this).prop('checked', true);
+            }
         });
 
         // Update select elements to have unique IDs and add event handlers
         newComponentSection.find('select#IdLoi').each(function () {
             let newId = 'IdLoi-' + timestamp;
             $(this).attr('id', newId);
-            $(this).addClass('error-type-select error-loi-select');
-            $(this).attr('onchange', 'layGiaTheoLoi(this.value, "donGia-' + timestamp + '")');
+            $(this).attr('name', `ErrorDetails[${$('.split-with-button').length}].IdLoi`);
+            $(this).attr('onchange', `layGiaTheoLoi(this.value, "donGia-${timestamp}")`);
         });
         // Update price input to have a unique ID
         newComponentSection.find('input#donGia').each(function () {
@@ -370,18 +374,13 @@ function layGiaTheoLoi(idLoi, targetId) {
 }
 
 // Hàm để cập nhật tổng tiền
+
 function updateTotalPrice() {
     // Tìm tất cả các trường đơn giá (bao gồm các trường được thêm động)
     const donGiaFields = document.querySelectorAll('.price-field');
     let totalPrice = 0;
 
     // Tính tổng giá từ tất cả các thành phần
-    //donGiaFields.forEach(field => {
-    //    // Chuyển đổi chuỗi giá có định dạng (ví dụ: "1.000.000") thành số
-    //    const priceText = field.value.replace(/\./g, '').replace(/,/g, '');
-    //    const price = parseInt(priceText) || 0;
-    //    totalPrice += price;
-    //});
     donGiaFields.forEach(field => {
         // Chuyển đổi chuỗi giá Việt (ví dụ: "1.000.000") thành số nguyên
         const raw = field.value || '';
@@ -396,17 +395,16 @@ function updateTotalPrice() {
         errorPriceInput.value = new Intl.NumberFormat('vi-VN').format(totalPrice);
     }
 
-    // Tính tổng tiền = Tiền lỗi + Tiền linh kiện (nếu có)
+    // Tính tiền linh kiện (nếu có)
     let partPrice = 0;
     const selectedParts = document.querySelectorAll('.selected-part');
     selectedParts.forEach(part => {
         const priceText = part.querySelector('.part-price').textContent;
         const priceMatch = priceText.match(/[\d.,]+/);
         if (priceMatch) {
-            //const price = parseFloat(priceMatch[0].replace(/\./g, '').replace(/,/g, '.')) || 0;
             // Xử lý chuỗi giá linh kiện từ định dạng Việt → số thực
             const raw = priceMatch[0];
-            const normalized = raw.replace(/\./g, '').replace(/,/g, '.'); // ví dụ: 1.200.000 → 1200000
+            const normalized = raw.replace(/\./g, '').replace(/,/g, ''); // ví dụ: 1.200.000 → 1200000
             const price = parseFloat(normalized) || 0;
             partPrice += price;
         }
@@ -423,7 +421,6 @@ function updateTotalPrice() {
 
     // Tính tiền còn lại = Tổng tiền - Tiền ứng trước
     const advancePaymentInput = document.getElementById('advancePayment');
-    //const advancePayment = parseInt(advancePaymentInput.value) || 0;
     const advanceText = advancePaymentInput?.value || '';
     const advanceNormalized = advanceText.replace(/\./g, '').replace(/,/g, '');
     const advancePayment = parseInt(advanceNormalized) || 0;
@@ -1110,16 +1107,39 @@ function populateWardDropdown(wards) {
     });
 }
 
-// Event handler for the Create Order button
-// ...existing code...
 
 // Event handler for the Create Order button
 document.addEventListener('DOMContentLoaded', function () {
     const createOrderBtn = document.querySelector('.create-order-btn');
     if (createOrderBtn) {
-        createOrderBtn.addEventListener('click', function () {
+        // Thay thế addEventListener bằng code mới
+        $(createOrderBtn).on('click', function (e) {
+            //e.preventDefault();
+
+            // Lấy tất cả ID linh kiện đã chọn
+            const selectedPartIds = [];
+            $('#selectedPartsContainer .selected-part').each(function () {
+                selectedPartIds.push($(this).attr('data-id'));
+            });
+
+            // Gắn linh kiện vào các lỗi
+            $('.split-with-button').each(function (index) {
+                // Nếu có linh kiện tương ứng với index này
+                if (index < selectedPartIds.length) {
+                    // Tạo hoặc cập nhật hidden field
+                    let hiddenField = $(this).find(`input[name="ErrorDetails[${index}].IdLinhKien"]`);
+                    if (hiddenField.length === 0) {
+                        hiddenField = $(`<input type="hidden" name="ErrorDetails[${index}].IdLinhKien" value="${selectedPartIds[index]}">`);
+                        $(this).append(hiddenField);
+                    } else {
+                        hiddenField.val(selectedPartIds[index]);
+                    }
+                }
+            });
+
             // Get the service order ID from the hidden input
             const serviceOrderId = document.getElementById('IdDonDichVu').value;
+
 
             // Validate form fields
             if (!validateOrderForm()) {
@@ -1130,6 +1150,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (confirm(`Xác nhận tạo đơn dịch vụ ${serviceOrderId}?`)) {
                 // Collect form data
                 const formData = new FormData();
+
 
                 // Add service order ID
                 formData.append('IdDonDichVu', serviceOrderId);
@@ -1153,21 +1174,47 @@ document.addEventListener('DOMContentLoaded', function () {
                 formData.append('IdNhanVienKyThuat', $('#selectedStaffId').val());
 
                 // Collect error details
-                const errorDetails = [];
-                $('.split-with-button').each(function (index) {
-                    const detail = {
-                        IdLoi: $(this).find('.error-loi-select').val(),
-                        MoTaLoi: $(this).find('textarea').first().val(),
-                        IdLinhKien: '',
-
-                        SoLuong: 1,
-                        LoaiDichVu: $('.section:contains("Loại dịch vụ") .dropdown input').eq(0).val(),
-                        ConBaoHanh: $(this).find('input[name^="warranty"]:checked').val() === 'true'
-                    };
-                    errorDetails.push(detail);
+                const selectedLinhKiens = [];
+                $('#selectedPartsContainer .selected-part').each(function () {
+                    const partId = $(this).attr('data-id');
+                    if (partId) {
+                        selectedLinhKiens.push(partId);
+                    }
                 });
 
-                formData.append('ErrorDetails', JSON.stringify(errorDetails));
+                // Tạo biến để đếm số linh kiện đã sử dụng
+                let linhKienIndex = 0;
+
+                // Collect error details
+                $('.split-with-button').each(function (index) {
+                    // Lấy IdLoi từ select box 
+                    const selectLoi = $(this).find('select[id^="IdLoi"]');
+                    const idLoi = selectLoi.val();
+                    console.log("Select element found:", selectLoi.length, "ID:", selectLoi.attr('id'));
+                    console.log("IdLoi value:", idLoi);
+
+                    // Lấy IdLinhKien từ danh sách linh kiện đã chọn (nếu còn)
+                    let idLinhKien = '';
+                    if (linhKienIndex < selectedLinhKiens.length) {
+                        idLinhKien = selectedLinhKiens[linhKienIndex];
+                        linhKienIndex++; // Tăng chỉ số để dùng linh kiện tiếp theo cho lỗi tiếp theo
+                    }
+
+                    console.log(`Gán linh kiện ${idLinhKien} cho lỗi ${idLoi}`);
+
+                    const conBaoHanh = $(this).find('input[type="radio"][name^="warranty"]:checked').val();
+                    console.log(`Trạng thái bảo hành cho lỗi ${idLoi}: ${conBaoHanh}`);
+
+                    // Thêm trực tiếp vào FormData
+                    formData.append(`ErrorDetails[${index}].IdLoi`, idLoi || '');
+                    formData.append(`ErrorDetails[${index}].MoTaLoi`, $(this).find('textarea').first().val() || '');
+                    formData.append(`ErrorDetails[${index}].IdLinhKien`, idLinhKien || ''); // Gán IdLinhKien vào ErrorDetails
+                    formData.append(`ErrorDetails[${index}].SoLuong`, 1);
+                    formData.append(`ErrorDetails[${index}].LoaiDichVu`, $('.section:contains("Loại dịch vụ") .dropdown input').eq(0).val() || '');
+                    formData.append(`ErrorDetails[${index}].ConBaoHanh`, conBaoHanh);
+                });
+
+
                 const selectedPartIds = [];
                 const selectedPartLoiIds = [];
 
@@ -1202,100 +1249,58 @@ document.addEventListener('DOMContentLoaded', function () {
                 //formData.append('TongTien', tongTien);
 
                 let tongTien = $('#tongTienInput').val() || $('.price-input').eq(1).val() || '0';
-                tongTien = tongTien.replace(/\./g, '').replace(/,/g, '').replace(/\s/g, ''); // Bỏ dấu chấm ngăn cách nghìn
+                tongTien = tongTien.replace(/\./g, '').replace(/,/g, '').replace(/\s/g, '');
                 const tongTienNumber = parseInt(tongTien) || 0;
                 formData.append('TongTien', tongTienNumber); // lưu 300000.00
 
 
                 // Show loading overlay
-                showLoadingOverlay('Đang tạo đơn dịch vụ...');
+                //showLoadingOverlay('Đang tạo đơn dịch vụ...');
 
                 // Submit form data to server
-                $.ajax({
-                    url: createServiceOrderUrl,
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        hideLoadingOverlay();
-                        if (response.success) {
-                            alert('Đơn dịch vụ đã được tạo thành công!');
-                            window.location.href = '@Url.Action("IndexDSDDV", "DanhSachDonDichVu")';
-                        } else {
-                            let errorMessage = response.message || 'Có lỗi xảy ra khi tạo đơn dịch vụ.';
-                            if (response.detailedMessage) {
-                                console.error(response.detailedMessage);
-                                console.error('Inner exception:', response.innerException);
-                            }
-                            alert(errorMessage);
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        hideLoadingOverlay();
-                        console.error('Error status:', status);
-                        console.error('Error details:', error);
-                        let errorMessage = 'Có lỗi xảy ra khi tạo đơn dịch vụ!';
-                        try {
-                            const responseJson = xhr.responseJSON;
-                            if (responseJson && responseJson.message) {
-                                errorMessage = responseJson.message;
-                                if (responseJson.innerException) {
-                                    console.error('Inner exception:', responseJson.innerException);
-                                }
-                            }
-                        } catch (e) {
-                            console.error('Không thể phân tích phản hồi từ máy chủ:', e);
-                        }
-                        alert(errorMessage);
-                    }
-                });
+                //$.ajax({
+                //    url: '/TaoDonDichVuKVL/CreateServiceOrder',
+                //    type: 'POST',
+                //    data: formData,
+                //    processData: false,
+                //    contentType: false,
+                //    success: function (response) {
+                //        hideLoadingOverlay();
+                //        if (response.success) {
+                //            alert('Đơn dịch vụ đã được tạo thành công!');
+                //            window.location.href = '@Url.Action("IndexDSDDV", "DanhSachDonDichVu")';
+                //        } else {
+                //            let errorMessage = response.message || 'Có lỗi xảy ra khi tạo đơn dịch vụ.';
+                //            //if (response.detailedMessage) {
+                //            //    console.error(response.detailedMessage);
+                //            //    console.error('Inner exception:', response.innerException);
+                //            //}
+                //            //alert(errorMessage);
+                //            setTimeout(function () {
+                //                window.location.href = '/DanhSachDonDichVu/IndexDSDDV';
+                //            }, 2000); // 2 giây sau chuyển trang
+                //        }
+                //    },
+                //    error: function (xhr, status, error) {
+                //        hideLoadingOverlay();
+                //        let errorMessage = 'Có lỗi xảy ra khi tạo đơn dịch vụ!';
+                //        try {
+                //            const responseJson = xhr.responseJSON;
+                //            if (responseJson && responseJson.message) {
+                //                errorMessage = responseJson.message;
+                //            }
+                //        } catch (e) { }
+                //        alert(errorMessage);
+                //        setTimeout(function () {
+                //            window.location.href = '/DanhSachDonDichVu/IndexDSDDV';
+                //        }, 2000);
+                //    }
+                //});
             }
         });
     }
 });
-// Add this function to associate error IDs with parts
-function associateErrorWithPart(partId, errorId) {
-    const partElement = $(`.selected-part[data-id="${partId}"]`);
-    if (partElement.length) {
-        // Store the error ID as data attribute
-        partElement.attr('data-error-id', errorId);
 
-        // Visual indication that error is assigned
-        const errorText = errorId ? $('#IdLoi option[value="' + errorId + '"]').text() : '';
-
-        if (errorText) {
-            let errorBadge = partElement.find('.error-badge');
-            if (!errorBadge.length) {
-                errorBadge = $('<span class="error-badge"></span>');
-                partElement.append(errorBadge);
-            }
-            errorBadge.text('Lỗi: ' + errorText);
-        }
-    }
-}
-
-// Add this code to your existing part selection logic
-$(document).ready(function () {
-    // Add button to associate errors with parts
-    $('.link-error-btn').click(function () {
-        const selectedPartId = $('.selected-part.active').data('id');
-        const selectedErrorId = $('.error-loi-select').val();
-
-        if (selectedPartId && selectedErrorId) {
-            associateErrorWithPart(selectedPartId, selectedErrorId);
-            alert('Đã liên kết linh kiện với lỗi thành công!');
-        } else {
-            alert('Vui lòng chọn một linh kiện và một loại lỗi để liên kết');
-        }
-    });
-
-    // Make parts selectable
-    $(document).on('click', '.selected-part', function () {
-        $('.selected-part').removeClass('active');
-        $(this).addClass('active');
-    });
-});
 // Xử lý sự kiện khi chọn trạng thái đơn hàng
 $(document).ready(function () {
     // Trạng thái dropdown

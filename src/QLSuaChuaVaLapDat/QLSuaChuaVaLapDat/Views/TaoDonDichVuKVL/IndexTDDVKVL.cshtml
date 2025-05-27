@@ -580,14 +580,26 @@
             <div class="split">
                 <div class="form-group">
                     <label>Loại linh kiện: <span class="required">(*)</span></label>
-                    @Html.DropDownList("IdLoaiLinhKien", ViewBag.LoaiLinhKiens as List<SelectListItem>, "Chọn loại linh kiện", new { @class = "form-control select-linhkien" })
-                </div>
+                    <select name="IdLinhKien" class="form-control select-linhkien">
+                        <option value="">Chọn loại linh kiện</option>
+                        @foreach (var item in ViewBag.LoaiLinhKiens)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+
+                    </div>
 
 
                 <div class="flex-date-time">
                     <div class="form-group">
                         <label>Lỗi: <span class="required">(*)</span></label>
-                        @Html.DropDownList("IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new { @class = "form-control error-type-select error-loi-select", @onchange = "layGiaTheoLoi(this.value)" })
+                        @Html.DropDownList("ErrorDetails[0].IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new { 
+                            @class = "form-control error-type-select error-loi-select", 
+                            @onchange = "layGiaTheoLoi(this.value)",
+                            @id = "IdLoi-0"
+                        })
+                        @* @Html.DropDownList("IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new { @class = "form-control error-type-select error-loi-select", @onchange = "layGiaTheoLoi(this.value)", @name = "ErrorDetails[0].IdLoi" }) *@
                     </div>
                     <div class="form-group">
                         <label>Đơn giá (VND): <span class="required">(*)</span></label>
