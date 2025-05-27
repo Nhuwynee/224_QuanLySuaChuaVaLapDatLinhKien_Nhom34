@@ -17,8 +17,8 @@
                 <label for="so-id">Mã đơn dịch vụ</label>
                 <input type="text" id="so-id" name="MaDonDichVu"
                 @(Model.donDichVuSearch.MaDonDichVu != null
-                                                    ? $"value={Model.donDichVuSearch.MaDonDichVu}"
-                                                    : "")
+                                                                                        ? $"value={Model.donDichVuSearch.MaDonDichVu}"
+                                                                                        : "")
                 placeholder="Nhập mã đơn...">
 
             </div>
@@ -27,8 +27,8 @@
                 <label for="so-customer">Khách hàng</label>
                 <input type="text" id="so-customer" name="TenKhachHang"
                 @(Model.donDichVuSearch.TenKhachHang != null
-                                                    ? $"value={Model.donDichVuSearch.TenKhachHang}"
-                                                    : "")
+                                                                                        ? $"value={Model.donDichVuSearch.TenKhachHang}"
+                                                                                        : "")
                 placeholder="Nhập tên hoặc SĐT...">
             </div>
 
@@ -36,8 +36,8 @@
                 <label for="so-technician">Kỹ thuật viên</label>
                 <input type="text" id="so-technician" name="IDKyThuatVien"
                 @(Model.donDichVuSearch.IDKyThuatVien != null
-                                                    ? $"value={Model.donDichVuSearch.IDKyThuatVien}"
-                                                    : "")
+                                                                                        ? $"value={Model.donDichVuSearch.IDKyThuatVien}"
+                                                                                        : "")
                 placeholder="Nhập id kỹ thuật viên...">
             </div>
             @{
@@ -120,20 +120,55 @@
                     } 
                 </select>
                 <select name="LoaiDichVu"">
-                    <option value="">Loại dịch vụ</option>
-                    <option value="Sửa chữa">Sửa chữa</option>
-                    <option value="Lắp đặt">Lắp đặt</option>
+                <option value="">Loại dịch vụ</option>
+                <option value="Sửa chữa">Sửa chữa</option>
+                <option value="Lắp đặt">Lắp đặt</option>
                 </select>
-            </div>
+                </div>
 
-            <div class="sort-section">
+                <div class="sort-section">
                 <span>Sắp xếp theo:</span>
+                @{
+                    var xapxep = Model.donDichVuSearch.SapXepTheo;
+                }
                 <select name="SapXepTheo" ">
                     <option value="">Theo</option>
-                    <option value="NgayTaoDesc">Ngày tạo (mới nhất)</option>
-                    <option value="NgayTaoAsc">Ngày tạo (cũ nhất)</option>
-                    <option value="TongTienDesc">Tổng tiền (cao nhất)</option>
-                    <option value="TongTienAsc">Tổng tiền (thấp nhất)</option>
+                    @if (xapxep == "NgayTaoDesc")
+                    {
+                        <option value="NgayTaoDesc" selected>Ngày tạo (mới nhất)</option>
+                    }
+                    else
+                    {
+                        <option value="NgayTaoDesc">Ngày tạo (mới nhất)</option>
+                    }
+
+                    @if (xapxep == "NgayTaoAsc")
+                    {
+                        <option value="NgayTaoAsc" selected>Ngày tạo (cũ nhất)</option>
+                    }
+                    else
+                    {
+                        <option value="NgayTaoAsc">Ngày tạo (cũ nhất)</option>
+                    }
+                    @if (xapxep == "TongTienDesc")
+                    {
+                        <option value="TongTienDesc" selected>Tổng tiền (cao nhất)</option>
+                    }
+                    else
+                    {
+                        <option value="TongTienDesc">Tổng tiền (cao nhất)</option>
+                    }
+
+                    @if (xapxep == "TongTienDesc")
+                    {
+                        <option value="TongTienAsc" selected>Tổng tiền (thấp nhất)</option>
+                    }
+                    else
+                    {
+                        <option value="TongTienAsc">Tổng tiền (thấp nhất)</option>
+                    }
+
+                    
                 </select>
             </div>
         </div>
