@@ -58,7 +58,8 @@ namespace QLSuaChuaVaLapDat.Models.viewmodel
         public string? IdLinhKien { get; set; }
         public int SoLuong { get; set; } = 1;
         public bool ConBaoHanh { get; set; }
-        public DateOnly? NgayKetThucBaoHanh { get; set; } = new DateOnly(2025, 12, 31);// Ngày kết thúc bảo hành
+        public DateOnly? NgayKetThucBaoHanh { get; set; }// Ngày kết thúc bảo hành
+        public int ThoiGianBaoHanh { get; set; }
         public string GhiChu { get; set; }
         // Navigation properties to provide stronger typing
         public virtual LoaiLoi? Loi { get; set; }

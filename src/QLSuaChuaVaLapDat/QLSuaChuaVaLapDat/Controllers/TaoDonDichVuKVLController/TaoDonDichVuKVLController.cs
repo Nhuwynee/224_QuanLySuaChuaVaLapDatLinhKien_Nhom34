@@ -154,6 +154,8 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                     Text = llk.TenLoaiLinhKien
                 }).ToList();
 
+                
+
             //lấy danh sách lỗi
             var loaiLois = _context.LoaiLois
                 .Select(ll => new SelectListItem
@@ -199,6 +201,32 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
             return Json(result);
         }
 
+
+        [HttpGet]
+        public IActionResult LayLinhKienTheoLoai(string idLoaiLinhKien)
+        {
+            if (string.IsNullOrWhiteSpace(idLoaiLinhKien))
+            {
+                return Json(new { success = false, message = "Mã loại linh kiện không hợp lệ" });
+            }
+
+            var linhKiens = _context.LinhKiens
+                .Where(lk => lk.IdLoaiLinhKien == idLoaiLinhKien)
+                .Join(_context.NhaSanXuats,
+                    lk => lk.IdNsx,
+                    nsx => nsx.IdNsx,
+                    (lk, nsx) => new {
+                        idLinhKien = lk.IdLinhKien,
+                        tenLinhKien = lk.TenLinhKien,
+                        gia = lk.Gia,
+                        soLuong = lk.SoLuong,
+                        tenNsx = nsx.TenNsx,
+                        thoiGianBaoHanh = lk.ThoiGianBaoHanh
+                    })
+                .ToList();
+
+            return Json(linhKiens);
+        }
 
         //lấy danh sách chuyên môn và nhân viên
         [HttpGet]
@@ -645,6 +673,28 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                     //var linhKien = await _context.LinhKiens.FindAsync(idLinhKien);
                     string idCTDH = GenerateNextDetailId();
 
+                    // Calculate warranty end date if applicable (for selected parts without error details)
+                    DateOnly? warrantyEndDate = null;
+
+                    // Default warranty period for separate parts (can be modified as needed)
+                    int warrantyPeriodMonths = linhKien.ThoiGianBaoHanh;
+
+                    // Only calculate if order is completed and we have warranty information
+                    if (
+                        
+                        donDichVu.NgayHoanThanh.HasValue &&
+                        warrantyPeriodMonths > 0)
+                    {
+                        // Get completion date
+                        DateTime completionDate = donDichVu.NgayHoanThanh.Value;
+
+                        // Add warranty months to completion date
+                        DateTime endWarrantyDate = completionDate.AddMonths(warrantyPeriodMonths);
+
+                        // Convert to DateOnly format
+                        warrantyEndDate = DateOnly.FromDateTime(endWarrantyDate);
+                    }
+
                     var chiTiet = new ChiTietDonDichVu
                     {
                         IdCtdh = idCTDH,
@@ -655,7 +705,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                         MoTa = formData.MoTa,
                         SoLuong = 1,
                         ThoiGianThemLinhKien = DateTime.Now,
-                        NgayKetThucBh = formData.NgayKetThucBaoHanh, // Ngày kết thúc bảo hành từ form
+                        NgayKetThucBh = warrantyEndDate, // Ngày kết thúc bảo hành từ form
                         HanBaoHanh = false // Mặc định là hết bảo hành
 
                     };
@@ -691,7 +741,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
             // Direct connection to database to verify IDs exist before assignment
             string validIdLinhKien = null;
             string validIdLoi = null;
-
+            int warrantyPeriodMonths = 0;
             // Validate IdLinhKien by directly checking the database
             if (!string.IsNullOrEmpty(errorDetail.IdLinhKien))
             {
@@ -700,6 +750,8 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                 {
                     validIdLinhKien = linhKien.IdLinhKien;
                     errorDetail.LinhKien = linhKien;
+                    // Get warranty period from the selected part
+                    warrantyPeriodMonths = linhKien.ThoiGianBaoHanh;
                 }
                 else
                 {
@@ -732,6 +784,43 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
             // Tạo ID chi tiết đơn hàng mới
             string idCTDH = GenerateNextDetailId();
 
+            // Calculate warranty end date if applicable
+            DateOnly? warrantyEndDate = null;
+
+            // Only calculate warranty end date if:
+            // 1. The order status is "Hoàn thành" or "Đã hoàn thành"
+            // 2. The warranty flag is true
+            // 3. We have valid completion date and warranty period
+            if (
+                //errorDetail.ConBaoHanh == false &&
+                donDichVu.NgayHoanThanh.HasValue &&
+                warrantyPeriodMonths > 0)
+            {
+                // Get completion date
+                DateTime completionDate = donDichVu.NgayHoanThanh.Value;
+
+                // Add warranty months to completion date
+                DateTime endWarrantyDate = completionDate.AddMonths(warrantyPeriodMonths);
+
+                // Convert to DateOnly format
+                warrantyEndDate = DateOnly.FromDateTime(endWarrantyDate);
+            }
+            // If explicitly marked as under warranty but no end date specified, 
+            // use the warranty period from the part if available
+            else if (errorDetail.ConBaoHanh && validIdLinhKien != null &&
+                     donDichVu.NgayHoanThanh.HasValue && warrantyPeriodMonths > 0)
+            {
+                // Calculate warranty end date from completion date
+                DateTime completionDate = donDichVu.NgayHoanThanh.Value;
+                DateTime endWarrantyDate = completionDate.AddMonths(warrantyPeriodMonths);
+                warrantyEndDate = DateOnly.FromDateTime(endWarrantyDate);
+            }
+            // If user provided a specific warranty end date, use that
+            else if (errorDetail.NgayKetThucBaoHanh.HasValue)
+            {
+                warrantyEndDate = errorDetail.NgayKetThucBaoHanh;
+            }
+
             // Create the ChiTietDonDichVu with validated IDs
             var chiTiet = new ChiTietDonDichVu
             {
@@ -743,7 +832,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                 MoTa = errorDetail.MoTaLoi,
                 SoLuong = errorDetail.SoLuong,
                 ThoiGianThemLinhKien = DateTime.Now,
-                NgayKetThucBh = errorDetail.NgayKetThucBaoHanh, // Ngày kết thúc bảo hành từ form
+                NgayKetThucBh = warrantyEndDate, // Ngày kết thúc bảo hành từ form
                 HanBaoHanh = errorDetail.ConBaoHanh
             };
 

@@ -20,6 +20,46 @@ $(document).ready(function () {
     const doneTypingInterval = 500; // 500ms
     let selectedParts = [];
 
+    // Thêm API endpoint để lấy linh kiện theo loại
+    $(document).ready(function () {
+        // Xử lý sự kiện khi thay đổi loại linh kiện
+        $(document).on('change', '.select-linhkien', function () {
+            const selectedTypeId = $(this).val();
+            const linhKienSelect = $(this).closest('.form-group').parent().find('.part-select');
+
+            if (selectedTypeId) {
+                // Tải danh sách linh kiện theo loại
+                $.ajax({
+                    url: layLinhKienUrl,
+                    type: 'GET',
+                    data: { idLoaiLinhKien: selectedTypeId },
+                    success: function (data) {
+                        // Xóa các option cũ
+                        linhKienSelect.empty();
+
+                        // Thêm option mặc định
+                        linhKienSelect.append('<option value="">Chọn linh kiện</option>');
+
+                        // Thêm các linh kiện mới
+                        $.each(data, function (index, item) {
+                            linhKienSelect.append(`<option value="${item.idLinhKien}" 
+                            data-gia="${item.gia}" 
+                            data-nsx="${item.tenNsx}"
+                            data-soluong="${item.soLuong}">${item.tenLinhKien}</option>`);
+                        });
+                    },
+                    error: function () {
+                        console.log('Lỗi khi tải danh sách linh kiện');
+                    }
+                });
+            } else {
+                // Nếu không chọn loại, xóa danh sách linh kiện
+                linhKienSelect.empty();
+                linhKienSelect.append('<option value="">Chọn linh kiện</option>');
+            }
+        });
+    });
+
     // Add event handler for the add-part-btn
     $(document).on('click', '.add-part-btn', function () {
         // Clone the first split-with-button element (without its events)
@@ -45,6 +85,22 @@ $(document).ready(function () {
                 $(this).prop('checked', true);
             }
         });
+
+        // Cập nhật ID cho select loại linh kiện
+        newComponentSection.find('select.part-type-select').each(function () {
+            let newId = 'partType-' + timestamp;
+            $(this).attr('id', newId);
+            $(this).val('');
+        });
+
+        // Cập nhật ID cho select linh kiện
+        newComponentSection.find('select.part-select').each(function () {
+            let newId = 'part-' + timestamp;
+            $(this).attr('id', newId);
+            $(this).val('');
+            $(this).empty().append('<option value="">Chọn linh kiện</option>');
+        });
+
 
         // Update select elements to have unique IDs and add event handlers
         newComponentSection.find('select#IdLoi').each(function () {
@@ -478,7 +534,36 @@ $(document).ready(function () {
 //    });
 //});
 
+// Đảm bảo mỗi lỗi đều có input hidden IdLinhKien trước khi submit
+function updateErrorDetailPartIds() {
+    const errorDetailContainers = document.querySelectorAll('.split-with-button');
+    const selectedPartIds = [];
+    $('#selectedPartsContainer .selected-part').each(function () {
+        selectedPartIds.push($(this).attr('data-id'));
+    });
 
+    errorDetailContainers.forEach((container, index) => {
+        let idLinhKien = '';
+        if (index < selectedPartIds.length) {
+            idLinhKien = selectedPartIds[index];
+        }
+        let hiddenField = container.querySelector(`input[name="ErrorDetails[${index}].IdLinhKien"]`);
+        if (!hiddenField) {
+            hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = `ErrorDetails[${index}].IdLinhKien`;
+            container.appendChild(hiddenField);
+        }
+        hiddenField.value = idLinhKien;
+    });
+}
+
+// Gọi hàm này trước khi submit form
+$(document).ready(function () {
+    $('#serviceOrderForm').on('submit', function () {
+        updateErrorDetailPartIds();
+    });
+});
 
 
 
@@ -1409,6 +1494,8 @@ $(document).ready(function () {
         const deviceTypes = [];
         const errorTypes = [];
         const errorDescriptions = [];
+        const selectedParts = [];
+
         // Collect all device types, errors, and descriptions from all sections
         $('.section').each(function () {
             // Collect device types - look for both ID and class selectors to handle dynamic additions
@@ -1419,6 +1506,16 @@ $(document).ready(function () {
                 }
             });
 
+            // collect selected parts from the selected parts container
+            //$('.section').each(function () {
+            //    $(this).find('select[id*="IdLinhKien"], select.error-type-select').each(function () {
+            //        const errorText = $(this).find('option:selected').text();
+            //        if (errorText && errorText !== 'Chọn lỗi') {
+            //            errorTypes.push(errorText.trim());
+            //        }
+            //    });
+            //});
+
             // Collect error types - look for both ID and class selectors
             $(this).find('select[id*="IdLoi"], select.error-type-select').each(function () {
                 const errorText = $(this).find('option:selected').text();
@@ -1426,6 +1523,8 @@ $(document).ready(function () {
                     errorTypes.push(errorText.trim());
                 }
             });
+
+
 
             // Collect error descriptions from all textareas in the form
             $(this).find('.form-group:contains("Mô tả lỗi") textarea, textarea.error-desc-textarea').each(function () {
@@ -1449,6 +1548,11 @@ $(document).ready(function () {
             deviceTypes.push('Chưa chọn');
         }
 
+        // If no parts selected
+        if (selectedParts.length === 0) {
+            selectedParts.push('Không có linh kiện');
+        }
+
         // If no errors found
         if (errorTypes.length === 0) {
             errorTypes.push('Chưa chọn');
@@ -1461,6 +1565,7 @@ $(document).ready(function () {
 
         // Format them with bullet points for display
         const formattedDeviceTypes = deviceTypes.map(type => `• ${type}`).join('<br>');
+        const formattedParts = selectedParts.map(part => `• ${part}`).join('<br>');
         const formattedErrorTypes = errorTypes.map(error => `• ${error}`).join('<br>');
         const formattedDescriptions = errorDescriptions.map(desc => `• ${desc}`).join('<br>');
 
@@ -1566,24 +1671,66 @@ $(document).ready(function () {
     // Đóng payment popup khi nhấn nút đóng hoặc nút Hủy
     $('.payment-popup-close, .payment-cancel-btn').click(function () {
         $('#paymentModal').fadeOut(200);
+    });    // Xử lý khi nhấn nút xác nhận thanh toán
+    $('.payment-confirm-btn').click(function () {
+        // Ẩn modal thanh toán và hiển thị modal chọn phương thức thanh toán
+        $('#paymentModal').fadeOut(100, function () {
+            // Sau khi ẩn modal thanh toán, hiển thị modal phương thức thanh toán
+            $('#paymentMethodModal').fadeIn(100);
+        });
+    });
+    // Xử lý khi chọn phương thức thanh toán
+    $('.payment-method-btn').click(function () {
+        // Thêm lớp selected vào button được chọn và xóa khỏi các button khác
+        $('.payment-method-btn').removeClass('selected');
+        $(this).addClass('selected');
+
+        const paymentMethod = $(this).data('method');
+        let paymentMethodText = paymentMethod === 'cash' ? 'tiền mặt' : 'chuyển khoản';
+
+        // Hiển thị thông báo xác nhận
+        if (confirm('Bạn có chắc chắn muốn thanh toán bằng ' + paymentMethodText + '?')) {
+            // Xử lý logic thanh toán ở đây
+            alert('Thanh toán bằng ' + paymentMethodText + ' thành công!');
+            $('#paymentMethodModal').fadeOut(200);
+
+            // Cập nhật số tiền ứng trước bằng tổng tiền để hiển thị tiền còn lại = 0
+            const totalPrice = $('.price-input').eq(1).val().replace(/[^\d]/g, '');
+            $('#advancePayment').val(totalPrice).trigger('input');
+
+            // Lưu phương thức thanh toán vào một trường ẩn để có thể gửi lên server
+            if (!$('#paymentMethod').length) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'paymentMethod',
+                    name: 'PhuongThucThanhToan',
+                    value: paymentMethod
+                }).appendTo('#serviceOrderForm');
+            } else {
+                $('#paymentMethod').val(paymentMethod);
+            }
+        } else {
+            // Nếu người dùng chọn Cancel, xóa lớp selected
+            $(this).removeClass('selected');
+        }
     });
 
-    // Xử lý khi nhấn nút xác nhận thanh toán
-    $('.payment-confirm-btn').click(function () {
-        // Xử lý logic thanh toán ở đây
-        alert('Thanh toán thành công!');
-        $('#paymentModal').fadeOut(200);
-
-        // Cập nhật số tiền ứng trước bằng tổng tiền để hiển thị tiền còn lại = 0
-        const totalPrice = $('.price-input').eq(1).val().replace(/[^\d]/g, '');
-        $('#advancePayment').val(totalPrice).trigger('input');
+    // Đóng popup phương thức thanh toán
+    $('.payment-method-popup-close').click(function () {
+        $('#paymentMethodModal').fadeOut(200);
     });
 
     // Đóng popup khi click bên ngoài
     $(window).click(function (event) {
-        const modal = $('#paymentModal')[0];
-        if (event.target === modal) {
+        const paymentModal = $('#paymentModal')[0];
+        const methodModal = $('#paymentMethodModal')[0];
+
+        if (event.target === paymentModal) {
             $('#paymentModal').fadeOut(200);
+        }
+
+        if (event.target === methodModal) {
+            $('#paymentMethodModal').fadeOut(200);
         }
     });
 });

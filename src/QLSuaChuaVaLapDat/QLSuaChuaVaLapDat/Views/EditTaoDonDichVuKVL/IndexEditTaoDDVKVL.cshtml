@@ -381,105 +381,67 @@
     .payment-invoice-value {
         width: 60%;
         color: #333;
-    }
-
-    .payment-parts-list {
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        margin-top: 10px;
-    }
-
-    .payment-part-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 12px;
-        border-bottom: 1px solid #eee;
-    }
-
-        .payment-part-item:last-child {
-            border-bottom: none;
-        }
-
-    .payment-part-name {
-        font-weight: 500;
-    }
-
-    .payment-part-price {
-        color: #d9534f;
-    }
-
-    .payment-amount-section {
-        background-color: #e6f7ff;
-        border-radius: 6px;
-        padding: 15px;
-        margin-bottom: 15px;
-    }
-
-    .payment-amount-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
-        font-size: 16px;
-    }
-
-        .payment-amount-row.total {
-            font-size: 18px;
-            font-weight: bold;
-            border-top: 1px dashed #bbb;
-            margin-top: 10px;
-            padding-top: 10px;
-        }
-
-            .payment-amount-row.total .payment-amount-value {
-                color: #d9534f;
-            }
-
-    .payment-popup-footer {
-        display: flex;
-        justify-content: flex-end;
-        padding-top: 15px;
-        border-top: 1px solid #eee;
-        margin-top: 15px;
-    }
-
-    .payment-confirm-btn,
-    .payment-cancel-btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: background-color 0.2s;
-    }
-
-    .payment-confirm-btn {
-        background-color: #28a745;
-        color: white;
-        margin-left: 10px;
-    }
-
-        .payment-confirm-btn:hover {
-            background-color: #218838;
-        }
-
-    .payment-cancel-btn {
-        background-color: #f8f9fa;
-        color: #333;
-        border: 1px solid #ddd;
-    }
-
-        .payment-cancel-btn:hover {
-            background-color: #e2e6ea;
-        }
-
-    /* Date-time styling in payment popup */
-    #invoice-start-time, #invoice-end-time {
-        font-weight: normal;
-        color: #333;
-    }
-
-    .payment-invoice-value {
         word-break: break-word; /* Allow long date strings to break properly */
+    }
+    
+    /* Payment method styles */
+    .payment-methods {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px 0;
+    }
+    
+    .payment-method-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 160px;
+        height: 120px;
+        border: 2px solid #e1e1e1;
+        border-radius: 10px;
+        background-color: white;
+        font-weight: 500;
+        font-size: 18px;
+        color: #333;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    
+    .payment-method-btn:hover {
+        border-color: #4CAF50;
+        background-color: #f5fff5;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .payment-method-btn i {
+        font-size: 36px;
+        margin-bottom: 10px;
+        color: #28a745;
+    }
+    
+    .payment-method-btn[data-method="cash"] i {
+        color: #28a745;
+    }
+    
+    .payment-method-btn[data-method="transfer"] i {
+        color: #007bff;
+    }
+    
+    /* Additional styles for payment method selection */
+    .payment-method-btn.selected {
+        border-color: #4CAF50;
+        background-color: #f0fff0;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+    }
+    
+    .payment-method-btn[data-method="cash"].selected i {
+        color: #218838;
+    }
+    
+    .payment-method-btn[data-method="transfer"].selected i {
+        color: #0069d9;
     }
 </style>
 
@@ -976,6 +938,28 @@
         <div class="payment-popup-footer">
             <button class="payment-cancel-btn">Đóng</button>
             <button class="payment-confirm-btn">Xác nhận thanh toán</button>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Method Modal -->
+<div id="paymentMethodModal" class="payment-popup">
+    <div class="payment-popup-content" style="max-width: 500px;">
+        <div class="payment-popup-header">
+            <h2>Chọn phương thức thanh toán</h2>
+            <span class="payment-method-popup-close">&times;</span>
+        </div>
+        <div class="payment-popup-body">
+            <div class="payment-methods">
+                <button class="payment-method-btn" data-method="cash">
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    <span>Tiền mặt</span>
+                </button>
+                <button class="payment-method-btn" data-method="transfer">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Chuyển khoản</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>

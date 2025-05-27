@@ -19,7 +19,7 @@ public partial class LinhKien
 
     public string? Anh { get; set; }
 
-    public DateOnly ThoiGianBaoHanh { get; set; }
+    public int ThoiGianBaoHanh { get; set; }
 
     public string DieuKienBaoHanh { get; set; } = null!;
 

@@ -4,7 +4,7 @@ namespace QLSuaChuaVaLapDat.Controllers.EditTaoDonDichVuKVLController
 {
     public class EditTaoDonDichVuKVLController : Controller
     {
-        public IActionResult Index()
+        public IActionResult IndexEditTaoDDVKVL()
         {
             return View();
         }

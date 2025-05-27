@@ -721,36 +721,121 @@ function validateOrderForm() {
     return true;
 }
 
+// Lấy dữ liệu từ form và điền vào hóa đơn
+function populateInvoiceData() {
+    // Thông tin đơn hàng
+    $('#invoice-order-id').text($('#IdDonDichVu').val());
+    $('#invoice-order-date').text($('.order-date').text().replace('Ngày tạo: ', ''));
+    $('#invoice-staff-name').text($('.staff-name').text().replace('Nhân viên: ', ''));
 
+    // Thông tin khách hàng
+    $('#invoice-customer-name').text($('.form-group:contains("Họ và tên khách hàng") input').val());
+    $('#invoice-customer-phone').text($('.form-group:contains("Số điện thoại") input').val());
+    const address = `${$('#wardInput').val()}, ${$('#districtInput').val()}, ${$('#cityInput').val()}, ${$('input[name="DuongSoNha"]').val()}`;
+    $('#invoice-customer-address').text(address);
 
+    // Thông tin thiết bị
+    $('#invoice-device-type').text($('#IdLoaiThietBi option:selected').text());
+    $('#invoice-error-type').text($('.error-loi-select option:selected').text());
+    $('#invoice-error-description').text($('textarea[name="ErrorDetails[0].MoTaLoi"]').val());
 
-// Xử lý khi click vào nút thanh toán
-paymentBtn.click(function () {
-    // Kiểm tra tiền còn lại
-    const remainingText = $('#remainingAmount').text();
-    const remainingAmount = parseInt(remainingText.match(/\d+/g).join('')) || 0;
+    // Thông tin dịch vụ
+    $('#invoice-service-type').text($('#serviceType option:selected').text());
+    $('#invoice-service-location').text($('#serviceLocation option:selected').text());
+    $('#invoice-technician').text($('.selected-staff .staff-name').text());
+    $('#invoice-start-time').text($('#startDatetimePicker').val());
+    $('#invoice-end-time').text($('#endDatetimePicker').val());
 
-    if (remainingAmount <= 1000) {
-        alert("Đơn hàng phải nhập đầy đủ các thông tin bắt buộc!");
-    } else {
-        // Hiển thị popup hóa đơn thanh toán
-        showPaymentPopup();
-    }
-});    // Hiển thị popup hóa đơn thanh toán
-function showPaymentPopup() {
-    console.log('Opening payment popup...');
+    // Linh kiện
+    const partsList = $('#invoice-parts-list');
+    partsList.empty();
 
-    // Log date values before populating
-    console.log('Start date before populate:', $('#startDatetimePicker').val());
-    console.log('End date before populate:', $('#endDatetimePicker').val());
+    $('.selected-part').each(function() {
+        const partName = $(this).find('.part-name').text();
+        const partPrice = $(this).find('.part-price').text();
+        
+        partsList.append(`
+            <div class="payment-part-item">
+                <div class="payment-part-name">${partName}</div>
+                <div class="payment-part-price">${partPrice}</div>
+            </div>
+        `);
+    });
 
-    // Lấy thông tin từ form để hiển thị trong hóa đơn
-    populateInvoiceData();
-
-    // Log date values after populating
-    console.log('Start date displayed:', $('#invoice-start-time').text());
-    console.log('End date displayed:', $('#invoice-end-time').text());
-
-    // Hiển thị popup
-    $('#paymentModal').fadeIn(100);
+    // Thông tin thanh toán
+    $('#invoice-error-cost').text($('.price-input').eq(0).val() + ' VND');
+    $('#invoice-parts-cost').text($('.price-input').eq(1).val() + ' VND');
+    $('#invoice-advance-payment').text($('#advancePayment').val() + ' VND');
+    $('#invoice-remaining-amount').text($('#remainingAmount').text().replace('Tiền còn lại mà khách phải trả là: ', ''));
 }
+
+// Xử lý khi nhấn nút xác nhận thanh toán
+$(document).ready(function() {
+    // Xử lý khi nhấn nút xác nhận thanh toán
+    $('.payment-confirm-btn').click(function () {
+        // Ẩn modal thanh toán và hiển thị modal chọn phương thức thanh toán
+        $('#paymentModal').fadeOut(100, function() {
+            // Sau khi ẩn modal thanh toán, hiển thị modal phương thức thanh toán
+            $('#paymentMethodModal').fadeIn(100);
+        });
+    });
+      // Xử lý khi chọn phương thức thanh toán
+    $('.payment-method-btn').click(function() {
+        // Thêm lớp selected vào button được chọn và xóa khỏi các button khác
+        $('.payment-method-btn').removeClass('selected');
+        $(this).addClass('selected');
+        
+        const paymentMethod = $(this).data('method');
+        let paymentMethodText = paymentMethod === 'cash' ? 'tiền mặt' : 'chuyển khoản';
+        
+        // Hiển thị thông báo xác nhận
+        if(confirm('Bạn có chắc chắn muốn thanh toán bằng ' + paymentMethodText + '?')) {
+            // Xử lý logic thanh toán ở đây
+            alert('Thanh toán bằng ' + paymentMethodText + ' thành công!');
+            $('#paymentMethodModal').fadeOut(200);
+            
+            // Cập nhật số tiền ứng trước bằng tổng tiền để hiển thị tiền còn lại = 0
+            const totalPrice = $('.price-input').eq(1).val().replace(/[^\d]/g, '');
+            $('#advancePayment').val(totalPrice).trigger('input');
+            
+            // Lưu phương thức thanh toán vào một trường ẩn để có thể gửi lên server
+            if (!$('#paymentMethod').length) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'paymentMethod',
+                    name: 'PhuongThucThanhToan',
+                    value: paymentMethod
+                }).appendTo('#serviceOrderForm');
+            } else {
+                $('#paymentMethod').val(paymentMethod);
+            }
+        } else {
+            // Nếu người dùng chọn Cancel, xóa lớp selected
+            $(this).removeClass('selected');
+        }
+    });
+    
+    // Đóng popup phương thức thanh toán
+    $('.payment-method-popup-close').click(function() {
+        $('#paymentMethodModal').fadeOut(200);
+    });
+    
+    // Đóng payment popup khi nhấn nút đóng hoặc nút Hủy
+    $('.payment-popup-close, .payment-cancel-btn').click(function () {
+        $('#paymentModal').fadeOut(200);
+    });
+
+    // Đóng popup khi click bên ngoài
+    $(window).click(function (event) {
+        const paymentModal = $('#paymentModal')[0];
+        const methodModal = $('#paymentMethodModal')[0];
+        
+        if (event.target === paymentModal) {
+            $('#paymentModal').fadeOut(200);
+        }
+        
+        if (event.target === methodModal) {
+            $('#paymentMethodModal').fadeOut(200);
+        }
+    });
+});
