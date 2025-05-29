@@ -12,47 +12,107 @@
         <div class="search-fields">
             <div class="form-group">
                 <label for="war-code">Mã bảo hành</label>
-                <input name="MaDonDichVu" type="text" id="war-code" placeholder="Nhập mã bảo hành...">
+                <input name="MaDonDichVu" type="text" id="war-code"
+                @(Model.baoHanhSearch.MaDonDichVu != null
+                                            ? $"value={Model.baoHanhSearch.MaDonDichVu}"
+                                            : "")
+                placeholder="Nhập mã bảo hành...">
             </div>
 
             <div class="form-group">
                 <label for="war-component">Mã linh kiện</label>
-                <input name="MaLinhKien" type="text" id="war-component" placeholder="Nhập mã linh kiện...">
+                <input name="MaLinhKien" type="text" id="war-component"
+                @(Model.baoHanhSearch.MaLinhKien != null
+                                            ? $"value={Model.baoHanhSearch.MaLinhKien}"
+                                            : "")
+                placeholder="Nhập mã linh kiện...">
             </div>
 
             <div class="form-group">
                 <label for="war-customer">Khách hàng</label>
-                <input name="SoDienThoaiKhachHang" type="text" id="war-customer" placeholder="Nhập SĐT khách hàng...">
+                <input name="SoDienThoaiKhachHang" type="text" id="war-customer"
+                @(Model.baoHanhSearch.SoDienThoaiKhachHang != null
+                                            ? $"value={Model.baoHanhSearch.SoDienThoaiKhachHang}"
+                                            : "")
+                placeholder="Nhập SĐT khách hàng...">
             </div>
 
             <div class="form-group">
                 <label for="war-status">Trạng thái</label>
+                @{
+                    var trangThai = Model.baoHanhSearch.TrangThai;
+                }
                 <select name="TrangThai" id="war-status">
-                    <option value="">Tất cả</option>
-                    <option value="active">Đang bảo hành</option>
-                    <option value="expired">Hết hạn</option>
+                    @if (trangThai == null)
+                    {
+                        <option value="" selected>Tất cả</option>
+                    }else{
+                        <option value="">Tất cả</option>
+                    }
+
+                    @if (trangThai == "active")
+                    {
+                        <option value="active" selected>Đang bảo hành</option>
+                    }
+                    else
+                    {
+                        <option value="active">Đang bảo hành</option>
+                    }
+
+                    @if (trangThai == "active")
+                    {
+                        <option value="expired" selected>Hết hạn</option>
+                    }
+                    else
+                    {
+                        <option value="expired">Hết hạn</option>
+                    }
+
+
+
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="war-from">Từ ngày</label>
-                <input name="TuNgay" type="date" id="war-from">
+                <input name="TuNgay" type="date"
+                @(Model.baoHanhSearch.TuNgay != null
+                                    ? $"value={Model.baoHanhSearch.TuNgay}"
+                                    : "")
+                id="war-from">
             </div>
 
             <div class="form-group">
                 <label for="war-to">Đến ngày</label>
-                <input name="DenNgay" type="date" id="war-to">
+                <input name="DenNgay" type="date"
+                @(Model.baoHanhSearch.DenNgay != null
+                                    ? $"value={Model.baoHanhSearch.DenNgay}"
+                                    : "")
+                id="war-to">
             </div>
         </div>
 
         <div class="filter-sort">
             <div class="filter-section">
                 <span>Lọc theo:</span>
+                @{
+                    var LoaiLinhKien = Model.baoHanhSearch.LoaiLinhKien;
+                    var NhaSanXuat = Model.baoHanhSearch.NhaSanXuat;
+                }
                 <select name="LoaiLinhKien">
                     <option value=""></option>
                     @foreach(var item in Model.linhKiens)
                     {
-                        <option value="@item.IdLoaiLinhKien">@item.TenLoaiLinhKien</option>
+                        if (item.IdLoaiLinhKien == LoaiLinhKien)
+                        {
+                            <option value="@item.IdLoaiLinhKien" selected>@item.TenLoaiLinhKien</option>
+
+                        }
+                        else
+                        {
+                            <option value="@item.IdLoaiLinhKien">@item.TenLoaiLinhKien</option>
+
+                        }
                     }
 
                 </select>
@@ -60,20 +120,74 @@
                     <option value=""></option>
                     @foreach (var item in Model.nhaSanXuats)
                     {
-                        <option value="@item.IdNsx">@item.TenNsx</option>
+                        if (item.IdNsx == NhaSanXuat)
+                        {
+                            <option value="@item.IdNsx" selected>@item.TenNsx</option>
+
+                        }
+                        else
+                        {
+                            <option value="@item.IdNsx">@item.TenNsx</option>
+
+                        }
+                       
                     }
                 </select>
             </div>
 
             <div class="sort-section">
                 <span>Sắp xếp theo:</span>
-                <select>
-                    <option value=""></option>
-                    <option value="datedesc">Ngày kích hoạt (mới nhất)</option>
-                    <option value="dateasc">Ngày kích hoạt (cũ nhất)</option>
-                    <option value="outdesc">Ngày hết hạn (sớm nhất)</option>
-                    <option value="outasc">Ngày hết hạn (muộn nhất)</option>
+                @{
+                    var xapSep = Model.baoHanhSearch.SapXepTheo;
+                }
+                <select name="SapXepTheo">
+                    @if (string.IsNullOrEmpty(xapSep))
+                    {
+                        <option value="" selected>-- Chọn sắp xếp --</option>
+                    }
+                    else
+                    {
+                        <option value="">-- Chọn sắp xếp --</option>
+                    }
+
+                    @if (xapSep == "datedesc")
+                    {
+                        <option value="datedesc" selected>Ngày kích hoạt (mới nhất)</option>
+                    }
+                    else
+                    {
+                        <option value="datedesc">Ngày kích hoạt (mới nhất)</option>
+                    }
+
+                    @if (xapSep == "dateasc")
+                    {
+                        <option value="dateasc" selected>Ngày kích hoạt (cũ nhất)</option>
+                    }
+                    else
+                    {
+                        <option value="dateasc">Ngày kích hoạt (cũ nhất)</option>
+                    }
+
+                    @if (xapSep == "outdesc")
+                    {
+                        <option value="outdesc" selected>Ngày hết hạn (sớm nhất)</option>
+                    }
+                    else
+                    {
+                        <option value="outdesc">Ngày hết hạn (sớm nhất)</option>
+                    }
+
+                    @if (xapSep == "outasc")
+                    {
+                        <option value="outasc" selected>Ngày hết hạn (muộn nhất)</option>
+                    }
+                    else
+                    {
+                        <option value="outasc">Ngày hết hạn (muộn nhất)</option>
+                    }
                 </select>
+
+
             </div>
         </div>
 

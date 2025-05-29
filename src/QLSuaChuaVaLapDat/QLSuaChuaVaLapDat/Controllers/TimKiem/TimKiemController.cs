@@ -736,7 +736,13 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
         [HttpGet]
         public async Task<IActionResult> TimKiemBaoHanh()
         {
-            
+            Paging paging = new Paging();
+            int pageIndex = paging.PageActive;
+            int pageSize = paging.PageSize;
+
+            int totalRecords = await _context.ChiTietDonDichVus.CountAsync();
+            int totalPage = (int)Math.Ceiling((double)totalRecords / pageSize);
+
             // Query ChiTietDonDichVu directly
             var chiTietDonDichVus = await _context.ChiTietDonDichVus
                 .Include(ct => ct.IdDonDichVuNavigation)
@@ -767,16 +773,25 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 DieuKien = ct.IdLinhKienNavigation?.DieuKienBaoHanh?? null
             }).ToList();
 
-            chiTietDonHangDtos = chiTietDonHangDtos.OrderBy(dto => dto.idDonDichVu).ToList();
+            chiTietDonHangDtos = chiTietDonHangDtos.OrderBy(dto => dto.idDonDichVu)
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
 
             var loaiLK = await _context.LoaiLinhKiens.ToListAsync();
             var NhaSX = await _context.NhaSanXuats.ToListAsync();
 
+            paging.TotalPage = totalPage;
+            paging.PageActive = pageIndex;
+            BaoHanhSearch baoHanhSearchNew = new BaoHanhSearch();
             BaoHanhSearchVM baohanhView = new BaoHanhSearchVM
             {
                 ChiTietDonHangs = chiTietDonHangDtos,
                 nhaSanXuats = NhaSX,
-                linhKiens = loaiLK
+                linhKiens = loaiLK,
+                Paging = paging,
+                baoHanhSearch = baoHanhSearchNew
             };
 
             return View(baohanhView);
@@ -788,6 +803,9 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
         [HttpPost]
         public async Task<IActionResult> TimKiemBaoHanh(BaoHanhSearch baoHanhSearch)
         {
+            Paging paging = new Paging();
+            int pageIndex = baoHanhSearch.PageActive > 0 ? baoHanhSearch.PageActive : 1;
+            int pageSize = paging.PageSize;
             // Query ChiTietDonDichVu directly to simplify mapping
             var query = _context.ChiTietDonDichVus
                 .Include(ct => ct.IdDonDichVuNavigation)
@@ -863,6 +881,8 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 DieuKien = ct.IdLinhKienNavigation?.DieuKienBaoHanh ?? null
             }).ToList();
 
+
+
             // Sorting
             if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheo))
             {
@@ -883,17 +903,25 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
             {
                 chiTietDonHangDtos = chiTietDonHangDtos.OrderBy(dto => dto.idDonDichVu).ToList();
             }
+            int TotalRecords = chiTietDonHangDtos.Count;
+            int TotalPage= (int)Math.Ceiling((double)TotalRecords / pageSize);
+            chiTietDonHangDtos = chiTietDonHangDtos.Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize).ToList();
+            paging.TotalPage = TotalPage;
+            paging.PageActive = baoHanhSearch.PageActive;
 
             // Fetch additional data for the view
             var loaiLK = await _context.LoaiLinhKiens.ToListAsync();
             var NhaSX = await _context.NhaSanXuats.ToListAsync();
-
-            // Update BaoHanhSearchVM to use the DTO list
+            BaoHanhSearch baoHanhSearchNew = new BaoHanhSearch();
+            baoHanhSearchNew = baoHanhSearch;
             BaoHanhSearchVM baohanhView = new BaoHanhSearchVM
             {
-                ChiTietDonHangs = chiTietDonHangDtos, // Update BaoHanhSearchVM to use List<ChiTietDonHangDTO>
+                ChiTietDonHangs = chiTietDonHangDtos, 
                 nhaSanXuats = NhaSX,
-                linhKiens = loaiLK
+                linhKiens = loaiLK,
+                Paging = paging,
+                baoHanhSearch =baoHanhSearchNew 
             };
 
             return View(baohanhView);
