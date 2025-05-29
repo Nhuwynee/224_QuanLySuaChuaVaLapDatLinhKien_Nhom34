@@ -365,27 +365,28 @@ INSERT INTO LoaiLinhKien (idLoaiLinhKien, tenLoaiLinhKien) VALUES
 ('LLK019', N'Mạch sạc / pin'),
 ('LLK020', N'Cầu chì / Bảo vệ mạch');
 
-INSERT INTO LinhKien (idLinhKien, idNSX, idLoaiLinhKien, tenLinhKien, gia, soLuong, anh, thoiGianBaoHanh, dieuKienBaoHanh) VALUES
-('LK001', 'NSX001', 'LLK001', N'Tụ điện 450V 50uF', 25000, 300, 'tu_dien_450v.jpg', '3', N'Bảo hành 12 tháng'),
-('LK002', 'NSX001', 'LLK002', N'Điện trở công suất 5W 220Ω', 5000, 500, 'dien_tro_5w.jpg', '6', N'Không đổi trả sau hư hỏng do quá tải'),
-('LK003', 'NSX002', 'LLK003', N'Cuộn cảm 10mH 5A lõi ferrite', 18000, 250, 'cuon_cam_10mh.jpg', '9', N'Bảo hành 6 tháng'),
-('LK004', 'NSX002', 'LLK004', N'Diode Schottky 1N5819', 3000, 1000, 'diode.jpg', '12', N'Không bảo hành do linh kiện nhỏ'),
-('LK005', 'NSX003', 'LLK005', N'Triac BTA16-600B', 9000, 400, 'triac.jpg', '15', N'Bảo hành 3 tháng'),
-('LK006', 'NSX003', 'LLK006', N'MOSFET IRF540N 100V 33A', 12000, 600, 'mosfet.jpg', '18', N'Không bảo hành nếu chân gãy'),
-('LK007', 'NSX004', 'LLK007', N'IC nguồn LNK304PN', 15000, 350, 'ic_lnk.jpg', '24', N'Bảo hành 6 tháng'),
-('LK008', 'NSX004', 'LLK008', N'IC vi điều khiển ATmega328P', 40000, 200, 'ic_atmega.jpg', '3', N'Không bảo hành khi chân bị hàn lỗi'),
-('LK009', 'NSX005', 'LLK009', N'Relay 12VDC 10A', 18000, 450, 'relay_12v.jpg', '12', N'Bảo hành 6 tháng'),
-('LK010', 'NSX005', 'LLK010', N'Cảm biến nhiệt độ NTC 10K', 6000, 700, 'cam_bien_ntc.jpg', '6', N'Không bảo hành'),
-('LK011', 'NSX006', 'LLK011', N'Cảm biến dòng ACS712 20A', 35000, 300, 'cam_bien_acs.jpg', '7', N'Bảo hành 3 tháng'),
-('LK012', 'NSX006', 'LLK012', N'Mạch nguồn xung 5V 2A mini', 48000, 150, 'mach_nguon_5v.jpg', '3', N'Bảo hành 12 tháng'),
-('LK013', 'NSX007', 'LLK013', N'Mạch inverter 220V LED', 65000, 100, 'mach_led.jpg', '12', N'Bảo hành 6 tháng'),
-('LK014', 'NSX007', 'LLK014', N'Mạch điều khiển vi xử lý STM32', 98000, 120, 'mach_stm32.jpg', '12', N'Bảo hành 6 tháng'),
-('LK015', 'NSX008', 'LLK015', N'Socket DIP 28 chân', 3000, 1000, 'socket_dip.jpg', '3', N'Không bảo hành'),
-('LK016', 'NSX008', 'LLK016', N'Jack nguồn DC 5.5mm', 2000, 1200, 'jack_dc.jpg', '6', N'Không bảo hành'),
-('LK017', 'NSX009', 'LLK017', N'Motor DC 12V 200rpm', 50000, 160, 'motor_12v.jpg', '12', N'Bảo hành 6 tháng'),
-('LK018', 'NSX009', 'LLK018', N'Board mạch điện tử đa năng', 75000, 140, 'board.jpg', '9', N'Bảo hành 12 tháng'),
-('LK019', 'NSX010', 'LLK019', N'Mạch sạc pin lithium 3.7V TP4056', 12000, 400, 'mach_tp.jpg', '6', N'Không bảo hành'),
-('LK020', 'NSX010', 'LLK020', N'Cầu chì 5A 250V chân cắm', 4000, 600, 'cauchi_5a.jpg', '12', N'Không bảo hành');
+INSERT INTO LinhKien (idLinhKien, idNSX, idLoaiLinhKien, tenLinhKien, gia, soLuong, thoiGianBaoHanh, dieuKienBaoHanh) VALUES
+('LK001', 'NSX001', 'LLK001', N'Tụ điện 450V 50uF', 25000, 300, 3, N'Bảo hành lỗi từ nhà sản xuất hoặc hư hỏng do vận chuyển'),
+('LK002', 'NSX001', 'LLK002', N'Điện trở công suất 5W 220Ω', 5000, 500, 6, N'Bảo hành lỗi kỹ thuật hoặc sử dụng sai điện áp'),
+('LK003', 'NSX002', 'LLK003', N'Cuộn cảm 10mH 5A lõi ferrite', 18000, 250, 9, N'Bảo hành lỗi vật liệu hoặc môi trường ẩm ướt'),
+('LK004', 'NSX002', 'LLK004', N'Diode Schottky 1N5819', 3000, 1000, 12, N'Bảo hành lỗi sản xuất hoặc quá nhiệt'),
+('LK005', 'NSX003', 'LLK005', N'Triac BTA16-600B', 9000, 400, 15, N'Bảo hành lỗi thiết kế hoặc hư hỏng do ngắn mạch'),
+('LK006', 'NSX003', 'LLK006', N'MOSFET IRF540N 100V 33A', 12000, 600, 18, N'Bảo hành lỗi từ nhà sản xuất hoặc va đập'),
+('LK007', 'NSX004', 'LLK007', N'IC nguồn LNK304PN', 15000, 350, 24, N'Bảo hành lỗi chip hoặc nguồn điện không ổn định'),
+('LK008', 'NSX004', 'LLK008', N'IC vi điều khiển ATmega328P', 40000, 200, 3, N'Bảo hành lỗi lập trình hoặc hư hỏng chân hàn'),
+('LK009', 'NSX005', 'LLK009', N'Relay 12VDC 10A', 18000, 450, 12, N'Bảo hành lỗi cơ học hoặc quá tải'),
+('LK010', 'NSX005', 'LLK010', N'Cảm biến nhiệt độ NTC 10K', 6000, 700, 6, N'Bảo hành lỗi cảm biến hoặc môi trường khắc nghiệt'),
+('LK011', 'NSX006', 'LLK011', N'Cảm biến dòng ACS712 20A', 35000, 300, 7, N'Bảo hành lỗi đo lường hoặc hư hỏng do từ trường'),
+('LK012', 'NSX006', 'LLK012', N'Mạch nguồn xung 5V 2A mini', 48000, 150, 3, N'Bảo hành lỗi linh kiện hoặc điện áp không đúng'),
+('LK013', 'NSX007', 'LLK013', N'Mạch inverter 220V LED', 65000, 100, 12, N'Bảo hành lỗi biến áp hoặc sử dụng sai tải'),
+('LK014', 'NSX007', 'LLK014', N'Mạch điều khiển vi xử lý STM32', 98000, 120, 12, N'Bảo hành lỗi phần mềm hoặc hư hỏng do sét đánh'),
+('LK015', 'NSX008', 'LLK015', N'Socket DIP 28 chân', 3000, 1000, 0, N'Không bảo hành do linh kiện tiêu hao'),
+('LK016', 'NSX008', 'LLK016', N'Jack nguồn DC 5.5mm', 2000, 1200, 0, N'Không bảo hành do hư hỏng vật lý'),
+('LK017', 'NSX009', 'LLK017', N'Motor DC 12V 200rpm', 50000, 160, 12, N'Bảo hành lỗi động cơ hoặc quá tải'),
+('LK018', 'NSX009', 'LLK018', N'Board mạch điện tử đa năng', 75000, 140, 9, N'Bảo hành lỗi hàn hoặc môi trường bụi bẩn'),
+('LK019', 'NSX010', 'LLK019', N'Mạch sạc pin lithium 3.7V TP4056', 12000, 400, 6, N'Bảo hành lỗi mạch hoặc pin bị phồng'),
+('LK020', 'NSX010', 'LLK020', N'Cầu chì 5A 250V chân cắm', 4000, 600, 0, N'Không bảo hành do cháy nổ');
+GO
 
 
 INSERT INTO PhiLapDat (idPhiLapDat, idLinhKien, phi, ngayApDung) VALUES
@@ -693,7 +694,8 @@ VALUES
 
 -- Đơn 11: Khách vãng lai, NV kỹ thuật NVKT05
 ('DDV011', NULL, 'KVL005', 'NVKT010', 'CSKH015', 'TB010', N'RAM DDR4 8GB', N'Khách vãng lai', '2025-02-10 11:00:00', '2025-02-10 12:30:00', 600000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Đang sửa chữa', '2025-02-10 12:30:00');
-
+select * from ChiTietDonDichVu
+select * from LinhKien
 -- Thêm chi tiết đơn dịch vụ cho 10 đơn trên (mỗi đơn 2 chi tiết)
 INSERT INTO ChiTietDonDichVu (idCTDH, idDonDichVu, idLinhKien, idLoi, loaiDichVu, moTa, soLuong, ngayKetThucBH, thoiGianThemLinhKien, hanBaoHanh)
 VALUES

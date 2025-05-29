@@ -344,17 +344,18 @@ input, select {
     margin-bottom: 10px;
 }
 
-    .price-inputs input {
-        width: 48%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        text-align: center;
-        font-size: 16px;
-        font-weight: bold;
-    }
+.price-inputs input {
+    width: 48%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
 
 .slider-container {
+    overflow: hidden;
     position: relative;
     height: 36px;
 }

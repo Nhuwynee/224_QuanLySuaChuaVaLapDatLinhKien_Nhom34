@@ -12,6 +12,7 @@
         public string NhomKhachHang { get; set; } 
         public string CuaHang { get; set; }      
         public string SapXepTheo { get; set; }   
+        public int pageActive { get; set; }
         
         public KhachHangSearch() {
             NhomKhachHang = null;

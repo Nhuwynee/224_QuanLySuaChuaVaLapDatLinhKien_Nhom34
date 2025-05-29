@@ -12,6 +12,7 @@
         public string LocTheo { get; set; } 
         public string SapXep { get; set; } 
         public int TTSanPham { set; get; }
+        public int PageActive { get; set; } = 1;
 
         public LinhKienSearch()
         {

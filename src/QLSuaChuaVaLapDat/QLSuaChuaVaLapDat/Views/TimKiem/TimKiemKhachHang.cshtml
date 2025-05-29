@@ -7,7 +7,7 @@
         <div class="search-header">
             <div class="search-title">Tìm kiếm Khách hàng</div>
             <div class="search-actions">
-                <button class="btn btn-secondary">Làm mới</button>
+                <button class="btn btn-secondary" onclick="resetForm()">Làm mới</button>
                 <button class="btn btn-primary">Tìm kiếm</button>
             </div>
         </div>
@@ -15,12 +15,16 @@
         <div class="search-fields">
             <div class="form-group">
                 <label for="cus-name">Tên khách hàng</label>
-                <input type="text" name="TenKhachHang" id="cus-name" placeholder="Nhập tên khách hàng...">
+                <input type="text" name="TenKhachHang" id="cus-name" @(Model.KhachHangSearch?.TenKhachHang != null
+                       ? $"value={Model.KhachHangSearch.TenKhachHang}"
+                       : "") placeholder="Nhập tên khách hàng...">
             </div>
 
             <div class="form-group">
                 <label for="cus-phone">Số điện thoại</label>
-                <input type="text" name="SoDienThoai" id="cus-phone" placeholder="Nhập số điện thoại...">
+                <input type="text" name="SoDienThoai" id="cus-phone" @(Model.KhachHangSearch?.SoDienThoai != null
+                       ? $"value={Model.KhachHangSearch.SoDienThoai}"
+                       : "") placeholder="Nhập số điện thoại...">
             </div>
 
             <div class="form-group">
@@ -52,24 +56,86 @@
         <div class="filter-sort">
             <div class="filter-section">
                 <span>Lọc theo:</span>
-                <select name="LoaiKhachHang" >
-                    <option value=""></option>
-                    <option value="Users">Khách hàng</option>
-                    <option value="KhachVangLais">Khách vãng lai</option>
+                <select name="LoaiKhachHang" onchange="submitForm()">
+                    @{
+                        var loaiKH = Model.KhachHangSearch?.LoaiKhachHang;
+                    }
+                    <option value="">Loại khách</option>
+                    @if (loaiKH == "Users")
+                        {
+                            <option value="Users" selected>Khách hàng</option>
+                        }
+                    else
+                        {
+                            <option value="Users">Khách hàng</option>
+                        }
+                    @if (loaiKH == "KhachVangLais")
+                    {
+                        <option value="KhachVangLais" selected>Khách vãng lai</option>
+                    }
+                    else
+                    {
+                        <option value="KhachVangLais">Khách vãng lai</option>
+                    }
                 </select>
                
             </div>
 
             <div class="sort-section">
                 <span>Sắp xếp theo:</span>
-                <select name="SapXepTheo">
+                <select name="SapXepTheo" onchange="submitForm()">
+                    @{
+                        var sxTheo = Model.KhachHangSearch?.SapXepTheo;
+                    }
                     <option value=""></option>
-                    <option value ="asc">Tên A-Z</option>
-                    <option value ="desc">Tên Z-A</option>
-                    <option value ="ddvdesc">Số đơn nhiều nhất</option>
-                    <option value="ddvasc">Số đơn ít nhất</option>
-                    <option value="ctdesc">Tổng chi tiêu cao nhất</option>
-                    <option value="ctasc">Tổng chi tiêu thấp nhất</option>
+                    @if (sxTheo == "asc")
+                    {
+                        <option value="asc" selected>Tên A-Z</option>
+                    }
+                    else
+                    {
+                        <option value="asc">Tên A-Z</option>
+                    }
+                    @if (sxTheo == "desc")
+                    {
+                        <option value="desc" selected>Tên Z-A</option>
+                    }
+                    else
+                    {
+                        <option value="desc">Tên Z-A</option>
+                    }
+                    @if (sxTheo == "ddvdesc")
+                    {
+                        <option value="ddvdesc" selected>Số đơn nhiều nhất</option>
+                    }
+                    else
+                    {
+                        <option value="ddvdesc">Số đơn nhiều nhất</option>
+                    }
+                    @if (sxTheo == "ddvasc")
+                    {
+                        <option value="ddvasc" selected>Số đơn ít nhất</option>
+                    }
+                    else
+                    {
+                        <option value="ddvasc">Số đơn ít nhất</option>
+                    }
+                    @if (sxTheo == "ctdesc")
+                    {
+                        <option value="ctdesc" selected>Tổng chi tiêu cao nhất</option>
+                    }
+                    else
+                    {
+                        <option value="ctdesc">Tổng chi tiêu cao nhất</option>
+                    }
+                    @if (sxTheo == "ctasc")
+                    {
+                        <option value="ctasc" selected>Tổng chi tiêu thấp nhất</option>
+                    }
+                    else
+                    {
+                        <option value="ctasc">Tổng chi tiêu thấp nhất</option>
+                    }
                 </select>
             </div>
         </div>
@@ -134,7 +200,7 @@
                             <td>Nữ</td>
                         }
                         <td>@item.TongDon</td>
-                        <td>@(item.tongDonHang.ToString("#,##0") + " vnđ" ?? "0,00 vnđ")</td>
+                        <td>@(item.tongDonHang.ToString("#,##0") + " VND" ?? "0,00 VND")</td>
                         <td class="action-buttons">
                             <button class="btn btn-edit">Sửa</button>
                             <button class="btn btn-lock">Khóa</button>
@@ -162,6 +228,7 @@
                     </tr>
                 }
         </tbody>
+          
     </table>
 
         <div class="pagination">
@@ -176,6 +243,7 @@
             }
         </div>
 </div>
+    <input type="hidden" id="page_active" name="PageActive" value="1" />
 </form>
 
 <script>
@@ -261,5 +329,22 @@
       function submitForm() {
         document.getElementById("searchForm").submit();
     }
+    function resetForm() {
+
+        const inputs = document.querySelectorAll('#searchForm input, #searchForm select');
+
+        inputs.forEach(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+                input.checked = false;
+            } else {
+                input.value = '';
+            }
+        });
+
+        document.getElementById('page_active').value = '1';
+
+        submitForm();
+    }
+
 
 </script>

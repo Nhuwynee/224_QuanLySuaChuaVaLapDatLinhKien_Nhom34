@@ -17,8 +17,8 @@
                 <label for="so-id">Mã đơn dịch vụ</label>
                 <input type="text" id="so-id" name="MaDonDichVu"
                 @(Model.donDichVuSearch.MaDonDichVu != null
-                                                                                        ? $"value={Model.donDichVuSearch.MaDonDichVu}"
-                                                                                        : "")
+                    ? $"value={Model.donDichVuSearch.MaDonDichVu}"
+                    : "")
                 placeholder="Nhập mã đơn...">
 
             </div>
@@ -27,8 +27,8 @@
                 <label for="so-customer">Khách hàng</label>
                 <input type="text" id="so-customer" name="TenKhachHang"
                 @(Model.donDichVuSearch.TenKhachHang != null
-                                                                                        ? $"value={Model.donDichVuSearch.TenKhachHang}"
-                                                                                        : "")
+                    ? $"value={Model.donDichVuSearch.TenKhachHang}"
+                    : "")
                 placeholder="Nhập tên hoặc SĐT...">
             </div>
 
@@ -36,8 +36,8 @@
                 <label for="so-technician">Kỹ thuật viên</label>
                 <input type="text" id="so-technician" name="IDKyThuatVien"
                 @(Model.donDichVuSearch.IDKyThuatVien != null
-                                                                                        ? $"value={Model.donDichVuSearch.IDKyThuatVien}"
-                                                                                        : "")
+                    ? $"value={Model.donDichVuSearch.IDKyThuatVien}"
+                    : "")
                 placeholder="Nhập id kỹ thuật viên...">
             </div>
             @{
@@ -105,7 +105,7 @@
                     @{
                         var idTB = Model.donDichVuSearch.IdLoaiThietBi;
                     }
-                    <option value="">Tất cả</option>
+                    <option value="">Tất cả Thiết Bị</option>
                     @foreach (var item in Model.loaiTB)
                     {
                         if (item.IdLoaiThietBi == idTB)
@@ -119,10 +119,41 @@
 
                     } 
                 </select>
-                <select name="LoaiDichVu"">
-                <option value="">Loại dịch vụ</option>
-                <option value="Sửa chữa">Sửa chữa</option>
-                <option value="Lắp đặt">Lắp đặt</option>
+
+
+                @{
+                    var loaiDV = Model.donDichVuSearch.LoaiDichVu;
+                }
+                <select name="LoaiDichVu"" onchange="submitForm()">
+
+                @if (loaiDV == null)
+                {
+                        <option value="" selected>Loại dịch vụ</option>
+                }
+                else
+                {
+                        <option value="">Loại dịch vụ</option>
+                }
+                @if (loaiDV == "Sửa chữa")
+                {
+                        <option value="Sửa chữa" selected>
+                            Sửa chữa
+                        </option>
+                }
+                else
+                {
+                        <option value="Sửa chữa">Sửa chữa</option>
+                }
+                @if (loaiDV == "Lắp đặt")
+                {
+                        <option value="Lắp đặt" selected>
+                            Lắp đặt
+                        </option>
+                }
+                else
+                {
+                        <option value="Lắp đặt">Lắp đặt</option>
+                }
                 </select>
                 </div>
 
@@ -131,8 +162,8 @@
                 @{
                     var xapxep = Model.donDichVuSearch.SapXepTheo;
                 }
-                <select name="SapXepTheo" ">
-                    <option value="">Theo</option>
+                <select name="SapXepTheo" " onchange="submitForm()">
+                    <option value="">Sắp xếp theo</option>
                     @if (xapxep == "NgayTaoDesc")
                     {
                         <option value="NgayTaoDesc" selected>Ngày tạo (mới nhất)</option>
@@ -159,7 +190,7 @@
                         <option value="TongTienDesc">Tổng tiền (cao nhất)</option>
                     }
 
-                    @if (xapxep == "TongTienDesc")
+                    @if (xapxep == "TongTienAsc")
                     {
                         <option value="TongTienAsc" selected>Tổng tiền (thấp nhất)</option>
                     }
@@ -226,7 +257,7 @@
                         {
                             <td><span class="status status-cancelled">@item.TrangThaiDon</span></td>
                         }
-                        <td>@item.TongTien</td>
+                        <td>@(item.TongTien?.ToString("#,##0") + " VND" ?? "0,00 VND")</td>
                         <td>@(item.NgayTaoDon.HasValue ? item.NgayTaoDon.Value.ToString("dd/MM/yyyy") : "")</td>
                         <td>@item.NgayChinhSua</td>
                         <td><button class="btn btn-edit">Sửa</button></td>

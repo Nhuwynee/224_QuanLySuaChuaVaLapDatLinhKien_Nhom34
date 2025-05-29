@@ -11,5 +11,6 @@
         public string? LoaiLinhKien { get; set; } = null;
         public string? NhaSanXuat { get; set; }
         public string SapXepTheo { get; set; }
+        public int PageActive { get; set; } = 1;
     }
 }
