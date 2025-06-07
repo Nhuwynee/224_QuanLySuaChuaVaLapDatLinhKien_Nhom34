@@ -477,7 +477,7 @@
                                 var imgHtml = '';
                                 if (item.danhSachAnh && item.danhSachAnh.length > 0) {
                                     item.danhSachAnh.forEach(function(url) {
-                                    imgHtml += '<img src="' + url + '" alt="Ảnh lỗi" style="max-width:60px;max-height:60px;margin:2px;border-radius:4px;border:1px solid #ccc;cursor:pointer;" />';
+                                imgHtml += '<img src="' + url + '" alt="Ảnh lỗi" class="img-error-thumb" style="max-width:60px;max-height:60px;margin:2px;border-radius:4px;border:1px solid #ccc;cursor:pointer;" />';
                                     });
                                 } else {
                                     imgHtml = '<span class="text-muted">Không có</span>';
