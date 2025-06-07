@@ -132,7 +132,12 @@ namespace QLSuaChuaVaLapDat.Controllers.DanhSachDonDichVuController
                     LoaiDichVu = ctdv.LoaiDichVu,
                     NgayKetThucBh = ctdv.NgayKetThucBh != null ? new DateTime(ctdv.NgayKetThucBh.Value.Year, ctdv.NgayKetThucBh.Value.Month, ctdv.NgayKetThucBh.Value.Day) : null,
                     ThoiGianThemLinhKien = ctdv.ThoiGianThemLinhKien,
-                    HanBaoHanh = ctdv.HanBaoHanh
+                    HanBaoHanh = ctdv.HanBaoHanh,
+                    // Thêm dòng sau để lấy danh sách ảnh
+                    DanhSachAnh = _context.HinhAnhs
+                        .Where(h => h.IdCtdh == ctdv.IdCtdh)
+                        .Select(h => h.Anh) // hoặc h.TenFile nếu bạn lưu tên file
+                        .ToList()
                 }).ToList();
 
             if (danhSachChiTietLoi.Any())
