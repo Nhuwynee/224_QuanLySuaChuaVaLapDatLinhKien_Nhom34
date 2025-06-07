@@ -80,64 +80,7 @@
                 </select>
                
             </div>
-
-            <div class="sort-section">
-                <span>Sắp xếp theo:</span>
-                <select name="SapXepTheo" onchange="submitForm()">
-                    @{
-                        var sxTheo = Model.KhachHangSearch?.SapXepTheo;
-                    }
-                    <option value=""></option>
-                    @if (sxTheo == "asc")
-                    {
-                        <option value="asc" selected>Tên A-Z</option>
-                    }
-                    else
-                    {
-                        <option value="asc">Tên A-Z</option>
-                    }
-                    @if (sxTheo == "desc")
-                    {
-                        <option value="desc" selected>Tên Z-A</option>
-                    }
-                    else
-                    {
-                        <option value="desc">Tên Z-A</option>
-                    }
-                    @if (sxTheo == "ddvdesc")
-                    {
-                        <option value="ddvdesc" selected>Số đơn nhiều nhất</option>
-                    }
-                    else
-                    {
-                        <option value="ddvdesc">Số đơn nhiều nhất</option>
-                    }
-                    @if (sxTheo == "ddvasc")
-                    {
-                        <option value="ddvasc" selected>Số đơn ít nhất</option>
-                    }
-                    else
-                    {
-                        <option value="ddvasc">Số đơn ít nhất</option>
-                    }
-                    @if (sxTheo == "ctdesc")
-                    {
-                        <option value="ctdesc" selected>Tổng chi tiêu cao nhất</option>
-                    }
-                    else
-                    {
-                        <option value="ctdesc">Tổng chi tiêu cao nhất</option>
-                    }
-                    @if (sxTheo == "ctasc")
-                    {
-                        <option value="ctasc" selected>Tổng chi tiêu thấp nhất</option>
-                    }
-                    else
-                    {
-                        <option value="ctasc">Tổng chi tiêu thấp nhất</option>
-                    }
-                </select>
-            </div>
+            
         </div>
 
         <div class="select-all-container">
@@ -148,16 +91,31 @@
             <thead>
                 <tr>
                     <th><input type="checkbox" class="select-all" data-table="customers"></th>
-                    <th>Mã KH</th>
-                    <th>Tên User</th>
-                    <th>Tên khách hàng</th>
+                    <th class="cursor-pointer" onclick="sortTable('MaKH')">
+                        Mã KH <span class="sort-icon">@(Model.KhachHangSearch?.SapXepTheoMaKH == "MaKHAsc" ? "↑" : Model.KhachHangSearch?.SapXepTheoMaKH == "MaKHDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_MaKH" name="SapXepTheoMaKH" value="@Model.KhachHangSearch?.SapXepTheoMaKH" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('TenUser')">
+                        Tên đăng ký <span class="sort-icon">@(Model.KhachHangSearch?.SapXepTheoTenUser == "TenUserAsc" ? "↑" : Model.KhachHangSearch?.SapXepTheoTenUser == "TenUserDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TenUser" name="SapXepTheoTenUser" value="@Model.KhachHangSearch?.SapXepTheoTenUser" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('TenKhachHang')">
+                        Tên khách hàng <span class="sort-icon">@(Model.KhachHangSearch?.SapXepTheoTenKhachHang == "TenKhachHangAsc" ? "↑" : Model.KhachHangSearch?.SapXepTheoTenKhachHang == "TenKhachHangDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TenKhachHang" name="SapXepTheoTenKhachHang" value="@Model.KhachHangSearch?.SapXepTheoTenKhachHang" />
+                    </th>
                     <th>Số điện thoại</th>
                     <th>Địa chỉ</th>
                     <th>Ngày sinh</th>
-                    <th>Trạng thái </th>
+                    <th>Trạng thái</th>
                     <th>Giới tính</th>
-                    <th>Tổng số đơn</th>
-                    <th>Tổng số tiền sửa chữa</th>
+                    <th class="cursor-pointer" onclick="sortTable('TongSoDon')">
+                        Tổng số đơn <span class="sort-icon">@(Model.KhachHangSearch?.SapXepTheoTongSoDon == "TongSoDonAsc" ? "↑" : Model.KhachHangSearch?.SapXepTheoTongSoDon == "TongSoDonDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TongSoDon" name="SapXepTheoTongSoDon" value="@Model.KhachHangSearch?.SapXepTheoTongSoDon" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('TongSoTienSuaChua')">
+                        Tổng số tiền sửa chữa <span class="sort-icon">@(Model.KhachHangSearch?.SapXepTheoTongSoTienSuaChua == "TongSoTienSuaChuaAsc" ? "↑" : Model.KhachHangSearch?.SapXepTheoTongSoTienSuaChua == "TongSoTienSuaChuaDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TongSoTienSuaChua" name="SapXepTheoTongSoTienSuaChua" value="@Model.KhachHangSearch?.SapXepTheoTongSoTienSuaChua" />
+                    </th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -245,7 +203,21 @@
 </div>
     <input type="hidden" id="page_active" name="PageActive" value="1" />
 </form>
+<style>
+    .results-table th {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
 
+    .sort-icon {
+        margin-left: 5px;
+    }
+
+    .results-table th {
+        text-align: left;
+        font-size: 14px;
+    }
+</style>
 <script>
     const quans = @Html.Raw(Json.Serialize(Model.Quans));
     const phuongs = @Html.Raw(Json.Serialize(Model.Phuongs));
@@ -346,5 +318,23 @@
         submitForm();
     }
 
+    function sortTable(column) {
+        const columns = ['MaKH', 'TenUser', 'TenKhachHang', 'TongSoDon', 'TongSoTienSuaChua'];
+        columns.forEach(col => {
+            const input = document.getElementById(`sort_column_${col}`);
+            if (col === column) {
+                const currentSort = input.value;
+                let newSort = `${col}Asc`;
+                if (currentSort === `${col}Asc`) {
+                    newSort = `${col}Desc`;
+                } else if (currentSort === `${col}Desc`) {
+                    newSort = `${col}Asc`;
+                }
+                input.value = newSort;
+            } else {
 
+            }
+        });
+        submitForm();
+    }
 </script>

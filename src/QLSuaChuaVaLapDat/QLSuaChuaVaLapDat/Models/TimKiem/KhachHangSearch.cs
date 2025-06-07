@@ -10,13 +10,17 @@
         public string QuanHuyen { get; set; }   
         public string PhuongXa { get; set; }    
         public string NhomKhachHang { get; set; } 
-        public string CuaHang { get; set; }      
-        public string SapXepTheo { get; set; }   
+        public string CuaHang { get; set; }
+        public string? SapXepTheoMaKH { get; set; } = null;
+        public string? SapXepTheoTenUser { get; set; } = null;
+        public string? SapXepTheoTenKhachHang { get; set; } = null;
+        public string? SapXepTheoTongSoDon { get; set; } = null;
+        public string? SapXepTheoTongSoTienSuaChua { get; set; } = null;
         public int pageActive { get; set; }
         
         public KhachHangSearch() {
             NhomKhachHang = null;
-            SapXepTheo = null;
+           
         }
     }
 }

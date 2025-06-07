@@ -19,8 +19,7 @@
                 @(Model.donDichVuSearch.MaDonDichVu != null
                     ? $"value={Model.donDichVuSearch.MaDonDichVu}"
                     : "")
-                placeholder="Nhập mã đơn...">
-
+                       placeholder="Nhập mã đơn...">
             </div>
 
             <div class="form-group">
@@ -29,7 +28,7 @@
                 @(Model.donDichVuSearch.TenKhachHang != null
                     ? $"value={Model.donDichVuSearch.TenKhachHang}"
                     : "")
-                placeholder="Nhập tên hoặc SĐT...">
+                       placeholder="Nhập tên hoặc SĐT...">
             </div>
 
             <div class="form-group">
@@ -38,14 +37,14 @@
                 @(Model.donDichVuSearch.IDKyThuatVien != null
                     ? $"value={Model.donDichVuSearch.IDKyThuatVien}"
                     : "")
-                placeholder="Nhập id kỹ thuật viên...">
+                       placeholder="Nhập id kỹ thuật viên...">
             </div>
             @{
                 var trangthai = Model.donDichVuSearch.TrangThaiDV;
             }
             <div class="form-group">
                 <label for="so-status">Trạng thái</label>
-                <select id="so-status" name="TrangThaiDV" >
+                <select id="so-status" name="TrangThaiDV" onchange="submitForm()">
                     @if (trangthai == null)
                     {
                         <option value="" selected>Tất cả</option>
@@ -56,32 +55,22 @@
                     }
                     @if (trangthai == "processing")
                     {
-                        <option value="processing" selected> 
-                            Đang xử lý 
-                        </option>
+                        <option value="processing" selected>Đang xử lý</option>
                     }
                     else
                     {
-                        <option value="processing">
-                            Đang xử lý
-                        </option>
+                        <option value="processing">Đang xử lý</option>
                     }
                     @if (trangthai == "completed")
                     {
-                        <option value="completed" selected>
-                            Hoàn thành
-                        </option>
+                        <option value="completed" selected>Hoàn thành</option>
                     }
                     else
                     {
-                        <option value="completed">
-                            Hoàn thành
-                        </option>
+                        <option value="completed">Hoàn thành</option>
                     }
-
                 </select>
             </div>
-
 
             <div class="form-group">
                 <label for="so-date-from">Từ ngày</label>
@@ -116,90 +105,37 @@
                         {
                             <option value="@item.IdLoaiThietBi">@item.TenLoaiThietBi</option>
                         }
-
-                    } 
+                    }
                 </select>
-
 
                 @{
                     var loaiDV = Model.donDichVuSearch.LoaiDichVu;
                 }
-                <select name="LoaiDichVu"" onchange="submitForm()">
-
-                @if (loaiDV == null)
-                {
+                <select name="LoaiDichVu" onchange="submitForm()">
+                    @if (loaiDV == null)
+                    {
                         <option value="" selected>Loại dịch vụ</option>
-                }
-                else
-                {
+                    }
+                    else
+                    {
                         <option value="">Loại dịch vụ</option>
-                }
-                @if (loaiDV == "Sửa chữa")
-                {
-                        <option value="Sửa chữa" selected>
-                            Sửa chữa
-                        </option>
-                }
-                else
-                {
+                    }
+                    @if (loaiDV == "Sửa chữa")
+                    {
+                        <option value="Sửa chữa" selected>Sửa chữa</option>
+                    }
+                    else
+                    {
                         <option value="Sửa chữa">Sửa chữa</option>
-                }
-                @if (loaiDV == "Lắp đặt")
-                {
-                        <option value="Lắp đặt" selected>
-                            Lắp đặt
-                        </option>
-                }
-                else
-                {
+                    }
+                    @if (loaiDV == "Lắp đặt")
+                    {
+                        <option value="Lắp đặt" selected>Lắp đặt</option>
+                    }
+                    else
+                    {
                         <option value="Lắp đặt">Lắp đặt</option>
-                }
-                </select>
-                </div>
-
-                <div class="sort-section">
-                <span>Sắp xếp theo:</span>
-                @{
-                    var xapxep = Model.donDichVuSearch.SapXepTheo;
-                }
-                <select name="SapXepTheo" " onchange="submitForm()">
-                    <option value="">Sắp xếp theo</option>
-                    @if (xapxep == "NgayTaoDesc")
-                    {
-                        <option value="NgayTaoDesc" selected>Ngày tạo (mới nhất)</option>
                     }
-                    else
-                    {
-                        <option value="NgayTaoDesc">Ngày tạo (mới nhất)</option>
-                    }
-
-                    @if (xapxep == "NgayTaoAsc")
-                    {
-                        <option value="NgayTaoAsc" selected>Ngày tạo (cũ nhất)</option>
-                    }
-                    else
-                    {
-                        <option value="NgayTaoAsc">Ngày tạo (cũ nhất)</option>
-                    }
-                    @if (xapxep == "TongTienDesc")
-                    {
-                        <option value="TongTienDesc" selected>Tổng tiền (cao nhất)</option>
-                    }
-                    else
-                    {
-                        <option value="TongTienDesc">Tổng tiền (cao nhất)</option>
-                    }
-
-                    @if (xapxep == "TongTienAsc")
-                    {
-                        <option value="TongTienAsc" selected>Tổng tiền (thấp nhất)</option>
-                    }
-                    else
-                    {
-                        <option value="TongTienAsc">Tổng tiền (thấp nhất)</option>
-                    }
-
-                    
                 </select>
             </div>
         </div>
@@ -214,13 +150,34 @@
             <thead>
                 <tr>
                     <th><input type="checkbox" class="select-all" data-table="service-orders"></th>
-                    <th>Mã đơn</th>
-                    <th>Khách hàng</th>
-                    <th>Thiết bị</th>
-                    <th>Loại dịch vụ</th>
-                    <th>Trạng thái</th>
-                    <th>Tổng tiền</th>
-                    <th>Ngày tạo</th>
+                    <th class="cursor-pointer" onclick="sortTable('IdDonDichVu')">
+                        Mã đơn <span class="sort-icon">@(Model.donDichVuSearch.SapXepTheoIdDonDichVu == "IdDonDichVuAsc" ? "↑" : Model.donDichVuSearch.SapXepTheoIdDonDichVu == "IdDonDichVuDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_IdDonDichVu" name="SapXepTheoIdDonDichVu" value="@Model.donDichVuSearch.SapXepTheoIdDonDichVu" />
+
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('TenKhachHang')">
+                        Khách hàng <span class="sort-icon">@(Model.donDichVuSearch.SapXepTheoTenKhachHang == "TenKhachHangAsc" ? "↑" : Model.donDichVuSearch.SapXepTheoTenKhachHang == "TenKhachHangDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TenKhachHang" name="SapXepTheoTenKhachHang" value="@Model.donDichVuSearch.SapXepTheoTenKhachHang" />
+
+                    </th>
+                    <th class="cursor-pointer">
+                        Thiết bị
+                    </th>
+                    <th class="cursor-pointer">
+                        Loại DV
+                    </th>
+                    <th class="cursor-pointer">
+                        Trạng thái
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('TongTien')">
+                        Tổng tiền <span class="sort-icon">@(Model.donDichVuSearch.SapXepTheoTongTien == "TongTienAsc" ? "↑" : Model.donDichVuSearch.SapXepTheoTongTien == "TongTienDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TongTien" name="SapXepTheoTongTien" value="@Model.donDichVuSearch.SapXepTheoTongTien" />
+
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('NgayTao')">
+                        Ngày tạo <span class="sort-icon">@(Model.donDichVuSearch.SapXepTheoNgayTao == "NgayTaoAsc" ? "↑" : Model.donDichVuSearch.SapXepTheoNgayTao == "NgayTaoDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_NgayTao" name="SapXepTheoNgayTao" value="@Model.donDichVuSearch.SapXepTheoNgayTao" />
+                    </th>
                     <th>Cập nhật</th>
                     <th>Hành động</th>
                 </tr>
@@ -271,57 +228,76 @@
                 int totalPage = Model.Paging.TotalPage;
                 int currentPage = Model.Paging.PageActive;
             }
-
             @for (int i = 1; i <= totalPage; i++)
             {
                 <div class="page-item @(i == currentPage ? "active" : "")">@i</div>
             }
         </div>
-
     </div>
     <input type="hidden" id="page_active" name="PageActive" value="1" />
 </form>
+<style>
+    .results-table th {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
 
+    .sort-icon {
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .results-table th {
+        text-align: left;
+        font-size: 14px;
+    }
+</style>
 <script>
-
     const pageItems = document.querySelectorAll('.page-item');
-
-      pageItems.forEach(item => {
-          item.addEventListener('click', () => {
-              // Xóa class active khỏi tất cả
-              pageItems.forEach(i => i.classList.remove('active'));
-              // Thêm class active cho item được click
-              item.classList.add('active');
-
-              // Lấy số trang từ text của item
-              const pageNumber = item.innerText.trim();
-
-              // Gán vào input hidden
-              document.getElementById('page_active').value = pageNumber;
-
-              // Gửi form
-             submitForm();
-          });
-      });
+    pageItems.forEach(item => {
+        item.addEventListener('click', () => {
+            pageItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            const pageNumber = item.innerText.trim();
+            document.getElementById('page_active').value = pageNumber;
+            submitForm();
+        });
+    });
 
     function resetForm() {
-
         const inputs = document.querySelectorAll('#searchForm input, #searchForm select');
-
         inputs.forEach(input => {
             if (input.type === 'checkbox' || input.type === 'radio') {
-                input.checked = false; 
+                input.checked = false;
             } else {
-                input.value = ''; 
+                input.value = '';
             }
         });
-
         document.getElementById('page_active').value = '1';
-
         submitForm();
     }
 
     function submitForm() {
         document.getElementById("searchForm").submit();
+    }
+
+    function sortTable(column) {
+        const columns = ['IdDonDichVu', 'TenKhachHang', 'TongTien', 'NgayTao'];
+        columns.forEach(col => {
+            const input = document.getElementById(`sort_column_${col}`);
+            if (col === column) {
+                const currentSort = input.value;
+                let newSort = `${col}Asc`;
+                if (currentSort === `${col}Asc`) {
+                    newSort = `${col}Desc`;
+                } else if (currentSort === `${col}Desc`) {
+                    newSort = `${col}Asc`;
+                }
+                input.value = newSort;
+            } else {
+                
+            }
+        });
+        submitForm();
     }
 </script>

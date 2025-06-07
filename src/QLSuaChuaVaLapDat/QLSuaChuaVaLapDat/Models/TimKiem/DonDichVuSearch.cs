@@ -10,7 +10,13 @@
         public string DenNgay { get; set; } = null;
         public string? LoaiDichVu { get; set; } = null;
         public string? IdLoaiThietBi { get; set; } = null;
-        public string? SapXepTheo { get; set; } = null;
+        public string SapXepTheoIdDonDichVu { get; set; }
+
+        public string SapXepTheoTenKhachHang { set; get; }
+
+        public string SapXepTheoTongTien { set; get; }
+
+        public string SapXepTheoNgayTao { set; get; }
 
         public int PageActive { get; set; } = 1;
         public DonDichVuSearch()

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using QLSuaChuaVaLapDat.Models;
 using QLSuaChuaVaLapDat.Models.Impl;
@@ -121,23 +122,58 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 query = query.Where(d => d.LoaiDonDichVu == donDichVuSearch.LoaiDichVu);
             }
 
-            
 
-            if (!string.IsNullOrEmpty(donDichVuSearch.SapXepTheo))
+
+            if (!string.IsNullOrEmpty(donDichVuSearch.SapXepTheoIdDonDichVu))
             {
-                query = donDichVuSearch.SapXepTheo switch
+                query = donDichVuSearch.SapXepTheoIdDonDichVu switch
                 {
-                    "NgayTaoDesc" => query.OrderByDescending(d => d.NgayTaoDon),
-                    "NgayTaoAsc" => query.OrderBy(d => d.NgayTaoDon),
-                    "TongTienDesc" => query.OrderByDescending(d => d.TongTien),
-                    "TongTienAsc" => query.OrderBy(d => d.TongTien),
-                    _ => query.OrderByDescending(d => d.NgayTaoDon),
+                    "IdDonDichVuAsc" => query.OrderBy(d => d.IdDonDichVu),
+                    "IdDonDichVuDesc" => query.OrderByDescending(d => d.IdDonDichVu),
+                    _ => query.OrderByDescending(d => d.NgayTaoDon) 
                 };
             }
-            else
+           if (!string.IsNullOrEmpty(donDichVuSearch.SapXepTheoTenKhachHang))
             {
-                query = query.OrderByDescending(d => d.NgayTaoDon);
+                query = donDichVuSearch.SapXepTheoTenKhachHang switch
+                {
+                    "TenKhachHangAsc" => query.OrderBy(d => d.IdUserNavigation != null ? d.IdUserNavigation.TenUser : d.IdKhachVangLaiNavigation.HoVaTen),
+                    "TenKhachHangDesc" => query.OrderByDescending(d => d.IdUserNavigation != null ? d.IdUserNavigation.TenUser : d.IdKhachVangLaiNavigation.HoVaTen),
+                    _ => query.OrderByDescending(d => d.NgayTaoDon)
+                };
             }
+            if (!string.IsNullOrEmpty(donDichVuSearch.SapXepTheoTongTien))
+            {
+                query = donDichVuSearch.SapXepTheoTongTien switch
+                {
+                    "TongTienAsc" => query.OrderBy(d => d.TongTien),
+                    "TongTienDesc" => query.OrderByDescending(d => d.TongTien),
+                    _ => query.OrderByDescending(d => d.NgayTaoDon)
+                };
+            }
+            if (!string.IsNullOrEmpty(donDichVuSearch.SapXepTheoNgayTao))
+            {
+                query = donDichVuSearch.SapXepTheoNgayTao switch
+                {
+                    "NgayTaoAsc" => query.OrderBy(d => d.NgayTaoDon),
+                    "NgayTaoDesc" => query.OrderByDescending(d => d.NgayTaoDon),
+                    _ => query.OrderByDescending(d => d.NgayTaoDon)
+                };
+            }
+            
+
+            //var data = await query.ToListAsync();
+
+            //switch (sortOrder)
+            //{
+            //    case "TenKhachHangAsc":
+            //        data = data.OrderBy(d => d.IdUserNavigation.TenUser.Split(' ').Last()).ToList();
+            //        break;
+
+            //    case "TenKhachHangDesc":
+            //        data = data.OrderByDescending(d => d.IdUserNavigation.TenUser.Split(' ').Last()).ToList();
+            //        break;
+            //}
 
 
             var pagedResult = await query.ToListAsync();
@@ -416,45 +452,85 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 }
             }
 
-            // Sorting
-            if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheo))
+
+            if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheoMaKH))
             {
-                switch (khachHangSearch.SapXepTheo)
+                switch (khachHangSearch.SapXepTheoMaKH)
                 {
-                    case "asc":
-                        userQuery = userQuery.OrderBy(u => u.User.HoVaTen);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.HoVaTen);
+                    case "MaKHAsc":
+                        userQuery = userQuery.OrderBy(u => u.User.IdUser);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.IdKhachVangLai);
                         break;
-                    case "desc":
-                        userQuery = userQuery.OrderByDescending(u => u.User.HoVaTen);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.KhachVangLai.HoVaTen);
-                        break;
-                    case "ddvdesc":
-                        userQuery = userQuery.OrderByDescending(u => u.TongDon);
-                        break;
-                    case "ddvasc":
-                        userQuery = userQuery.OrderBy(u => u.TongDon);
-                        break;
-                    case "ctasc":
-                        userQuery = userQuery.OrderBy(u => u.TongGiaTri);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.TongGiaTri);
-                        break;
-                    case "ctdesc":
-                        userQuery = userQuery.OrderByDescending(u => u.TongGiaTri);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.TongGiaTri);
+                    case "MaKHDesc":
+                        userQuery = userQuery.OrderByDescending(u => u.User.IdUser);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.KhachVangLai.IdKhachVangLai);
                         break;
                     default:
-                        userQuery = userQuery.OrderBy(u => u.User.HoVaTen);
+                        userQuery = userQuery.OrderBy(u => u.User.IdUser);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.IdKhachVangLai);
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheoTenUser))
+            {
+                switch (khachHangSearch.SapXepTheoTenUser)
+                {
+                    case "TenUserAsc":
+                        userQuery = userQuery.OrderBy(u => u.User.TenUser);
+                        break;
+                    case "TenUserDesc":
+                        userQuery = userQuery.OrderByDescending(u => u.User.TenUser);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.KhachVangLai.HoVaTen);
+                        break;
+                    default:
+                        userQuery = userQuery.OrderBy(u => u.User.TenUser);
                         khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.HoVaTen);
                         break;
                 }
             }
-            else
+            if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheoTenKhachHang))
             {
-                userQuery = userQuery.OrderBy(u => u.User.HoVaTen);
-                khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.HoVaTen);
+                switch (khachHangSearch.SapXepTheoTenKhachHang)
+                {
+                    case "TenKhachHangAsc":
+                        userQuery = userQuery.OrderBy(u => u.User.HoVaTen);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.HoVaTen);
+                        break;
+                    case "TenKhachHangDesc":
+                        userQuery = userQuery.OrderByDescending(u => u.User.HoVaTen);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.KhachVangLai.HoVaTen);
+                        break;
+                }
             }
-
+            if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheoTongSoDon))
+            {
+                switch (khachHangSearch.SapXepTheoTongSoDon)
+                {
+                    case "TongSoDonAsc":
+                        userQuery = userQuery.OrderBy(u => u.TongDon);
+                        
+                        break;
+                    case "TongSoDonDesc":
+                        userQuery = userQuery.OrderByDescending(u => u.TongDon);
+                        break;
+                   
+                }
+            }
+            if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheoTongSoTienSuaChua))
+            {
+                switch (khachHangSearch.SapXepTheoTongSoTienSuaChua)
+                {
+                    case "TongSoTienSuaChuaAsc":
+                        userQuery = userQuery.OrderBy(u => u.TongGiaTri);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.TongGiaTri);
+                        break;
+                    case "TongSoTienSuaChuaDesc":
+                        userQuery = userQuery.OrderByDescending(u => u.TongGiaTri);
+                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.TongGiaTri);
+                        break;
+                }
+            }
+            
             // Execute queries
             var dsKH = await userQuery
                 .Select(result => new NguoiDung
@@ -764,7 +840,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 TenLinhKien = ct.IdLinhKienNavigation?.TenLinhKien ?? "Không có linh kiện", // Add null check
                 TenLoi = ct.IdLoiNavigation?.MoTaLoi ?? "Không có lỗi",
                 LoaiDichVu = ct.IdDonDichVuNavigation.LoaiDonDichVu ?? "N/A",
-                TenKhachHang = ct.IdDonDichVuNavigation.IdKhachVangLaiNavigation?.HoVaTen ?? ct.IdDonDichVuNavigation.IdUserNavigation?.TenUser ?? "Khách vãng lai",
+                TenKhachHang = ct.IdDonDichVuNavigation.IdKhachVangLaiNavigation?.HoVaTen ?? ct.IdDonDichVuNavigation.IdUserNavigation?.HoVaTen ?? "Khách vãng lai",
                 NgayKichHoat = ct.ThoiGianThemLinhKien,
                 NgayHetHan = ct.NgayKetThucBh.HasValue
           ? ct.NgayKetThucBh.Value.ToDateTime(TimeOnly.MinValue)
@@ -836,7 +912,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
 
             if (baoHanhSearch.TrangThai != null)
             {
-                query = query.Where(ct => ct.IdDonDichVuNavigation.TrangThaiDon == baoHanhSearch.TrangThai);
+                query = query.Where(ct => ct.HanBaoHanh == baoHanhSearch.TrangThai);
             }
 
             if (baoHanhSearch.TuNgay.HasValue)
@@ -884,25 +960,55 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
 
 
             // Sorting
-            if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheo))
+            if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheoidDonDichVu))
             {
-                switch (baoHanhSearch.SapXepTheo)
-                {
-                    case "datedesc":
-                        chiTietDonHangDtos = chiTietDonHangDtos.OrderByDescending(dto => dto.NgayKichHoat).ToList();
-                        break;
-                    case "dateasc":
-                        chiTietDonHangDtos = chiTietDonHangDtos.OrderBy(dto => dto.NgayKichHoat).ToList();
-                        break;
-                    default:
-                        chiTietDonHangDtos = chiTietDonHangDtos.OrderBy(dto => dto.idDonDichVu).ToList();
-                        break;
-                }
+                chiTietDonHangDtos = baoHanhSearch.SapXepTheoidDonDichVu == "idDonDichVuAsc"
+                    ? chiTietDonHangDtos.OrderBy(dto => dto.idDonDichVu).ToList()
+                    : chiTietDonHangDtos.OrderByDescending(dto => dto.idDonDichVu).ToList();
             }
-            else
+            if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheoIDChiTietDonDichVu))
             {
-                chiTietDonHangDtos = chiTietDonHangDtos.OrderBy(dto => dto.idDonDichVu).ToList();
+                chiTietDonHangDtos = baoHanhSearch.SapXepTheoIDChiTietDonDichVu == "IDChiTietDonDichVuAsc"
+                    ? chiTietDonHangDtos.OrderBy(dto => dto.IDChiTietDonDichVu).ToList()
+                    : chiTietDonHangDtos.OrderByDescending(dto => dto.IDChiTietDonDichVu).ToList();
             }
+            if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheoMaLinhKien))
+            {
+                chiTietDonHangDtos = baoHanhSearch.SapXepTheoMaLinhKien == "MaLinhKienAsc"
+                    ? chiTietDonHangDtos.OrderBy(dto => dto.MaLinhKien).ToList()
+                    : chiTietDonHangDtos.OrderByDescending(dto => dto.MaLinhKien).ToList();
+            }
+            if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheoTenLinhKien))
+            {
+                chiTietDonHangDtos = baoHanhSearch.SapXepTheoTenLinhKien == "TenLinhKienAsc"
+                    ? chiTietDonHangDtos.OrderBy(dto => dto.TenLinhKien).ToList()
+                    : chiTietDonHangDtos.OrderByDescending(dto => dto.TenLinhKien).ToList();
+            }
+            if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheoTenKhachHang))
+            {
+                chiTietDonHangDtos = baoHanhSearch.SapXepTheoTenKhachHang == "TenKhachHangAsc"
+                    ? chiTietDonHangDtos.OrderBy(dto => dto.TenKhachHang).ToList()
+                    : chiTietDonHangDtos.OrderByDescending(dto => dto.TenKhachHang).ToList();
+            }
+            if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheoNgayKichHoat))
+            {
+                chiTietDonHangDtos = baoHanhSearch.SapXepTheoNgayKichHoat == "NgayKichHoatAsc"
+                    ? chiTietDonHangDtos.OrderBy(dto => dto.NgayKichHoat).ToList()
+                    : chiTietDonHangDtos.OrderByDescending(dto => dto.NgayKichHoat).ToList();
+            }
+            if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheoNgayHetHan))
+            {
+                chiTietDonHangDtos = baoHanhSearch.SapXepTheoNgayHetHan == "NgayHetHanAsc"
+                    ? chiTietDonHangDtos.OrderBy(dto => dto.NgayHetHan).ToList()
+                    : chiTietDonHangDtos.OrderByDescending(dto => dto.NgayHetHan).ToList();
+            }
+            if (!string.IsNullOrEmpty(baoHanhSearch.SapXepTheoTrangThaiBaoHanh))
+            {
+                chiTietDonHangDtos = baoHanhSearch.SapXepTheoTrangThaiBaoHanh == "TrangThaiBaoHanhAsc"
+                    ? chiTietDonHangDtos.OrderBy(dto => dto.TrangThaiBaoHanh).ToList()
+                    : chiTietDonHangDtos.OrderByDescending(dto => dto.TrangThaiBaoHanh).ToList();
+            }
+         
             int TotalRecords = chiTietDonHangDtos.Count;
             int TotalPage= (int)Math.Ceiling((double)TotalRecords / pageSize);
             chiTietDonHangDtos = chiTietDonHangDtos.Skip((pageIndex - 1) * pageSize)

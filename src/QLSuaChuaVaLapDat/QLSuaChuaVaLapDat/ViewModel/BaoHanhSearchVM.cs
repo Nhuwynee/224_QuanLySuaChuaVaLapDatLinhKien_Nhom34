@@ -10,5 +10,7 @@ namespace QLSuaChuaVaLapDat.ViewModel
         public List<NhaSanXuat> nhaSanXuats { get; set; }
         public Paging Paging { get; set; }
         public BaoHanhSearch baoHanhSearch { set; get; }
+
+
     }
 }

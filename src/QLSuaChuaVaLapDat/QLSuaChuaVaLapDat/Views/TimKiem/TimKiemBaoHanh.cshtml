@@ -50,22 +50,22 @@
                         <option value="">Tất cả</option>
                     }
 
-                    @if (trangThai == "active")
+                    @if (trangThai == true)
                     {
-                        <option value="active" selected>Đang bảo hành</option>
+                        <option value="1" selected>Đang bảo hành</option>
                     }
                     else
                     {
-                        <option value="active">Đang bảo hành</option>
+                        <option value="1">Đang bảo hành</option>
                     }
 
-                    @if (trangThai == "active")
+                    @if (trangThai == false)
                     {
-                        <option value="expired" selected>Hết hạn</option>
+                        <option value="0" selected>Hết hạn</option>
                     }
                     else
                     {
-                        <option value="expired">Hết hạn</option>
+                        <option value="0">Hết hạn</option>
                     }
 
 
@@ -135,80 +135,57 @@
                 </select>
             </div>
 
-            <div class="sort-section">
-                <span>Sắp xếp theo:</span>
-                @{
-                    var xapSep = Model.baoHanhSearch.SapXepTheo;
-                }
-                <select name="SapXepTheo">
-                    @if (string.IsNullOrEmpty(xapSep))
-                    {
-                        <option value="" selected>-- Chọn sắp xếp --</option>
-                    }
-                    else
-                    {
-                        <option value="">-- Chọn sắp xếp --</option>
-                    }
-
-                    @if (xapSep == "datedesc")
-                    {
-                        <option value="datedesc" selected>Ngày kích hoạt (mới nhất)</option>
-                    }
-                    else
-                    {
-                        <option value="datedesc">Ngày kích hoạt (mới nhất)</option>
-                    }
-
-                    @if (xapSep == "dateasc")
-                    {
-                        <option value="dateasc" selected>Ngày kích hoạt (cũ nhất)</option>
-                    }
-                    else
-                    {
-                        <option value="dateasc">Ngày kích hoạt (cũ nhất)</option>
-                    }
-
-                    @if (xapSep == "outdesc")
-                    {
-                        <option value="outdesc" selected>Ngày hết hạn (sớm nhất)</option>
-                    }
-                    else
-                    {
-                        <option value="outdesc">Ngày hết hạn (sớm nhất)</option>
-                    }
-
-                    @if (xapSep == "outasc")
-                    {
-                        <option value="outasc" selected>Ngày hết hạn (muộn nhất)</option>
-                    }
-                    else
-                    {
-                        <option value="outasc">Ngày hết hạn (muộn nhất)</option>
-                    }
-                </select>
-
-
-            </div>
+           
         </div>
 
         <div class="select-all-container">
             <label for="select-all-warranty" style="margin-top: 15px;">Chọn tất cả</label>
         </div>
-
+        <style>
+            .cursor-pointer{
+                cursor:pointer;
+            }
+        </style>
         <table class="results-table">
             <thead>
                 <tr>
                     <th><input type="checkbox" class="select-all" data-table="warranty"></th>
-                    <th>Mã BH</th>
-                    <th>Mã đơn</th>
-                    <th>Số ĐT</th>
-                    <th>Mã linh kiện/ lỗi</th>
-                    <th>Linh kiện/ Loại lỗi</th>
-                    <th>Loại dịch vụ</th>
-                    <th>Khách hàng</th>
-                    <th>Ngày kích hoạt</th>
-                    <th>Ngày hết hạn</th>
-                    <th>Trạng thái bảo hành</th>
+                    <th class="cursor-pointer" onclick="sortTable('idDonDichVu')">
+                        Mã BH <span class="sort-icon">@(Model.baoHanhSearch.SapXepTheoidDonDichVu == "idDonDichVuAsc" ? "↑" : Model.baoHanhSearch.SapXepTheoidDonDichVu == "idDonDichVuDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_idDonDichVu" name="SapXepTheoidDonDichVu" value="@Model.baoHanhSearch.SapXepTheoidDonDichVu" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('IDChiTietDonDichVu')">
+                        CTDV <span class="sort-icon">@(Model.baoHanhSearch.SapXepTheoIDChiTietDonDichVu == "IDChiTietDonDichVuAsc" ? "↑" : Model.baoHanhSearch.SapXepTheoIDChiTietDonDichVu == "IDChiTietDonDichVuDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_IDChiTietDonDichVu" name="SapXepTheoIDChiTietDonDichVu" value="@Model.baoHanhSearch.SapXepTheoIDChiTietDonDichVu" />
+                    </th>
+                    <th class="cursor-pointer">
+                        Số ĐT 
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('MaLinhKien')">
+                        Mã LK/ lỗi <span class="sort-icon">@(Model.baoHanhSearch.SapXepTheoMaLinhKien == "MaLinhKienAsc" ? "↑" : Model.baoHanhSearch.SapXepTheoMaLinhKien == "MaLinhKienDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_MaLinhKien" name="SapXepTheoMaLinhKien" value="@Model.baoHanhSearch.SapXepTheoMaLinhKien" />
+                    </th>
+                    <th class="cursor-pointer" >
+                        Linh kiện/ Loại lỗi
+                    </th>
+                    <th class="cursor-pointer" >
+                        Loại DV
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('TenKhachHang')">
+                        Khách hàng <span class="sort-icon">@(Model.baoHanhSearch.SapXepTheoTenKhachHang == "TenKhachHangAsc" ? "↑" : Model.baoHanhSearch.SapXepTheoTenKhachHang == "TenKhachHangDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TenKhachHang" name="SapXepTheoTenKhachHang" value="@Model.baoHanhSearch.SapXepTheoTenKhachHang" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('NgayKichHoat')">
+                        Ngày kích hoạt <span class="sort-icon">@(Model.baoHanhSearch.SapXepTheoNgayKichHoat == "NgayKichHoatAsc" ? "↑" : Model.baoHanhSearch.SapXepTheoNgayKichHoat == "NgayKichHoatDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_NgayKichHoat" name="SapXepTheoNgayKichHoat" value="@Model.baoHanhSearch.SapXepTheoNgayKichHoat" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('NgayHetHan')">
+                        Ngày hết hạn <span class="sort-icon">@(Model.baoHanhSearch.SapXepTheoNgayHetHan == "NgayHetHanAsc" ? "↑" : Model.baoHanhSearch.SapXepTheoNgayHetHan == "NgayHetHanDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_NgayHetHan" name="SapXepTheoNgayHetHan" value="@Model.baoHanhSearch.SapXepTheoNgayHetHan" />
+                    </th>
+                    <th class="cursor-pointer">
+                        Trạng thái BH
+                    </th>
                     <th>Điều kiện</th>
                     <th>Hành động</th>
                 </tr>
@@ -288,7 +265,22 @@
     </div>
     <input type="hidden" id="page_active" name="PageActive" value="1" />
 </form>
+<style>
+    .results-table th {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
 
+    .sort-icon {
+        margin-left: 5px;
+        cursor: pointer;
+    }
+
+    .results-table th {
+        text-align: left;
+        font-size: 13px;
+    }
+</style>
 <script>
     const pageItems = document.querySelectorAll('.page-item');
 
@@ -311,5 +303,25 @@
     });
        function submitForm() {
         document.getElementById("searchForm").submit();
+    }
+
+     function sortTable(column) {
+        const columns = ['idDonDichVu', 'IDChiTietDonDichVu', 'SDT', 'MaLinhKien', 'TenLinhKien', 'LoaiDichVu', 'TenKhachHang', 'NgayKichHoat', 'NgayHetHan'];
+        columns.forEach(col => {
+            const input = document.getElementById(`sort_column_${col}`);
+            if (col === column) {
+                const currentSort = input.value;
+                let newSort = `${col}Asc`;
+                if (currentSort === `${col}Asc`) {
+                    newSort = `${col}Desc`;
+                } else if (currentSort === `${col}Desc`) {
+                    newSort = `${col}Asc`;
+                }
+                input.value = newSort;
+            } else {
+
+            }
+        });
+        submitForm();
     }
 </script>
