@@ -8,7 +8,31 @@
             <div class="search-title">Tìm kiếm Đơn dịch vụ</div>
             <div class="search-actions">
                 <button class="btn btn-secondary2">Xuất Excel</button>
+                <input type="hidden" name="isexport" id="isexport" value="@ViewBag.IsExport" />
+
                 <button class="btn btn-primary2 mar">Xuất báo cáo</button>
+                <input type="hidden" name="isBaoCao" id="isBaoCao" value="@ViewBag.IsBaoCao" />
+
+                <script>
+                    document.querySelector('.btn.btn-secondary2').addEventListener('click', function (event) {
+                        event.preventDefault();
+                        document.getElementById('isexport').value = '1';
+                        document.getElementById('isBaoCao').value = '0';
+                        document.querySelector('form').submit();
+                        document.getElementById('isexport').value = '0';
+                    });
+
+                    document.querySelector('.btn.btn-primary2.mar').addEventListener('click', function (event) {
+                        event.preventDefault();
+                        document.getElementById('isBaoCao').value = '1';
+                        document.getElementById('isexport').value = '0'; 
+                        document.querySelector('form').submit();
+                        document.getElementById('isBaoCao').value = '0';
+                    });
+
+                   
+                </script>
+
                 <button type="button" class="btn btn-secondary" onclick="resetForm()">Làm mới</button>
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
             </div>
@@ -55,21 +79,21 @@
                     {
                         <option value="">Tất cả</option>
                     }
-                    @if (trangthai == "processing")
+                    @if (trangthai == "Đang sửa chữa")
                     {
-                        <option value="processing" selected>Đang xử lý</option>
+                        <option value="Đang sửa chữa" selected>Đang xử lý</option>
                     }
                     else
                     {
-                        <option value="processing">Đang xử lý</option>
+                        <option value="Đang sửa chữa">Đang xử lý</option>
                     }
-                    @if (trangthai == "completed")
+                    @if (trangthai == "Hoàn thành")
                     {
-                        <option value="completed" selected>Hoàn thành</option>
+                        <option value="Hoàn thành" selected>Hoàn thành</option>
                     }
                     else
                     {
-                        <option value="completed">Hoàn thành</option>
+                        <option value="Hoàn thành">Hoàn thành</option>
                     }
                 </select>
             </div>
@@ -307,6 +331,8 @@
     }
 
     function submitForm() {
+        document.getElementById('isBaoCao').value = '0';
+        document.getElementById('isexport').value = '0';
         document.getElementById("searchForm").submit();
     }
 

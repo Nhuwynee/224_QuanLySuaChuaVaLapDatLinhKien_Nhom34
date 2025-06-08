@@ -18,6 +18,11 @@
 
         public string SapXepTheoNgayTao { set; get; }
 
+
+        public int? isexport { get; set; } = 0;
+
+        public int? isBaoCao { get; set; } = 0;
+
         public int PageActive { get; set; } = 1;
         public DonDichVuSearch()
         {

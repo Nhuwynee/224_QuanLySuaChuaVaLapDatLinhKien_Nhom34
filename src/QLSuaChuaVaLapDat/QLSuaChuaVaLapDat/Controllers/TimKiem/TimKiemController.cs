@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
 using QLSuaChuaVaLapDat.Models;
-using QLSuaChuaVaLapDat.Models.Impl;
 using QLSuaChuaVaLapDat.Models.TimKiem;
 using QLSuaChuaVaLapDat.ViewModel;
 using System.Collections.Generic;
@@ -93,13 +95,8 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
 
             if (!string.IsNullOrEmpty(donDichVuSearch.TrangThaiDV))
             {
-                string trangThai = donDichVuSearch.TrangThaiDV switch
-                {
-                    "processing" => "Đang sửa chữa",
-                    "completed" => "Hoàn thành",
-                    _ => donDichVuSearch.TrangThaiDV
-                };
-                query = query.Where(d => d.TrangThaiDon == trangThai);
+               
+                query = query.Where(d => d.TrangThaiDon == donDichVuSearch.TrangThaiDV);
             }
 
             if (!string.IsNullOrEmpty(donDichVuSearch.TuNgay) && DateTime.TryParse(donDichVuSearch.TuNgay, out var tuNgay))
@@ -162,20 +159,6 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
             }
             
 
-            //var data = await query.ToListAsync();
-
-            //switch (sortOrder)
-            //{
-            //    case "TenKhachHangAsc":
-            //        data = data.OrderBy(d => d.IdUserNavigation.TenUser.Split(' ').Last()).ToList();
-            //        break;
-
-            //    case "TenKhachHangDesc":
-            //        data = data.OrderByDescending(d => d.IdUserNavigation.TenUser.Split(' ').Last()).ToList();
-            //        break;
-            //}
-
-
             var pagedResult = await query.ToListAsync();
 
             // Lọc theo tên khách hàng
@@ -193,8 +176,189 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 ).ToList();
             }
 
-          
-             int totalRecords = pagedResult.Count;
+
+            // Export to Excel
+            if (donDichVuSearch.isexport == 1)
+            {
+                using (var package = new ExcelPackage())
+                {
+                    var worksheet = package.Workbook.Worksheets.Add("DonDichVu");
+
+                    // Set title row
+                    worksheet.Cells[1, 1].Value = "Thông Tin Đơn Dịch Vụ";
+                    worksheet.Cells[1, 1, 1, 9].Merge = true; 
+                    worksheet.Cells[1, 1].Style.Font.Bold = true;
+                    worksheet.Cells[1, 1].Style.Font.Size = 17;
+                    worksheet.Cells[1, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center; 
+
+                    // Set header row
+                    worksheet.Cells[2, 1].Value = "STT";
+                    worksheet.Cells[2, 2].Value = "Mã đơn";
+                    worksheet.Cells[2, 3].Value = "Khách hàng";
+                    worksheet.Cells[2, 4].Value = "Thiết bị";
+                    worksheet.Cells[2, 5].Value = "Loại dịch vụ";
+                    worksheet.Cells[2, 6].Value = "Trạng thái";
+                    worksheet.Cells[2, 7].Value = "Tổng tiền";
+                    worksheet.Cells[2, 8].Value = "Ngày tạo";
+                    worksheet.Cells[2, 9].Value = "Ngày cập nhật";
+
+                    using (var range = worksheet.Cells[2, 1, 2, 9]) 
+                    {
+                        range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                        range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightBlue); 
+                        range.Style.Font.Bold = true; 
+                    }
+
+                    // Populate data rows
+                    for (int i = 0; i < pagedResult.Count; i++)
+                    {
+                        var record = pagedResult[i];
+                        worksheet.Cells[i + 3, 1].Value = i + 1; // Start data from row 3
+                        worksheet.Cells[i + 3, 2].Value = record.IdDonDichVu ?? "N/A";
+                        worksheet.Cells[i + 3, 3].Value = record.IdUserNavigation?.HoVaTen ?? record.IdKhachVangLaiNavigation?.HoVaTen ?? "N/A";
+                        worksheet.Cells[i + 3, 4].Value = record.IdLoaiThietBiNavigation?.TenLoaiThietBi ?? "N/A";
+                        worksheet.Cells[i + 3, 5].Value = record.LoaiDonDichVu ?? "N/A";
+                        worksheet.Cells[i + 3, 6].Value = record.TrangThaiDon ?? "N/A";
+                        worksheet.Cells[i + 3, 7].Value = record.TongTien?.ToString("N0") ?? "0";
+                        worksheet.Cells[i + 3, 8].Value = record.NgayTaoDon?.ToString("dd/MM/yyyy HH:mm") ?? "N/A";
+                        worksheet.Cells[i + 3, 9].Value = record.NgayChinhSua?.ToString("dd/MM/yyyy HH:mm") ?? "N/A";
+                    }
+
+                    // Add footer row with export date and total records
+                    int footerRow = pagedResult.Count + 3; 
+                    worksheet.Cells[footerRow, 1].Value = $"Ngày xuất file:{DateTime.Now.ToString("dd/MM/yyyy HH:mm")}";
+                    worksheet.Cells[footerRow, 1, footerRow, 3].Merge = true;
+                    worksheet.Cells[footerRow, 5].Value = $"Tổng số lượng: {pagedResult.Count}";
+                    worksheet.Cells[footerRow, 5, footerRow, 7].Merge = true; 
+                    worksheet.Cells[footerRow, 1].Style.Font.Bold = true;
+                    worksheet.Cells[footerRow, 5].Style.Font.Bold = true;
+
+                    // Auto-fit columns for better readability
+                    worksheet.Cells.AutoFitColumns();
+
+                    // Generate filename with current date
+                    string fileName = $"DonDichVu_{DateTime.Now:yyyyMMdd}.xlsx";
+
+                    // Return the Excel file
+                    var stream = new MemoryStream(package.GetAsByteArray());
+                    ViewBag.IsExport = 0;
+                    ViewBag.IsBaoCao = 0;
+                    return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+                }
+            }
+
+            // Export to Report
+            if (donDichVuSearch.isBaoCao == 1)
+            {
+                var doc = new PdfDocument();
+                var page = doc.AddPage();
+                page.Size = PdfSharpCore.PageSize.A4;
+                var gfx = XGraphics.FromPdfPage(page);
+
+                // Fonts
+                var font = new XFont("Arial", 9, XFontStyle.Regular);
+                var fontBold = new XFont("Arial", 10, XFontStyle.Bold);
+                var titleFont = new XFont("Arial", 14, XFontStyle.Bold);
+                var headerFont = new XFont("Arial", 11, XFontStyle.Bold);
+                var pen = new XPen(XColors.Black, 0.5);
+
+                // Layout
+                double margin = 40;
+                double y = margin;
+                double rowHeight = 22;
+                double pageWidth = page.Width - 2 * margin;
+
+                //  Header: Quốc hiệu 
+                gfx.DrawString("CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM", headerFont, XBrushes.Black, new XRect(0, y, page.Width, 15), XStringFormats.TopCenter);
+                y += 15;
+                gfx.DrawString("Độc lập - Tự do - Hạnh phúc", font, XBrushes.Black, new XRect(0, y, page.Width, 15), XStringFormats.TopCenter);
+                y += 25;
+
+                // Tiêu đề báo cáo 
+                gfx.DrawString("BÁO CÁO ĐƠN DỊCH VỤ", titleFont, XBrushes.DarkRed, new XRect(0, y, page.Width, 20), XStringFormats.TopCenter);
+                y += 30;
+
+                // Thông tin người lập báo cáo
+                gfx.DrawString("Họ và tên: .........................................................", font, XBrushes.Black, new XPoint(margin, y));
+                gfx.DrawString("Chức vụ: ................................", font, XBrushes.Black, new XPoint(page.Width / 2 + 20, y));
+                y += 15;
+
+                gfx.DrawString($"Từ ngày: {donDichVuSearch.TuNgay?.ToString() ?? "..."}  đến ngày  {donDichVuSearch.DenNgay?.ToString() ?? "..."}",
+                    font, XBrushes.Black, new XPoint(margin, y));
+                y += 15;
+
+                gfx.DrawString($"Trạng thái đơn: {donDichVuSearch.TrangThaiDV ?? "Tất cả"}", font, XBrushes.Black, new XPoint(margin, y));
+                y += 15;
+
+                gfx.DrawString($"Theo kỹ thuật viên: {donDichVuSearch.IDKyThuatVien?.ToString() ?? "..."}", font, XBrushes.Black, new XPoint(margin, y));
+                y += 15;
+
+                gfx.DrawString("Bộ phận công tác: .........................................................", font, XBrushes.Black, new XPoint(margin, y));
+                y += 15;
+
+                gfx.DrawString($"Thời gian thực hiện: Ngày {DateTime.Now:dd} Tháng {DateTime.Now:MM} Năm {DateTime.Now:yyyy}",
+                    font, XBrushes.Black, new XPoint(margin, y));
+                y += 25;
+
+                //Tiêu đề bảng 
+                gfx.DrawString("I. DANH SÁCH ĐƠN DỊCH VỤ", fontBold, XBrushes.Black, new XPoint(margin, y));
+                y += 20;
+
+                //  Header bảng 
+                double[] colWidths = { 30, 50, 90, 95, 60, 70, 70, 70 };
+                string[] headers = { "STT", "Mã đơn", "Khách hàng", "Thiết bị", "Loại DV", "Trạng thái", "Tổng tiền", "Ngày tạo" };
+                double colX = margin;
+
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    gfx.DrawRectangle(pen, XBrushes.LightGray, colX, y, colWidths[i], rowHeight);
+                    gfx.DrawString(headers[i], fontBold, XBrushes.Black, new XRect(colX + 3, y + 5, colWidths[i], rowHeight), XStringFormats.TopLeft);
+                    colX += colWidths[i];
+                }
+                y += rowHeight;
+
+                // Dữ liệu bảng
+                int maxRows = Math.Min(pagedResult.Count, 20); // Chỉ in 20 dòng để đảm bảo nằm trong 1 trang qua 21 sẽ nằm trang khác
+                for (int i = 0; i < maxRows; i++)
+                {
+                    var item = pagedResult[i];
+                    string[] values = {
+            (i + 1).ToString(),
+            item.IdDonDichVu ?? "N/A",
+            item.IdUserNavigation?.HoVaTen ?? item.IdKhachVangLaiNavigation?.HoVaTen ?? "N/A",
+            item.IdLoaiThietBiNavigation?.TenLoaiThietBi ?? "N/A",
+            item.LoaiDonDichVu ?? "N/A",
+            item.TrangThaiDon ?? "N/A",
+            item.TongTien?.ToString("N0") ?? "0",
+            item.NgayTaoDon?.ToString("dd/MM/yyyy") ?? "N/A"
+        };
+
+                    colX = margin;
+                    for (int j = 0; j < values.Length; j++)
+                    {
+                        gfx.DrawRectangle(pen, colX, y, colWidths[j], rowHeight);
+                        gfx.DrawString(values[j], font, XBrushes.Black, new XRect(colX + 3, y + 5, colWidths[j], rowHeight), XStringFormats.TopLeft);
+                        colX += colWidths[j];
+                    }
+                    y += rowHeight;
+                }
+
+                // ======= Ghi chú & chữ ký =======
+                y += 20;
+                gfx.DrawString("Ghi chú: Báo cáo có hiệu lực trong vòng 7 ngày kể từ ngày xuất báo cáo.", font, XBrushes.Black, new XPoint(margin, y));
+                y += 35;
+                gfx.DrawString("PHỤ TRÁCH BỘ PHẬN", fontBold, XBrushes.Black, new XPoint(margin + 30, y));
+                gfx.DrawString("NGƯỜI BÁO CÁO", fontBold, XBrushes.Black, new XPoint(page.Width - margin - 130, y));
+
+                // ======= Xuất PDF =======
+                using var stream = new MemoryStream();
+                doc.Save(stream, false);
+                ViewBag.IsExport = 0;
+                ViewBag.IsBaoCao = 0;
+                return File(stream.ToArray(), "application/pdf", "BaoCaoDonDichVu.pdf");
+            }
+
+            int totalRecords = pagedResult.Count;
              int totalPage = (int)Math.Ceiling((double)totalRecords / pageSize);
 
   
@@ -213,6 +377,8 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
             paging.PageActive = pageIndex;
             DonDichVuSearch donDichVuSearchNew = new DonDichVuSearch();
             donDichVuSearchNew = donDichVuSearch;
+            ViewBag.IsExport = 0;
+            ViewBag.IsBaoCao = 0;
             resultView.donDichVuSearch = donDichVuSearchNew;
 
             resultView.Paging = paging;
@@ -240,9 +406,9 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
         public async Task<IActionResult> TimKiemKhachHang()
         {
             Paging paging = new Paging();
-            int pageUser = 1;
-            int pageKVL = 1;
+            int currentPage = 1; 
             int pageSize = paging.PageSize;
+
             // Query Users (khách hàng đã đăng ký)
             var queryUsers = _context.Users
                 .Where(u => u.IdUser.StartsWith("KH"))
@@ -260,19 +426,13 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                         TongDon = orders.Count()
                     });
 
-            int totalUserRecords = await queryUsers.CountAsync();
-            int totalUserPages = (int)Math.Ceiling((double)totalUserRecords / pageSize);
-
             var dsKH = await queryUsers
-                .OrderBy(u => u.User.IdUser) // Sắp xếp theo ý muốn
-                .Skip((pageUser - 1) * pageSize)
-                .Take(pageSize)
-                .Select(result => new NguoiDung
+                .Select(result => new KhachHangViewTimKiem
                 {
-                    IdUser = result.User.IdUser,
-                    TenUser = result.User.TenUser,
-                    HoVaTen = result.User.HoVaTen,
-                    Sdt = result.User.Sdt,
+                    MaKH = result.User.IdUser,
+                    TenDangKy = result.User.TenUser,
+                    TenKhachHang = result.User.HoVaTen,
+                    SoDienThoai = result.User.Sdt,
                     NgaySinh = result.User.NgaySinh,
                     TrangThai = result.User.TrangThai,
                     DiaChi = (result.User.DiaChi ?? "") +
@@ -282,10 +442,9 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                              (result.User.IdPhuongNavigation != null && result.User.IdPhuongNavigation.IdQuanNavigation != null
                                  && result.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
                                  ? ", " + result.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
-                    tongDonHang = (double)result.TongGiaTri,
-                    TongDon = result.TongDon
+                    TongSoTienSuaChua = (double)result.TongGiaTri,
+                    TongSoDon = result.TongDon
                 }).ToListAsync();
-
 
             // Query KhachVangLais (khách vãng lai)
             var queryKVL = _context.KhachVangLais
@@ -303,18 +462,15 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                         TongDon = orders.Count()
                     });
 
-            int totalKVLRecords = await queryKVL.CountAsync();
-            int totalKVLPages = (int)Math.Ceiling((double)totalKVLRecords / (pageSize*2));
-
             var dsKVL = await queryKVL
-                .OrderBy(k => k.KhachVangLai.IdKhachVangLai) // Sắp xếp theo ý muốn
-                .Skip((pageKVL - 1) * pageSize)
-                .Take(pageSize)
-                .Select(result => new KhachVangLaiImpl
+                .Select(result => new KhachHangViewTimKiem
                 {
-                    IdKhachVangLai = result.KhachVangLai.IdKhachVangLai,
-                    HoVaTen = result.KhachVangLai.HoVaTen,
-                    Sdt = result.KhachVangLai.Sdt,
+                    MaKH = result.KhachVangLai.IdKhachVangLai,
+                    TenDangKy = null,
+                    TenKhachHang = result.KhachVangLai.HoVaTen,
+                    SoDienThoai = result.KhachVangLai.Sdt,
+                    NgaySinh = null,
+                    TrangThai = null,
                     DiaChi = (result.KhachVangLai.DiaChi ?? "") +
                              (result.KhachVangLai.IdPhuongNavigation != null ? ", " + result.KhachVangLai.IdPhuongNavigation.TenPhuong : "") +
                              (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
@@ -322,11 +478,24 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                              (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
                                  && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
                                  ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
-                    IdPhuong = result.KhachVangLai.IdPhuong,
-                    TongDonHang = (double)result.TongGiaTri
+                    TongSoTienSuaChua = (double)result.TongGiaTri,
+                    TongSoDon = null
                 }).ToListAsync();
 
-            // Lấy danh sách địa phương (thành phố, quận, phường)
+            // Gộp danh sách
+            var allCustomers = dsKH.Concat(dsKVL).ToList();
+
+            // Tính tổng số bản ghi và phân trang
+            int totalRecords = allCustomers.Count;
+            int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+
+            var pagedCustomers = allCustomers
+                .OrderBy(k => k.MaKH) // Hoặc thứ tự khác nếu bạn muốn
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // Lấy danh sách địa phương
             var ThanhPhos = _context.ThanhPhos
                 .Select(tp => new ThanhPhoDTO
                 {
@@ -352,20 +521,23 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 }).ToList();
 
             // Tạo ViewModel
-            KhachHang dsKhachHang = new KhachHang();
-            dsKhachHang.KhachVangLais = dsKVL;
-            dsKhachHang.Users = dsKH;
+            KhachHangSearchVM viewKH = new KhachHangSearchVM
+            {
+                Phuongs = Phuongs,
+                Quans = Quans,
+                ThanhPhos = ThanhPhos,
+                KhachHangs = pagedCustomers,
+                Paging = new Paging
+                {
+                    PageActive = currentPage,
+                    TotalPage = totalPages,
+                    PageSize = pageSize
+                }
+            };
 
-            KhachHangSearchVM viewKH = new KhachHangSearchVM();
-            viewKH.Phuongs = Phuongs;
-            viewKH.Quans = Quans;
-            viewKH.ThanhPhos = ThanhPhos;
-            viewKH.KhachHangs = dsKhachHang;
-
-            paging.TotalPage = totalUserPages + totalKVLPages;
-            viewKH.Paging = paging;
             return View(viewKH);
         }
+
 
 
         [HttpPost]
@@ -440,168 +612,127 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 khachVangLaiQuery = khachVangLaiQuery.Where(k => k.KhachVangLai.IdPhuong == khachHangSearch.PhuongXa);
             }
 
+
+            
+            // Execute queries
+            var dsKH = await userQuery
+                .Select(result => new KhachHangViewTimKiem
+                {
+                    MaKH = result.User.IdUser,
+                    TenDangKy = result.User.TenUser,
+                    TenKhachHang = result.User.HoVaTen,
+                    SoDienThoai = result.User.Sdt,
+                    NgaySinh = result.User.NgaySinh,
+                    TrangThai = result.User.TrangThai,
+                    DiaChi = result.User.DiaChi +
+                                (result.User.IdPhuongNavigation != null ? ", " + result.User.IdPhuongNavigation.TenPhuong : "") +
+                                (result.User.IdPhuongNavigation != null && result.User.IdPhuongNavigation.IdQuanNavigation != null
+                                    ? ", " + result.User.IdPhuongNavigation.IdQuanNavigation.TenQuan : "") +
+                                (result.User.IdPhuongNavigation != null && result.User.IdPhuongNavigation.IdQuanNavigation != null
+                                    && result.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
+                                    ? ", " + result.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
+                    TongSoTienSuaChua = (double)result.TongGiaTri,
+                    TongSoDon = result.TongDon
+                })
+                .ToListAsync();
+
+                var dsKVL = await khachVangLaiQuery
+                    .Select(result => new KhachHangViewTimKiem
+                    {
+                        MaKH= result.KhachVangLai.IdKhachVangLai,
+                        TenDangKy = null,
+                        TenKhachHang = result.KhachVangLai.HoVaTen,
+                        SoDienThoai = result.KhachVangLai.Sdt,
+                        DiaChi = result.KhachVangLai.DiaChi +
+                                    (result.KhachVangLai.IdPhuongNavigation != null ? ", " + result.KhachVangLai.IdPhuongNavigation.TenPhuong : "") +
+                                    (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
+                                        ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.TenQuan : "") +
+                                    (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
+                                        && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
+                                        ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
+                        TongSoDon = null,
+                        TongSoTienSuaChua = (double)result.TongGiaTri
+                    })
+                    .ToListAsync();
+
+            var danhSachGop = dsKH.Concat(dsKVL).ToList();
+
             if (!string.IsNullOrEmpty(khachHangSearch.LoaiKhachHang))
             {
                 if (khachHangSearch.LoaiKhachHang == "Users")
-                {
-                    khachVangLaiQuery = khachVangLaiQuery.Where(k => false);
-                }
+                    danhSachGop = danhSachGop.Where(k => k.MaKH.StartsWith("KH")).ToList(); 
                 else if (khachHangSearch.LoaiKhachHang == "KhachVangLais")
-                {
-                    userQuery = userQuery.Where(u => false);
-                }
+                    danhSachGop = danhSachGop.Where(k => !k.MaKH.StartsWith("KH")).ToList();
+            }
+
+
+
+            if (!string.IsNullOrEmpty(khachHangSearch.TenKhachHang))
+            {
+                string keyword = RemoveDiacritics(khachHangSearch.TenKhachHang.ToLower());
+                danhSachGop = danhSachGop.Where(k => RemoveDiacritics(k.TenKhachHang?.ToLower() ?? "").Contains(keyword)).ToList();
             }
 
 
             if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheoMaKH))
             {
-                switch (khachHangSearch.SapXepTheoMaKH)
+                danhSachGop = khachHangSearch.SapXepTheoMaKH switch
                 {
-                    case "MaKHAsc":
-                        userQuery = userQuery.OrderBy(u => u.User.IdUser);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.IdKhachVangLai);
-                        break;
-                    case "MaKHDesc":
-                        userQuery = userQuery.OrderByDescending(u => u.User.IdUser);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.KhachVangLai.IdKhachVangLai);
-                        break;
-                    default:
-                        userQuery = userQuery.OrderBy(u => u.User.IdUser);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.IdKhachVangLai);
-                        break;
-                }
+                    "MaKHAsc" => danhSachGop.OrderBy(k => k.MaKH).ToList(),
+                    "MaKHDesc" => danhSachGop.OrderByDescending(k => k.MaKH).ToList(),
+                    _ => danhSachGop.OrderBy(k => k.MaKH).ToList()
+                };
             }
             if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheoTenUser))
             {
-                switch (khachHangSearch.SapXepTheoTenUser)
+                danhSachGop = khachHangSearch.SapXepTheoTenUser switch
                 {
-                    case "TenUserAsc":
-                        userQuery = userQuery.OrderBy(u => u.User.TenUser);
-                        break;
-                    case "TenUserDesc":
-                        userQuery = userQuery.OrderByDescending(u => u.User.TenUser);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.KhachVangLai.HoVaTen);
-                        break;
-                    default:
-                        userQuery = userQuery.OrderBy(u => u.User.TenUser);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.HoVaTen);
-                        break;
-                }
+                    "TenUserAsc" => danhSachGop.OrderBy(k => k.TenDangKy).ToList(),
+                    "TenUserDesc" => danhSachGop.OrderByDescending(k => k.TenDangKy).ToList(),
+                    _ => danhSachGop.OrderBy(k => k.TenDangKy).ToList()
+                };
             }
             if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheoTenKhachHang))
             {
-                switch (khachHangSearch.SapXepTheoTenKhachHang)
+                danhSachGop = khachHangSearch.SapXepTheoTenKhachHang switch
                 {
-                    case "TenKhachHangAsc":
-                        userQuery = userQuery.OrderBy(u => u.User.HoVaTen);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.KhachVangLai.HoVaTen);
-                        break;
-                    case "TenKhachHangDesc":
-                        userQuery = userQuery.OrderByDescending(u => u.User.HoVaTen);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.KhachVangLai.HoVaTen);
-                        break;
-                }
+                    "TenKhachHangAsc" => danhSachGop.OrderBy(k => k.TenKhachHang).ToList(),
+                    "TenKhachHangDesc" => danhSachGop.OrderByDescending(k => k.TenKhachHang).ToList(),
+                    _ => danhSachGop
+                };
             }
             if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheoTongSoDon))
             {
-                switch (khachHangSearch.SapXepTheoTongSoDon)
+                danhSachGop = khachHangSearch.SapXepTheoTongSoDon switch
                 {
-                    case "TongSoDonAsc":
-                        userQuery = userQuery.OrderBy(u => u.TongDon);
-                        
-                        break;
-                    case "TongSoDonDesc":
-                        userQuery = userQuery.OrderByDescending(u => u.TongDon);
-                        break;
-                   
-                }
+                    "TongSoDonAsc" => danhSachGop.OrderBy(k => k.TongSoDon ?? 0).ToList(),
+                    "TongSoDonDesc" => danhSachGop.OrderByDescending(k => k.TongSoDon ?? 0).ToList(),
+                    _ => danhSachGop
+                };
             }
             if (!string.IsNullOrEmpty(khachHangSearch.SapXepTheoTongSoTienSuaChua))
             {
-                switch (khachHangSearch.SapXepTheoTongSoTienSuaChua)
+                danhSachGop = khachHangSearch.SapXepTheoTongSoTienSuaChua switch
                 {
-                    case "TongSoTienSuaChuaAsc":
-                        userQuery = userQuery.OrderBy(u => u.TongGiaTri);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderBy(k => k.TongGiaTri);
-                        break;
-                    case "TongSoTienSuaChuaDesc":
-                        userQuery = userQuery.OrderByDescending(u => u.TongGiaTri);
-                        khachVangLaiQuery = khachVangLaiQuery.OrderByDescending(k => k.TongGiaTri);
-                        break;
-                }
+                    "TongSoTienSuaChuaAsc" => danhSachGop.OrderBy(k => k.TongSoTienSuaChua).ToList(),
+                    "TongSoTienSuaChuaDesc" => danhSachGop.OrderByDescending(k => k.TongSoTienSuaChua).ToList(),
+                    _ => danhSachGop
+                };
             }
-            
-            // Execute queries
-            var dsKH = await userQuery
-                .Select(result => new NguoiDung
-                {
-                    IdUser = result.User.IdUser,
-                    TenUser = result.User.TenUser,
-                    HoVaTen = result.User.HoVaTen,
-                    Sdt = result.User.Sdt,
-                    NgaySinh = result.User.NgaySinh,
-                    TrangThai = result.User.TrangThai,
-                    GioiTinh = result.User.GioiTinh,
-                    DiaChi = result.User.DiaChi +
-                             (result.User.IdPhuongNavigation != null ? ", " + result.User.IdPhuongNavigation.TenPhuong : "") +
-                             (result.User.IdPhuongNavigation != null && result.User.IdPhuongNavigation.IdQuanNavigation != null
-                                 ? ", " + result.User.IdPhuongNavigation.IdQuanNavigation.TenQuan : "") +
-                             (result.User.IdPhuongNavigation != null && result.User.IdPhuongNavigation.IdQuanNavigation != null
-                                 && result.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
-                                 ? ", " + result.User.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
-                    tongDonHang = (double)result.TongGiaTri,
-                    TongDon = result.TongDon
-                })
-                .ToListAsync();
 
-                var dsKVL = await khachVangLaiQuery
-                    .Select(result => new KhachVangLaiImpl
-                    {
-                        IdKhachVangLai = result.KhachVangLai.IdKhachVangLai,
-                        HoVaTen = result.KhachVangLai.HoVaTen,
-                        Sdt = result.KhachVangLai.Sdt,
-                        DiaChi = result.KhachVangLai.DiaChi +
-                                 (result.KhachVangLai.IdPhuongNavigation != null ? ", " + result.KhachVangLai.IdPhuongNavigation.TenPhuong : "") +
-                                 (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
-                                     ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.TenQuan : "") +
-                                 (result.KhachVangLai.IdPhuongNavigation != null && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation != null
-                                     && result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation != null
-                                     ? ", " + result.KhachVangLai.IdPhuongNavigation.IdQuanNavigation.IdThanhPhoNavigation.TenThanhPho : ""),
-                        IdPhuong = result.KhachVangLai.IdPhuong,
-                        TongDonHang = (double)result.TongGiaTri
-                    })
-                    .ToListAsync();
 
-                    if (!string.IsNullOrEmpty(khachHangSearch.TenKhachHang))
-                    {
-                        string keyword = RemoveDiacritics(khachHangSearch.TenKhachHang.ToLower());
-                        dsKH = dsKH.Where(u => RemoveDiacritics(u.HoVaTen.ToLower()).Contains(keyword)).ToList();
-                        dsKVL = dsKVL.Where(k => RemoveDiacritics(k.HoVaTen.ToLower()).Contains(keyword)).ToList();
-                    }
+            int totalRecords = danhSachGop.Count;
+            int totalPage = (int)Math.Ceiling((double)totalRecords / pageSize);
 
-            int totalKH =  dsKH.Count;
-            int totalKVL = dsKVL.Count;
-            int totalRecords = totalKH + totalKVL;
-            int totalPage = 0;
-            if (totalKH!=0 && totalKVL != 0)
-            {
-                totalPage = (int)Math.Ceiling((double)totalRecords / (pageSize*2));
-            }
-            totalPage = (int)Math.Ceiling((double)totalRecords / (pageSize));
 
-            List<NguoiDung> dsNguoiDung = dsKH
+            List<KhachHangViewTimKiem> danhSachPhanTrang = danhSachGop
                 .Skip((pageUser - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
-            List<KhachVangLaiImpl> dsKhachVL = dsKVL
-               .Skip((pageUser - 1) * pageSize)
-               .Take(pageSize)
-               .ToList();
 
             paging.TotalPage = totalPage;
             paging.PageActive = khachHangSearch.pageActive;
 
-            // Populate DTOs for dropdowns
             var thanhPhos = await _context.ThanhPhos
                 .Select(tp => new ThanhPhoDTO
                 {
@@ -631,19 +762,20 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
             KhachHangSearch khSearch = new KhachHangSearch();
             khSearch = khachHangSearch;
 
-            // Prepare ViewModel
-            var khachHang = new KhachHang
-            {
-                Users = dsNguoiDung,
-                KhachVangLais = dsKhachVL 
-            };
+            //// Prepare ViewModel
+            //var khachHang = new KhachHang
+            //{
+            //    Users = dsNguoiDung,
+            //    KhachVangLais = dsKhachVL 
+            //};
+
 
             var viewKH = new KhachHangSearchVM
             {
                 Phuongs = phuongs,
                 Quans = quans,
                 ThanhPhos = thanhPhos,
-                KhachHangs = khachHang,
+                KhachHangs = danhSachPhanTrang,
                 Paging = paging,
                 KhachHangSearch = khSearch
             };

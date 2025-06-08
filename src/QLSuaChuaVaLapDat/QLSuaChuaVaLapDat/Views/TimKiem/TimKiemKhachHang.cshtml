@@ -1,6 +1,5 @@
 ﻿@model QLSuaChuaVaLapDat.ViewModel.KhachHangSearchVM
 @using QLSuaChuaVaLapDat.Models
-@using QLSuaChuaVaLapDat.Models.Impl
 
 <form id="searchForm" method="post" asp-action="TimKiemKhachHang">
     <div class="search-container" id="customers">
@@ -109,7 +108,6 @@
                     <th>Địa chỉ</th>
                     <th>Ngày sinh</th>
                     <th>Trạng thái</th>
-                    <th>Giới tính</th>
                     <th class="cursor-pointer" onclick="sortTable('TongSoDon')">
                         Tổng số đơn <span class="sort-icon">@(Model.KhachHangSearch?.SapXepTheoTongSoDon == "TongSoDonAsc" ? "↑" : Model.KhachHangSearch?.SapXepTheoTongSoDon == "TongSoDonDesc" ? "↓" : "↕")</span>
                         <input type="hidden" id="sort_column_TongSoDon" name="SapXepTheoTongSoDon" value="@Model.KhachHangSearch?.SapXepTheoTongSoDon" />
@@ -123,23 +121,19 @@
             </thead>
             <tbody>
                 @{
-                    var user = new List<NguoiDung>();
-                    var khachVangLai = new List<KhachVangLaiImpl>();
-   
-                    user = Model.KhachHangs.Users;
-
-                    khachVangLai = Model.KhachHangs.KhachVangLais;
+                  
+                   var KhachHangs = Model.KhachHangs;
                     
                 }
 
-                @foreach (var item in user)
+                @foreach (var item in KhachHangs)
                 {
                     <tr>
                         <td><input type="checkbox" class="row-checkbox"></td>
-                        <td>@item.IdUser</td>
-                        <td>@item.TenUser</td>
-                        <td>@item.HoVaTen</td>
-                        <td>@item.Sdt</td>
+                        <td>@item.MaKH</td>
+                        <td>@item.TenDangKy</td>
+                        <td>@item.TenKhachHang</td>
+                        <td>@item.SoDienThoai</td>
                         <td>@item.DiaChi</td>
                         <td>@item.NgaySinh</td>
                         @if (item.TrangThai == true)
@@ -151,16 +145,9 @@
                             <td>Không hoạt động</td>
                         }
 
-                        @if (item.GioiTinh == true)
-                        {
-                            <td>Nam</td>
-                        }
-                        else
-                        {
-                            <td>Nữ</td>
-                        }
-                        <td>@item.TongDon</td>
-                        <td>@(item.tongDonHang.ToString("#,##0") + " VND" ?? "0,00 VND")</td>
+                      
+                        <td>@item.TongSoDon</td>
+                        <td>@(item.TongSoTienSuaChua?.ToString("#,##0") + " VND" ?? "0,00 VND")</td>
                         <td class="action-buttons">
                             <button class="btn btn-edit">Sửa</button>
                             <button class="btn btn-lock">Khóa</button>
@@ -168,25 +155,6 @@
                     </tr>
                 }
 
-                @foreach (var item in khachVangLai)
-                {
-                    <tr>
-                        <td><input type="checkbox" class="row-checkbox"></td>
-                        <td>@item.IdKhachVangLai</td>
-                        <td>(Trống)</td>
-                        <td>@item.HoVaTen</td>
-                        <td>@item.Sdt</td>
-                        <td>@item.DiaChi</td>
-                        <td>(Trống)</td>
-                        <td>(Trống)</td>
-                        <td>(Trống)</td>
-                        <td>(Trống)</td>
-                        <td>@(item.TongDonHang.ToString("#,##0") + " vnđ" ?? "0,00 vnđ")</td>
-                        <td class="action-buttons">
-                         
-                        </td>
-                    </tr>
-                }
         </tbody>
           
     </table>

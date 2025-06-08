@@ -5,7 +5,7 @@ namespace QLSuaChuaVaLapDat.ViewModel
 {
     public class KhachHangSearchVM
     {
-        public KhachHang KhachHangs { get; set; }
+        public List<KhachHangViewTimKiem> KhachHangs { get; set; }
         public List<ThanhPhoDTO> ThanhPhos {  get; set; }
         public List<QuanDTO> Quans { get; set; }
         public Paging Paging { get; set; }
