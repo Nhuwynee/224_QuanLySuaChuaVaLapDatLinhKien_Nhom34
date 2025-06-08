@@ -497,42 +497,7 @@ $(document).ready(function () {
     });
 });
 
-// Add this function to ensure part IDs are correctly stored in hidden fields
 
-//function updateErrorDetailPartIds() {
-//    // Create an array to store all error detail forms
-//    const errorDetailContainers = document.querySelectorAll('.split-with-button');
-
-//    // For each container, find the associated active part and set the ID
-//    errorDetailContainers.forEach((container, index) => {
-//        // Get the active selected part ID for this error container
-//        const activePart = document.querySelector('.selected-part.active');
-//        if (activePart) {
-//            const partId = activePart.getAttribute('data-id');
-
-//            // Create or update hidden field for this error detail
-//            let hiddenField = container.querySelector(`input[name="ErrorDetails[${index}].IdLinhKien"]`);
-//            if (!hiddenField) {
-//                hiddenField = document.createElement('input');
-//                hiddenField.type = 'hidden';
-//                hiddenField.name = `ErrorDetails[${index}].IdLinhKien`;
-//                container.appendChild(hiddenField);
-//            }
-//            hiddenField.value = partId;
-//        }
-//    });
-//}
-
-//// Add this to document ready function - call before form submit
-//$(document).ready(function () {
-//    // Existing code...
-
-//    // Make sure to call this before form submission
-//    document.getElementById('serviceOrderForm').addEventListener('submit', function (e) {
-//        updateErrorDetailPartIds();
-//        // Continue with form submission
-//    });
-//});
 
 // Đảm bảo mỗi lỗi đều có input hidden IdLinhKien trước khi submit
 function updateErrorDetailPartIds() {
@@ -1329,58 +1294,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 formData.append('NgayHoanThanh', $('#endDatetimePicker').val());
-                //let tongTien = $('#tongTienInput').val() || $('.price-input').eq(1).val(); // hoặc lấy đúng input tổng tiền
-                //tongTien = tongTien.replace(/\./g, '').replace(/,/g, ''); // Loại bỏ mọi ký tự không phải số hoặc dấu chấm
-                //formData.append('TongTien', tongTien);
-
                 let tongTien = $('#tongTienInput').val() || $('.price-input').eq(1).val() || '0';
                 tongTien = tongTien.replace(/\./g, '').replace(/,/g, '').replace(/\s/g, '');
                 const tongTienNumber = parseInt(tongTien) || 0;
                 formData.append('TongTien', tongTienNumber); // lưu 300000.00
 
-
-                // Show loading overlay
-                //showLoadingOverlay('Đang tạo đơn dịch vụ...');
-
-                // Submit form data to server
-                //$.ajax({
-                //    url: '/TaoDonDichVuKVL/CreateServiceOrder',
-                //    type: 'POST',
-                //    data: formData,
-                //    processData: false,
-                //    contentType: false,
-                //    success: function (response) {
-                //        hideLoadingOverlay();
-                //        if (response.success) {
-                //            alert('Đơn dịch vụ đã được tạo thành công!');
-                //            window.location.href = '@Url.Action("IndexDSDDV", "DanhSachDonDichVu")';
-                //        } else {
-                //            let errorMessage = response.message || 'Có lỗi xảy ra khi tạo đơn dịch vụ.';
-                //            //if (response.detailedMessage) {
-                //            //    console.error(response.detailedMessage);
-                //            //    console.error('Inner exception:', response.innerException);
-                //            //}
-                //            //alert(errorMessage);
-                //            setTimeout(function () {
-                //                window.location.href = '/DanhSachDonDichVu/IndexDSDDV';
-                //            }, 2000); // 2 giây sau chuyển trang
-                //        }
-                //    },
-                //    error: function (xhr, status, error) {
-                //        hideLoadingOverlay();
-                //        let errorMessage = 'Có lỗi xảy ra khi tạo đơn dịch vụ!';
-                //        try {
-                //            const responseJson = xhr.responseJSON;
-                //            if (responseJson && responseJson.message) {
-                //                errorMessage = responseJson.message;
-                //            }
-                //        } catch (e) { }
-                //        alert(errorMessage);
-                //        setTimeout(function () {
-                //            window.location.href = '/DanhSachDonDichVu/IndexDSDDV';
-                //        }, 2000);
-                //    }
-                //});
             }
         });
     }

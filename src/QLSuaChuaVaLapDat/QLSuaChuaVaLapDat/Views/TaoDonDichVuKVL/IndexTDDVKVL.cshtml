@@ -561,6 +561,14 @@
 
                     <div class="flex-date-time">
                         <div class="form-group">
+                            <label>Mã khách hàng (có tài khoản):</label>
+                            <div class="input-with-icon" style="position: relative;">
+                                <input type="text" id="customerIdInput" class="form-control" placeholder="Nhập mã hoặc tên khách hàng...">
+                                <input type="hidden" id="IdUser" name="IdUser" value="">
+                                <div id="customerIdDropdown" class="custom-dropdown"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label>Họ và tên khách hàng: <span class="required">(*)</span></label>
                             <input type="text" name="HoVaTen">
                         </div>
@@ -1097,6 +1105,63 @@
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
+    <script>
+        var searchCustomerUrl = '@Url.Action("TimKiemKhachHang", "TaoDonDichVuKVL")';
+
+        $(document).ready(function () {
+            var typingTimer;
+            var doneTypingInterval = 400;
+
+            $('#customerIdInput').on('input', function () {
+                clearTimeout(typingTimer);
+                var keyword = $(this).val().trim();
+                if (keyword.length > 0) {
+                    typingTimer = setTimeout(function () {
+                        $.get(searchCustomerUrl, { keyword: keyword }, function (data) {
+                            var dropdown = $('#customerIdDropdown');
+                            dropdown.empty();
+                            if (data && data.length > 0) {
+                                data.forEach(function (item) {
+                                    var div = $('<div class="dropdown-item"></div>');
+                                    div.text(item.id + ' - ' + item.hoVaTen + ' (' + item.sdt + ')');
+                                    div.data('customer', item);
+                                    div.on('click', function () {
+                                        // Điền mã vào input
+                                        $('#customerIdInput').val(item.id);
+                                        $('#IdUser').val(item.id); // <-- Thêm dòng này
+                                        dropdown.hide();
+                                        // Điền thông tin khách hàng
+                                        $('input[name="HoVaTen"]').val(item.hoVaTen);
+                                        $('input[name="Sdt"]').val(item.sdt);
+                                        $('input[name="Email"]').val(item.email);
+                                        // Địa chỉ
+                                        $('#cityInput').val(item.thanhPho || '');
+                                        $('#districtInput').val(item.quan || '');
+                                        $('#wardInput').val(item.phuong || '');
+                                        $('#wardId').val(item.idPhuong || '');
+                                        $('input[placeholder="Số nhà, đường"]').val(item.duongSoNha || '');
+                                    });
+                                    dropdown.append(div);
+                                });
+                                dropdown.show();
+                            } else {
+                                dropdown.html('<div class="dropdown-item">Không tìm thấy khách hàng</div>').show();
+                            }
+                        });
+                    }, doneTypingInterval);
+                } else {
+                    $('#customerIdDropdown').hide();
+                }
+            });
+
+            // Ẩn dropdown khi click ra ngoài
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#customerIdInput').length) {
+                    $('#customerIdDropdown').hide();
+                }
+            });
+        });
+    </script>
 }
 
 

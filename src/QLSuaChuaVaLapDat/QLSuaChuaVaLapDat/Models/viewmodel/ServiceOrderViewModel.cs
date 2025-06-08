@@ -8,6 +8,7 @@ namespace QLSuaChuaVaLapDat.Models.viewmodel
     {
         // Thông tin khách hàng
         public string IdKhachVangLai { get; set; }
+        public string IdUser { get; set; }
         public string HoVaTen { get; set; }
         public string Sdt { get; set; }
         public string Email { get; set; }

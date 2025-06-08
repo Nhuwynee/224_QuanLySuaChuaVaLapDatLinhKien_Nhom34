@@ -19,6 +19,41 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
             _webHostEnvironment = webHostEnvironment;
         }
 
+        //Tìm kiếm id khách
+        [HttpGet]
+        public IActionResult TimKiemKhachHang(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword))
+                return Json(new List<object>());
+
+            var khachList = _context.Users
+                .Where(kh => kh.IdRole == "R005" && // chỉ lấy khách có tài khoản
+                             (kh.IdUser.Contains(keyword) || kh.HoVaTen.Contains(keyword)))
+                .Select(kh => new
+                {
+                    id = kh.IdUser,
+                    hoVaTen = kh.HoVaTen,
+                    sdt = kh.Sdt,
+                    
+                    duongSoNha = kh.DiaChi, // nếu có trường riêng thì sửa lại
+                    idPhuong = kh.IdPhuong,
+                    // Lấy tên phường, quận, thành phố
+                    phuong = _context.Phuongs.Where(p => p.IdPhuong == kh.IdPhuong).Select(p => p.TenPhuong).FirstOrDefault(),
+                    quan = (from p in _context.Phuongs
+                        join q in _context.Quans on p.IdQuan equals q.IdQuan
+                        where p.IdPhuong == kh.IdPhuong
+                        select q.TenQuan).FirstOrDefault(),
+                    thanhPho = (from p in _context.Phuongs
+                        join q in _context.Quans on p.IdQuan equals q.IdQuan
+                        join tp in _context.ThanhPhos on q.IdThanhPho equals tp.IdThanhPho
+                        where p.IdPhuong == kh.IdPhuong
+                        select tp.TenThanhPho).FirstOrDefault()
+                })
+                .Take(10)
+                .ToList();
+
+            return Json(khachList);
+        }
 
         // Helper method to get the next service order ID
         private string GenerateNextServiceOrderId()
@@ -443,7 +478,13 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                     try
                     {
                         // 1. Tạo khách vàng lai
-                        string idKhachVangLai = await TaoKhachVangLaiMoi(formData);
+                        //string idKhachVangLai = await TaoKhachVangLaiMoi(formData);
+                        string idKhachVangLai = null;
+                        // CHỈ tạo khách vãng lai nếu KHÔNG có IdUser
+                        if (string.IsNullOrEmpty(formData.IdUser))
+                        {
+                            idKhachVangLai = await TaoKhachVangLaiMoi(formData);
+                        }
 
                         // 2. Tạo đơn dịch vụ
                         string idDonDichVu = await TaoDonDichVu(formData, idKhachVangLai);
@@ -598,12 +639,17 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                 // Multiply by 1000 to fix common formatting issue
                 tongTien *= 1000;
             }
+
+            // Xác định khách hàng có tài khoản hay vãng lai
+            string idUser = !string.IsNullOrEmpty(formData.IdUser) ? formData.IdUser : null;
+            string idKhachVangLaiToSave = idUser == null ? idKhachVangLai : null;
+
             // Tạo đối tượng DonDichVu
             var donDichVu = new DonDichVu
             {
                 IdDonDichVu = idDonDichVu,
-                IdUser = null, // Khách vãng lai không có IdUser
-                IdKhachVangLai = idKhachVangLai,
+                IdUser = idUser, // Nếu có mã khách hàng thì lưu vào đây
+                IdKhachVangLai = idKhachVangLaiToSave, // Nếu không có mã khách thì lưu vào đây
                 IdNhanVienKyThuat = formData.IdNhanVienKyThuat,
                 IdUserTaoDon = HttpContext.Session.GetString("IdUser"), // Lấy ID người dùng từ session
                 IdLoaiThietBi = formData.IdLoaiThietBi,
