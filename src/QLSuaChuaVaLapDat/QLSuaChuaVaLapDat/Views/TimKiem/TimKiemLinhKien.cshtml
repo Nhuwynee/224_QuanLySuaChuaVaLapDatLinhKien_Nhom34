@@ -6,7 +6,9 @@
         <div class="search-header">
             <div class="search-title">Tìm kiếm Linh kiện</div>
             <div class="search-actions">
-                <button type="button" class="btn btn-secondary">Làm mới</button>
+                <button class="btn btn-secondary2">Xuất Excel</button>
+                <button class="btn btn-primary2 mar">Xuất báo cáo</button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Làm mới</button>
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
             </div>
         </div>
@@ -103,71 +105,6 @@
 
             </div>
 
-            <div class="sort-section">
-                @{
-                    var sxTheo = Model.linhKienSearch?.SapXep;
-                }
-                <span>Sắp xếp theo:</span>
-                <select name="SapXep" onchange="submitForm()">
-
-                    @if (sxTheo == null)
-                    {
-                        <option value="" selected>Tất cả</option>
-                    }
-                    else
-                    {
-                        <option value="">Tất cả</option>
-                    }
-                    @if (sxTheo == "asc")
-                    {
-                        <option value="asc" selected>Tên A-Z</option>
-                    }
-                    else
-                    {
-                        <option value="asc">Tên A-Z</option>
-                    }
-                    @if (sxTheo == "desc")
-                    {
-                        <option value="desc" selected>Tên Z-A</option>
-                    }
-                    else
-                    {
-                        <option value="desc">Tên Z-A</option>
-                    }
-                    @if (sxTheo == "price_asc")
-                    {
-                        <option value="price_asc" selected>Giá thấp nhất</option>
-                    }
-                    else
-                    {
-                        <option value="price_asc">Giá thấp nhất</option>
-                    }
-                    @if (sxTheo == "price_desc")
-                    {
-                        <option value="price_desc" selected>Giá cao nhất</option>
-                    }
-                    else
-                    {
-                        <option value="price_desc">Giá cao nhất</option>
-                    }
-                    @if (sxTheo == "warranty_asc")
-                    {
-                        <option value="warranty_asc" selected>Bảo hành ngắn nhất</option>
-                    }
-                    else
-                    {
-                        <option value="warranty_asc">Bảo hành ngắn nhất</option>
-                    }
-                    @if (sxTheo == "warranty_desc")
-                    {
-                        <option value="warranty_desc" selected>Bảo hành dài nhất</option>
-                    }
-                    else
-                    {
-                        <option value="warranty_desc">Bảo hành dài nhất</option>
-                    }
-                </select>
-            </div>
         </div>
 
         <div class="select-all-container">
@@ -177,16 +114,37 @@
         <table class="results-table">
             <thead>
                 <tr>
-                    <th><input type="checkbox" class="select-all" data-table="components"></th>
+                    <th><input type="checkbox" class="select-all" data-table="warranty"></th>
                     <th>Hình ảnh</th>
-                    <th>Mã linh kiện</th>
-                    <th>Tên linh kiện</th>
-                    <th>Loại</th>
-                    <th>Nhà SX</th>
-                    <th>Giá</th>
-                    <th>Số lượng</th>
-                    <th>Bảo hành</th>
-                    <th>Điều kiện BH</th>
+                    <th class="cursor-pointer" onclick="sortTable('MaLinhKien')" style="width: 40px;">
+                        ID <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoMaLinhKien == "MaLinhKienAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoMaLinhKien == "MaLinhKienDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_MaLinhKien" name="SapXepTheoMaLinhKien" value="@Model.linhKienSearch?.SapXepTheoMaLinhKien" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('TenLinhKien')">
+                        Tên LK <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoTenLinhKien == "TenLinhKienAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoTenLinhKien == "TenLinhKienDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TenLinhKien" name="SapXepTheoTenLinhKien" value="@Model.linhKienSearch?.SapXepTheoTenLinhKien" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('LoaiLinhKien')">
+                        Loại <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoLoaiLinhKien == "LoaiLinhKienAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoLoaiLinhKien == "LoaiLinhKienDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_LoaiLinhKien" name="SapXepTheoLoaiLinhKien" value="@Model.linhKienSearch?.SapXepTheoLoaiLinhKien" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('NhaSanXuat')">
+                        Nhà SX <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoNhaSanXuat == "NhaSanXuatAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoNhaSanXuat == "NhaSanXuatDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_NhaSanXuat" name="SapXepTheoNhaSanXuat" value="@Model.linhKienSearch?.SapXepTheoNhaSanXuat" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('Gia')">
+                        Giá <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoGia == "GiaAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoGia == "GiaDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_Gia" name="SapXepTheoGia" value="@Model.linhKienSearch?.SapXepTheoGia" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('SoLuong')">
+                        Sl <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoSoLuong == "SoLuongAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoSoLuong == "SoLuongDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_SoLuong" name="SapXepTheoSoLuong" value="@Model.linhKienSearch?.SapXepTheoSoLuong" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('BaoHanh')">
+                        Bảo hành <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoBaoHanh == "BaoHanhAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoBaoHanh == "BaoHanhDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_BaoHanh" name="SapXepTheoBaoHanh" value="@Model.linhKienSearch?.SapXepTheoBaoHanh" />
+                    </th>
+                    <th>ĐKBH</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -198,8 +156,8 @@
                         <td><img style="width:40px; height:40px; object-fit: cover;" src="~/img/@item.Anh" alt="Alternate Text" /></td>
                         <td>@item.IdLinhKien</td>
                         <td>@item.TenLinhKien</td>
-                        <td>@item.IdLoaiLinhKienNavigation.TenLoaiLinhKien</td>
-                        <td>@item.IdNsxNavigation.TenNsx</td>
+                        <td>@item.IdLoaiLinhKienNavigation?.TenLoaiLinhKien</td>
+                        <td>@item.IdNsxNavigation?.TenNsx</td>
                         <td>@(item.Gia.ToString("#,##0") + " vnđ" ?? "0,00 vnđ")</td>
                         <td>@item.SoLuong</td>
                         <td>@item.ThoiGianBaoHanh Tháng</td>
@@ -227,7 +185,40 @@
     </div>
     <input type="hidden" id="page_active" name="PageActive" value="1" />
 </form>
+<style>
+    .sort-icon {
+        margin-left: 5px;
+        cursor: pointer;
+    }
 
+    .btn-secondary2 {
+        background-color: #fffee8;
+        color: black;
+        border-radius: 5px;
+        border: #ffebaf solid 1px;
+    }
+
+        .btn-secondary2:hover {
+            background-color: lightblue;
+        }
+
+    .btn-primary2:hover {
+        background-color: lightpink;
+    }
+
+    .mar {
+        margin-right: 50px;
+        color: black;
+        background-color: #fff0f2;
+        border-radius: 5px;
+        border: #ffcdc0 solid 1px;
+
+    }
+
+    .hei {
+        margin-bottom: 25px;
+    }
+</style>
 <script>
         const pageItems = document.querySelectorAll('.page-item');
 
@@ -253,6 +244,25 @@
         document.getElementById("searchForm").submit();
     }
 
+         function sortTable(column) {
+        const columns = ['MaLinhKien', 'TenLinhKien', 'LoaiLinhKien', 'NhaSanXuat', 'Gia', 'SoLuong', 'BaoHanh'];
+        columns.forEach(col => {
+            const input = document.getElementById(`sort_column_${col}`);
+            if (col === column) {
+                const currentSort = input.value;
+                let newSort = `${col}Asc`;
+                if (currentSort === `${col}Asc`) {
+                    newSort = `${col}Desc`;
+                } else if (currentSort === `${col}Desc`) {
+                    newSort = `${col}Asc`;
+                }
+                input.value = newSort;
+            } else {
+
+            }
+        });
+        submitForm();
+    }
       document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('searchForm');
         const resetBtn = document.getElementById('resetBtn');

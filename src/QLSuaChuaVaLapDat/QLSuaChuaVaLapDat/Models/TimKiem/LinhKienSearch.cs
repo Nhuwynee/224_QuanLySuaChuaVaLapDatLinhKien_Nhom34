@@ -13,7 +13,13 @@
         public string SapXep { get; set; } 
         public int TTSanPham { set; get; }
         public int PageActive { get; set; } = 1;
-
+        public string SapXepTheoMaLinhKien { get; set; }
+        public string SapXepTheoTenLinhKien { get; set; }
+        public string SapXepTheoLoaiLinhKien { get; set; }
+        public string SapXepTheoNhaSanXuat { get; set; }
+        public string SapXepTheoGia { get; set; }
+        public string SapXepTheoSoLuong { get; set; }
+        public string SapXepTheoBaoHanh { get; set; }
         public LinhKienSearch()
         {
             LoaiLinhKien = "Tất cả";

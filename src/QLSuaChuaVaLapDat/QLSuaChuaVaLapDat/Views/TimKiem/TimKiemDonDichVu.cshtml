@@ -7,6 +7,8 @@
         <div class="search-header">
             <div class="search-title">Tìm kiếm Đơn dịch vụ</div>
             <div class="search-actions">
+                <button class="btn btn-secondary2">Xuất Excel</button>
+                <button class="btn btn-primary2 mar">Xuất báo cáo</button>
                 <button type="button" class="btn btn-secondary" onclick="resetForm()">Làm mới</button>
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
             </div>
@@ -250,6 +252,33 @@
     .results-table th {
         text-align: left;
         font-size: 14px;
+    }
+
+    .btn-secondary2 {
+        background-color: #fffee8;
+        color: black;
+        border-radius: 5px;
+        border: #ffebaf solid 1px;
+    }
+
+        .btn-secondary2:hover {
+            background-color: lightblue;
+        }
+
+    .btn-primary2:hover {
+        background-color: lightpink;
+    }
+
+    .mar {
+        margin-right: 50px;
+        color: black;
+        background-color: #fff0f2;
+        border-radius: 5px;
+        border: #ffcdc0 solid 1px;
+    }
+
+    .hei {
+        margin-bottom: 25px;
     }
 </style>
 <script>

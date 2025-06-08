@@ -778,6 +778,49 @@ namespace QLSuaChuaVaLapDat.Controllers.TimKiem
                 string keyword = RemoveDiacritics(timKiemLinhKien.TenLinhKien.ToLower());
                 resultLinhKien = resultLinhKien.Where(u => RemoveDiacritics(u.TenLinhKien.ToLower()).Contains(keyword)).ToList();
             }
+            if (!string.IsNullOrEmpty(timKiemLinhKien.SapXepTheoMaLinhKien))
+            {
+                resultLinhKien = timKiemLinhKien.SapXepTheoMaLinhKien == "MaLinhKienAsc"
+                    ? resultLinhKien.OrderBy(dto => dto.IdLinhKien).ToList()
+                    : resultLinhKien.OrderByDescending(dto => dto.IdLinhKien).ToList();
+            }
+            if (!string.IsNullOrEmpty(timKiemLinhKien.SapXepTheoTenLinhKien))
+            {
+                resultLinhKien = timKiemLinhKien.SapXepTheoTenLinhKien == "TenLinhKienAsc"
+                    ? resultLinhKien.OrderBy(dto => dto.TenLinhKien).ToList()
+                    : resultLinhKien.OrderByDescending(dto => dto.TenLinhKien).ToList();
+            }
+            if (!string.IsNullOrEmpty(timKiemLinhKien.SapXepTheoLoaiLinhKien))
+            {
+                resultLinhKien = timKiemLinhKien.SapXepTheoLoaiLinhKien == "LoaiLinhKienAsc"
+                    ? resultLinhKien.OrderBy(dto => dto.IdLoaiLinhKienNavigation?.TenLoaiLinhKien).ToList()
+                    : resultLinhKien.OrderByDescending(dto => dto.IdLoaiLinhKienNavigation?.TenLoaiLinhKien).ToList();
+            }
+            if (!string.IsNullOrEmpty(timKiemLinhKien.SapXepTheoNhaSanXuat))
+            {
+                resultLinhKien = timKiemLinhKien.SapXepTheoNhaSanXuat == "NhaSanXuatAsc"
+                    ? resultLinhKien.OrderBy(dto => dto.IdNsxNavigation?.TenNsx).ToList()
+                    : resultLinhKien.OrderByDescending(dto => dto.IdNsxNavigation?.TenNsx).ToList();
+            }
+            if (!string.IsNullOrEmpty(timKiemLinhKien.SapXepTheoGia))
+            {
+                resultLinhKien = timKiemLinhKien.SapXepTheoGia == "GiaAsc"
+                    ? resultLinhKien.OrderBy(dto => dto.Gia).ToList()
+                    : resultLinhKien.OrderByDescending(dto => dto.Gia).ToList();
+            }
+            if (!string.IsNullOrEmpty(timKiemLinhKien.SapXepTheoSoLuong))
+            {
+                resultLinhKien = timKiemLinhKien.SapXepTheoSoLuong == "SoLuongAsc"
+                    ? resultLinhKien.OrderBy(dto => dto.SoLuong).ToList()
+                    : resultLinhKien.OrderByDescending(dto => dto.SoLuong).ToList();
+            }
+            if (!string.IsNullOrEmpty(timKiemLinhKien.SapXepTheoBaoHanh))
+            {
+                resultLinhKien = timKiemLinhKien.SapXepTheoBaoHanh == "BaoHanhAsc"
+                    ? resultLinhKien.OrderBy(dto => dto.ThoiGianBaoHanh).ToList()
+                    : resultLinhKien.OrderByDescending(dto => dto.ThoiGianBaoHanh).ToList();
+            }
+
 
             int totalRecords = resultLinhKien.Count;
             int totalPage = (int)Math.Ceiling((double)totalRecords / pageSize);
