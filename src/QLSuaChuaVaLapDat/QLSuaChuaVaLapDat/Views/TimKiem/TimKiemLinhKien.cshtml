@@ -1,13 +1,36 @@
 ﻿@model QLSuaChuaVaLapDat.ViewModel.TimKiemLinhKiemVM
 @using QLSuaChuaVaLapDat.Models.TimKiem
-
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 <form id="searchForm" method="post" asp-action="TimKiemLinhKien">
     <div class="search-container" id="components">
         <div class="search-header">
             <div class="search-title">Tìm kiếm Linh kiện</div>
             <div class="search-actions">
-                <button class="btn btn-secondary2">Xuất Excel</button>
-                <button class="btn btn-primary2 mar">Xuất báo cáo</button>
+                <button class="btn btn-secondary2"><i class="fa-solid fa-table-cells"></i> Xuất Excel</button>
+                <input type="hidden" name="isexport" id="isexport" value="@ViewBag.IsExport" />
+
+                <button class="btn btn-primary2 mar"> <i class="fa-solid fa-download"></i> Xuất báo cáo</button>
+                <input type="hidden" name="isBaoCao" id="isBaoCao" value="@ViewBag.IsBaoCao" />
+
+                <script>
+                    document.querySelector('.btn.btn-secondary2').addEventListener('click', function (event) {
+                    event.preventDefault();
+                    document.getElementById('isexport').value = '1';
+                    document.getElementById('isBaoCao').value = '0';
+                    document.querySelector('form').submit();
+                    document.getElementById('isexport').value = '0';
+                    });
+
+                    document.querySelector('.btn.btn-primary2.mar').addEventListener('click', function (event) {
+                    event.preventDefault();
+                    document.getElementById('isBaoCao').value = '1';
+                    document.getElementById('isexport').value = '0';
+                    document.querySelector('form').submit();
+                    document.getElementById('isBaoCao').value = '0';
+                    });
+
+
+                </script>
                 <button type="button" class="btn btn-secondary" onclick="resetForm()">Làm mới</button>
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
             </div>
@@ -37,7 +60,7 @@
                     <option value="">Tất cả</option>
                     @foreach (var item in Model.LoaiLinhKiens)
                     {
-                        if (item.IdLoaiLinhKien == loaiLK)
+                        if (item.TenLoaiLinhKien == loaiLK)
                         {
                             <option value="@item.TenLoaiLinhKien" selected>@item.TenLoaiLinhKien</option>
                         }
@@ -53,9 +76,20 @@
                 <label for="comp-manu">Nhà sản xuất</label>
                 <select id="comp-manu" name="NhaSanXuat">
                     <option value="">Tất cả</option>
+                    @{
+                        var idNsx = Model.linhKienSearch.NhaSanXuat;
+                    }
                     @foreach (var item in Model.NhaSanXuats)
                     {
-                        <option value="@item.IdNsx">@item.TenNsx</option>
+                        if (item.IdNsx == idNsx)
+                        {
+                            <option value="@item.IdNsx" selected>@item.TenNsx</option>
+                        }
+                        else
+                        {
+                            <option value="@item.IdNsx">@item.TenNsx</option>
+                        }
+
                     }
                 </select>
             </div>
@@ -72,8 +106,8 @@
                 <div class="slider-container">
                     <div class="slider-track"></div>
                     <div class="slider-range" id="slider-range"></div>
-                    <input type="range" name="GiaTu" id="rangeMin" min="0" max="5000000" style="border: none;" value="0" step="20000">
-                    <input type="range" name="GiaDen" id="rangeMax" min="0" max="5000000" style="border: none;" value="5000000" step="20000">
+                    <input type="range" name="GiaTu" id="rangeMin" min="0" max="1500000" style="border: none;" value="0" step="10000">
+                    <input type="range" name="GiaDen" id="rangeMax" min="0" max="1500000" style="border: none;" value="1500000" step="10000">
                 </div>
             </div>
 
@@ -97,10 +131,39 @@
 
         <div class="filter-sort">
             <div class="filter-section">
+                @{
+                    var ttSanPham = Model.linhKienSearch.TTSanPham;
+                }
                 <span>Lọc theo tình trạng:</span>
-                <select name="TTSanPham">
-                    <option value="1">Còn hàng</option>
-                    <option value="0">Hết hàng</option>
+                <select name="TTSanPham" onchange="submitForm()">
+                    @if (ttSanPham == null)
+                    {
+                        <option value="" selected>Tất cả</option>
+                    }
+                    else
+                    {
+                        <option value="">Tất cả</option>
+                    }
+
+                    @if (ttSanPham == 1)
+                    {
+                        <option value="1" selected>Còn hàng</option>
+                    }
+                    else
+                    {
+                        <option value="1">Còn hàng</option>
+                    }
+
+
+                    @if (ttSanPham == 0)
+                    {
+                        <option value="0" selected>Hết hàng</option>
+                    }
+                    else
+                    {
+                        <option value="0">Hết hàng</option>
+                    }
+
                 </select>
 
             </div>

@@ -1,11 +1,35 @@
 ﻿@model QLSuaChuaVaLapDat.ViewModel.BaoHanhSearchVM
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 <form id="searchForm" method="post" asp-action="TimKiemBaoHanh">
     <div class="search-container " id="warranty">
         <div class="search-header">
             <div class="search-title hei">Tìm kiếm Bảo hành</div>
             <div class="search-actions">
-                <button class="btn btn-secondary2">Xuất Excel</button>
-                <button class="btn btn-primary2 mar">Xuất báo cáo</button>
+                <button class="btn btn-secondary2"><i class="fa-solid fa-table-cells"></i> Xuất Excel</button>
+                <input type="hidden" name="isexport" id="isexport" value="@ViewBag.IsExport" />
+
+                <button class="btn btn-primary2 mar"> <i class="fa-solid fa-download"></i> Xuất báo cáo</button>
+                <input type="hidden" name="isBaoCao" id="isBaoCao" value="@ViewBag.IsBaoCao" />
+
+                <script>
+                    document.querySelector('.btn.btn-secondary2').addEventListener('click', function (event) {
+                        event.preventDefault();
+                        document.getElementById('isexport').value = '1';
+                        document.getElementById('isBaoCao').value = '0';
+                        document.querySelector('form').submit();
+                        document.getElementById('isexport').value = '0';
+                    });
+
+                    document.querySelector('.btn.btn-primary2.mar').addEventListener('click', function (event) {
+                        event.preventDefault();
+                        document.getElementById('isBaoCao').value = '1';
+                        document.getElementById('isexport').value = '0';
+                        document.querySelector('form').submit();
+                        document.getElementById('isBaoCao').value = '0';
+                    });
+
+
+                </script>
                 <button class="btn btn-secondary" onclick="resetForm()">Làm mới</button>
                 <button class="btn btn-primary">Tìm kiếm</button>
             </div>
@@ -44,7 +68,7 @@
                 @{
                     var trangThai = Model.baoHanhSearch.TrangThai;
                 }
-                <select name="TrangThai" id="war-status">
+                <select name="TrangThai" id="war-status" onchange="submitForm()">
                     @if (trangThai == null)
                     {
                         <option value="" selected>Tất cả</option>
@@ -54,20 +78,20 @@
 
                     @if (trangThai == true)
                     {
-                        <option value="1" selected>Đang bảo hành</option>
+                        <option value="true" selected>Đang bảo hành</option>
                     }
                     else
                     {
-                        <option value="1">Đang bảo hành</option>
+                        <option value="true">Đang bảo hành</option>
                     }
 
                     @if (trangThai == false)
                     {
-                        <option value="0" selected>Hết hạn</option>
+                        <option value="false" selected>Hết hạn</option>
                     }
                     else
                     {
-                        <option value="0">Hết hạn</option>
+                        <option value="false">Hết hạn</option>
                     }
 
 
@@ -78,19 +102,16 @@
             <div class="form-group">
                 <label for="war-from">Từ ngày</label>
                 <input name="TuNgay" type="date"
-                @(Model.baoHanhSearch.TuNgay != null
-                                    ? $"value={Model.baoHanhSearch.TuNgay}"
-                                    : "")
-                id="war-from">
+                       value="@(Model.baoHanhSearch.TuNgay != null ? Model.baoHanhSearch.TuNgay?.ToString("yyyy-MM-dd") : "")"
+                       id="war-from">
             </div>
 
             <div class="form-group">
                 <label for="war-to">Đến ngày</label>
                 <input name="DenNgay" type="date"
-                @(Model.baoHanhSearch.DenNgay != null
-                                    ? $"value={Model.baoHanhSearch.DenNgay}"
-                                    : "")
-                id="war-to">
+                       value="@(Model.baoHanhSearch.DenNgay != null ? Model.baoHanhSearch.DenNgay?.ToString("yyyy-MM-dd") : "")"
+                       id="war-to">
+            </div>
             </div>
         </div>
 
@@ -224,9 +245,9 @@
                         <td>@item.TenKhachHang</td>
 
 
-                        <td>@item.NgayKichHoat</td>
+                    <td>@item.NgayKichHoat?.ToString("dd/MM/yyyy")</td>
+                    <td>@item.NgayHetHan?.ToString("dd/MM/yyyy")</td>
 
-                        <td>@item.NgayHetHan</td>
                         @if (@item.TrangThaiBaoHanh == true)
                         {
                             <td><span class="status status-confirmed">Đang bảo hành</span></td>

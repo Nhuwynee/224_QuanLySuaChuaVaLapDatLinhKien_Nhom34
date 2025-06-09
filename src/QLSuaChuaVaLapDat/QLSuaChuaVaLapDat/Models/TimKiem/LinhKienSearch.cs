@@ -20,6 +20,9 @@
         public string SapXepTheoGia { get; set; }
         public string SapXepTheoSoLuong { get; set; }
         public string SapXepTheoBaoHanh { get; set; }
+        public int? isexport { get; set; } = 0;
+
+        public int? isBaoCao { get; set; } = 0;
         public LinhKienSearch()
         {
             LoaiLinhKien = "Tất cả";

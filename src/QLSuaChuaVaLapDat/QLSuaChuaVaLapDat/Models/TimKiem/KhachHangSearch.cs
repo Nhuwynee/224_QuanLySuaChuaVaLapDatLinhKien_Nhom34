@@ -17,7 +17,11 @@
         public string? SapXepTheoTongSoDon { get; set; } = null;
         public string? SapXepTheoTongSoTienSuaChua { get; set; } = null;
         public int pageActive { get; set; }
-        
+
+        public int? isexport { get; set; } = 0;
+
+        public int? isBaoCao { get; set; } = 0;
+
         public KhachHangSearch() {
             NhomKhachHang = null;
            

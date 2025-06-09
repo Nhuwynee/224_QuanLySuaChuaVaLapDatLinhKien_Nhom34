@@ -21,5 +21,8 @@
         public string SapXepTheoNgayKichHoat { get; set; }
         public string SapXepTheoNgayHetHan { get; set; }
         public string SapXepTheoTrangThaiBaoHanh { get; set; }
+        public int? isexport { get; set; } = 0;
+
+        public int? isBaoCao { get; set; } = 0;
     }
 }

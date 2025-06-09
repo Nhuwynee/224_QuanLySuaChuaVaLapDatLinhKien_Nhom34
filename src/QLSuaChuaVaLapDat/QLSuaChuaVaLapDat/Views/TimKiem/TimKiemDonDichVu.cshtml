@@ -2,15 +2,16 @@
 @{
     ViewData["Title"] = "Tìm kiếm";
 }
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 <form id="searchForm" method="post" asp-action="TimKiemDonDichVu">
     <div class="search-container" id="service-orders">
         <div class="search-header">
             <div class="search-title">Tìm kiếm Đơn dịch vụ</div>
             <div class="search-actions">
-                <button class="btn btn-secondary2">Xuất Excel</button>
+                <button class="btn btn-secondary2"><i class="fa-solid fa-table-cells"></i> Xuất Excel</button>
                 <input type="hidden" name="isexport" id="isexport" value="@ViewBag.IsExport" />
 
-                <button class="btn btn-primary2 mar">Xuất báo cáo</button>
+                <button class="btn btn-primary2 mar"> <i class="fa-solid fa-download"></i> Xuất báo cáo</button>
                 <input type="hidden" name="isBaoCao" id="isBaoCao" value="@ViewBag.IsBaoCao" />
 
                 <script>
