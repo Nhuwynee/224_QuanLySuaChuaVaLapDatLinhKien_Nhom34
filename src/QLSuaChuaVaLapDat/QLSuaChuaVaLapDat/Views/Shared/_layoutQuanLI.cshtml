@@ -7,10 +7,15 @@
     <link rel="stylesheet" href="~/css/sidebar2.css" />
     <link rel="stylesheet" href="~/css/style_timkiem.css" />
     <link rel="stylesheet" href="~/css/export-modal.css" />
-    
+
+    <!-- Thêm Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Render Styles section from views -->
     @RenderSection("Styles", required: false)
-    
+
     <script src="~/js/sidebar.js" defer></script>
+    <script src="~/js/export-excel.js"></script>
 </head>
 <body>
     <nav id="sidebar">
@@ -90,7 +95,11 @@
     <main>
         @RenderBody()
     </main>
-    
+
+    <!-- Render Scripts section from views -->
     @RenderSection("Scripts", required: false)
+
+    <script src="~/js/sidebar.js" defer></script>
+    <script src="~/js/export-excel.js"></script>
 </body>
 </html>

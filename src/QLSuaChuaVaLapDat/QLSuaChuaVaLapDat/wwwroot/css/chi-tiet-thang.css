@@ -176,6 +176,17 @@
 .chart-wrapper {
     height: 400px;
     position: relative;
+    width: 100%;
+}
+
+    .chart-wrapper canvas {
+        max-height: 400px !important;
+    }
+
+/* Debug styles */
+#revenueChart {
+    border: 1px solid #ddd;
+    background-color: #fff;
 }
 
 /* Filters Section */

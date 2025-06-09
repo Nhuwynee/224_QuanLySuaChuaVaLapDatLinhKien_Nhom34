@@ -1,5 +1,11 @@
 ﻿import { Chart } from "@/components/ui/chart"
 document.addEventListener("DOMContentLoaded", () => {
+    // Kiểm tra Chart.js đã load chưa
+    if (typeof Chart === "undefined") {
+        console.error("Chart.js chưa được load!")
+        return
+    }
+
     // Initialize chart
     initializeChart()
 
@@ -18,7 +24,7 @@ let currentChartType = "pie"
 let currentPage = 1
 let pageSize = 25
 let filteredData = []
-const bootstrap = window.bootstrap // Declare bootstrap variable
+const bootstrap = window.bootstrap // Declare the bootstrap variable
 
 // Chart functionality
 function initializeChart() {
@@ -29,12 +35,17 @@ function initializeChart() {
     }
 
     const customerData = getCustomerData()
+    console.log("Customer data:", customerData)
+
     if (customerData.length === 0) {
         console.log("No customer data found")
+        // Hiển thị thông báo không có dữ liệu
+        ctx.getContext("2d").fillText("Không có dữ liệu để hiển thị", 10, 50)
         return
     }
 
     const top10Data = customerData.slice(0, 10)
+    console.log("Top 10 data:", top10Data)
 
     const chartData = {
         labels: top10Data.map((c) => c.name),
@@ -49,10 +60,10 @@ function initializeChart() {
                     "#4BC0C0",
                     "#9966FF",
                     "#FF9F40",
-                    "#FF6384",
-                    "#C9CBCF",
-                    "#4BC0C0",
-                    "#FF6384",
+                    "#FF6B6B",
+                    "#4ECDC4",
+                    "#45B7D1",
+                    "#96CEB4",
                 ],
                 borderWidth: 2,
                 borderColor: "#fff",
@@ -61,34 +72,41 @@ function initializeChart() {
     }
 
     try {
+        // Destroy existing chart if exists
+        if (currentChart) {
+            currentChart.destroy()
+        }
+
         currentChart = new Chart(ctx, {
             type: currentChartType,
             data: chartData,
             options: getChartOptions(),
         })
-        console.log("Chart initialized successfully")
+        console.log("Chart initialized successfully with type:", currentChartType)
     } catch (error) {
         console.error("Error initializing chart:", error)
     }
 }
 
 function changeChartType(type) {
+    console.log("Changing chart type to:", type)
     currentChartType = type
 
     // Update button states
     document.querySelectorAll(".chart-controls .btn").forEach((btn) => {
         btn.classList.remove("active")
     })
+
     const targetBtn = document.getElementById(`chartType${type.charAt(0).toUpperCase() + type.slice(1)}`)
     if (targetBtn) {
         targetBtn.classList.add("active")
+        console.log("Button activated:", targetBtn.id)
+    } else {
+        console.error("Button not found:", `chartType${type.charAt(0).toUpperCase() + type.slice(1)}`)
     }
 
-    // Update chart
-    if (currentChart) {
-        currentChart.destroy()
-        initializeChart()
-    }
+    // Reinitialize chart with new type
+    initializeChart()
 }
 
 function getChartOptions() {
@@ -107,7 +125,14 @@ function getChartOptions() {
                 callbacks: {
                     label: (context) => {
                         const label = context.label || ""
-                        const value = formatCurrency(context.parsed.y || context.parsed)
+                        let value
+
+                        if (currentChartType === "pie") {
+                            value = formatCurrency(context.parsed)
+                        } else {
+                            value = formatCurrency(context.parsed.y)
+                        }
+
                         return `${label}: ${value}`
                     },
                 },
@@ -123,6 +148,12 @@ function getChartOptions() {
                     beginAtZero: true,
                     ticks: {
                         callback: (value) => formatCurrency(value),
+                    },
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 0,
                     },
                 },
             },
@@ -315,16 +346,23 @@ function exportToExcel() {
 
 // Customer details functionality
 function viewCustomerDetails(customerName) {
-    // Check if bootstrap is available
+    // Simple alert if bootstrap is not available
     if (typeof bootstrap === "undefined") {
+        alert(`Chi tiết khách hàng: ${customerName}\n\nChức năng này cần Bootstrap để hiển thị modal.`)
+        return
+    }
+
+    const modalElement = document.getElementById("customerDetailsModal")
+    if (!modalElement) {
         alert(`Chi tiết khách hàng: ${customerName}`)
         return
     }
 
-    const modal = new bootstrap.Modal(document.getElementById("customerDetailsModal"))
+    const modal = new bootstrap.Modal(modalElement)
     const content = document.getElementById("customerDetailsContent")
 
-    content.innerHTML = `
+    if (content) {
+        content.innerHTML = `
         <div class="text-center">
             <div class="spinner-border" role="status">
                 <span class="visually-hidden">Đang tải...</span>
@@ -332,12 +370,14 @@ function viewCustomerDetails(customerName) {
             <p class="mt-2">Đang tải thông tin chi tiết...</p>
         </div>
     `
+    }
 
     modal.show()
 
     // Simulate API call
     setTimeout(() => {
-        content.innerHTML = `
+        if (content) {
+            content.innerHTML = `
             <h5>Thông tin khách hàng: ${customerName}</h5>
             <div class="row">
                 <div class="col-md-6">
@@ -377,16 +417,26 @@ function viewCustomerDetails(customerName) {
                 </table>
             </div>
         `
+        }
     }, 1000)
 }
 
 // Utility functions
 function getCustomerData() {
     const rows = document.querySelectorAll(".customer-row")
-    return Array.from(rows).map((row) => ({
-        name: row.querySelector(".customer-name")?.textContent || "",
-        revenue: Number.parseFloat(row.dataset.revenue) || 0,
-    }))
+    console.log("Found customer rows:", rows.length)
+
+    const data = Array.from(rows)
+        .map((row) => {
+            const name = row.querySelector(".customer-name")?.textContent?.trim() || ""
+            const revenue = Number.parseFloat(row.dataset.revenue) || 0
+            console.log("Customer:", name, "Revenue:", revenue)
+            return { name, revenue }
+        })
+        .filter((item) => item.name && item.revenue > 0)
+
+    console.log("Processed customer data:", data)
+    return data
 }
 
 function formatCurrency(value) {
@@ -412,3 +462,11 @@ function debounce(func, wait) {
 window.changePage = changePage
 window.changeChartType = changeChartType
 window.viewCustomerDetails = viewCustomerDetails
+
+// Debug function
+window.debugChart = () => {
+    console.log("Chart.js available:", typeof Chart !== "undefined")
+    console.log("Canvas element:", document.getElementById("revenueChart"))
+    console.log("Customer data:", getCustomerData())
+    console.log("Current chart:", currentChart)
+}
