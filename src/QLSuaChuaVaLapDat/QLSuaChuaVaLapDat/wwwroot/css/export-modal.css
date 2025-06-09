@@ -1,0 +1,312 @@
+.export-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.export-modal {
+    background-color: var(--base-clr);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 550px;
+    padding: 1.5rem;
+    position: relative;
+    animation: slideIn 0.3s ease-out;
+}
+
+.export-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--line-clr);
+}
+
+.export-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--secondary-text-clr);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.export-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-clr);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+    .export-modal-close:hover {
+        background-color: var(--hover-clr);
+        color: var(--secondary-text-clr);
+    }
+
+.export-modal-body {
+    margin-bottom: 1.5rem;
+}
+
+.export-option {
+    margin-bottom: 1.5rem;
+}
+
+.export-option-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--secondary-text-clr);
+}
+
+.export-date-range {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.export-date-field {
+    flex: 1;
+}
+
+.export-date-separator {
+    color: var(--text-clr);
+    font-weight: 500;
+}
+
+.export-select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--line-clr);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.95rem;
+    color: var(--text-clr);
+    background-color: var(--base-clr);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .export-select:focus {
+        border-color: var(--accent-clr);
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        outline: none;
+    }
+
+.year-input-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.year-select-wrapper {
+    position: relative;
+}
+
+.year-custom-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--line-clr);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.95rem;
+    color: var(--text-clr);
+    background-color: var(--base-clr);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .year-custom-input:focus {
+        border-color: var(--accent-clr);
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        outline: none;
+    }
+
+.year-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--base-clr);
+    border: 1px solid var(--line-clr);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1001;
+    display: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.year-suggestion-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid var(--line-clr);
+}
+
+    .year-suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+    .year-suggestion-item:hover {
+        background-color: var(--hover-clr);
+    }
+
+    .year-suggestion-item.highlighted {
+        background-color: var(--accent-clr);
+        color: white;
+    }
+
+.year-input-hint {
+    font-size: 0.8rem;
+    color: var(--text-clr);
+    font-style: italic;
+}
+
+.export-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line-clr);
+}
+
+.btn-cancel {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--line-clr);
+    background-color: var(--base-clr);
+    color: var(--text-clr);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+    .btn-cancel:hover {
+        background-color: var(--hover-clr);
+        border-color: var(--text-clr);
+    }
+
+.btn-export {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--accent-clr);
+    background-color: var(--accent-clr);
+    color: white;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+    .btn-export:hover {
+        background-color: var(--accent-hover-clr);
+        border-color: var(--accent-hover-clr);
+    }
+
+.export-radio-group {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 20px;
+}
+
+.export-radio-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+    .export-radio-option input[type="radio"] {
+        margin-right: 0.5rem;
+    }
+
+    .export-radio-option label {
+        color: var(--text-clr);
+        cursor: pointer;
+    }
+
+.export-fields {
+    margin-top: 1rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--accent-clr);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-left: 1rem;
+}
+
+    .export-btn:hover {
+        background-color: var(--accent-hover-clr);
+    }
+
+    .export-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid var(--accent-clr);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

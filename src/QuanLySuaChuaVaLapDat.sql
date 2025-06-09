@@ -73,7 +73,7 @@ CREATE TABLE LinhKien (
     gia DECIMAL(18,2) NOT NULL CHECK (gia >= 0),
     soLuong INT NOT NULL CHECK (soLuong >= 0),
     anh NVARCHAR(100), -- path
-    thoiGianBaoHanh DATE NOT NULL,
+    thoiGianBaoHanh INT NOT NULL,
     dieuKienBaoHanh NVARCHAR(500) NOT NULL
 );
 
@@ -167,6 +167,12 @@ CREATE TABLE DanhGia (
     gopY NTEXT
 );
 
+
+select * from dbo.DonDichVu
+
+update dbo.DonDichVu
+set trangThaiDon =N'Đang sửa chữa'
+where idDonDichVu ='DDV001'
 ------------------------- INSERT
 
 INSERT INTO ThanhPho (idThanhPho, tenThanhPho) VALUES
@@ -359,27 +365,28 @@ INSERT INTO LoaiLinhKien (idLoaiLinhKien, tenLoaiLinhKien) VALUES
 ('LLK019', N'Mạch sạc / pin'),
 ('LLK020', N'Cầu chì / Bảo vệ mạch');
 
-INSERT INTO LinhKien (idLinhKien, idNSX, idLoaiLinhKien, tenLinhKien, gia, soLuong, anh, thoiGianBaoHanh, dieuKienBaoHanh) VALUES
-('LK001', 'NSX001', 'LLK001', N'Tụ điện 450V 50uF', 25000, 300, 'tu_dien_450v.jpg', '2025-12-31', N'Bảo hành 12 tháng'),
-('LK002', 'NSX001', 'LLK002', N'Điện trở công suất 5W 220Ω', 5000, 500, 'dien_tro_5w.jpg', '2025-12-31', N'Không đổi trả sau hư hỏng do quá tải'),
-('LK003', 'NSX002', 'LLK003', N'Cuộn cảm 10mH 5A lõi ferrite', 18000, 250, 'cuon_cam_10mh.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK004', 'NSX002', 'LLK004', N'Diode Schottky 1N5819', 3000, 1000, 'diode.jpg', '2025-12-31', N'Không bảo hành do linh kiện nhỏ'),
-('LK005', 'NSX003', 'LLK005', N'Triac BTA16-600B', 9000, 400, 'triac.jpg', '2025-12-31', N'Bảo hành 3 tháng'),
-('LK006', 'NSX003', 'LLK006', N'MOSFET IRF540N 100V 33A', 12000, 600, 'mosfet.jpg', '2025-12-31', N'Không bảo hành nếu chân gãy'),
-('LK007', 'NSX004', 'LLK007', N'IC nguồn LNK304PN', 15000, 350, 'ic_lnk.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK008', 'NSX004', 'LLK008', N'IC vi điều khiển ATmega328P', 40000, 200, 'ic_atmega.jpg', '2025-12-31', N'Không bảo hành khi chân bị hàn lỗi'),
-('LK009', 'NSX005', 'LLK009', N'Relay 12VDC 10A', 18000, 450, 'relay_12v.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK010', 'NSX005', 'LLK010', N'Cảm biến nhiệt độ NTC 10K', 6000, 700, 'cam_bien_ntc.jpg', '2025-12-31', N'Không bảo hành'),
-('LK011', 'NSX006', 'LLK011', N'Cảm biến dòng ACS712 20A', 35000, 300, 'cam_bien_acs.jpg', '2025-12-31', N'Bảo hành 3 tháng'),
-('LK012', 'NSX006', 'LLK012', N'Mạch nguồn xung 5V 2A mini', 48000, 150, 'mach_nguon_5v.jpg', '2025-12-31', N'Bảo hành 12 tháng'),
-('LK013', 'NSX007', 'LLK013', N'Mạch inverter 220V LED', 65000, 100, 'mach_led.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK014', 'NSX007', 'LLK014', N'Mạch điều khiển vi xử lý STM32', 98000, 120, 'mach_stm32.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK015', 'NSX008', 'LLK015', N'Socket DIP 28 chân', 3000, 1000, 'socket_dip.jpg', '2025-12-31', N'Không bảo hành'),
-('LK016', 'NSX008', 'LLK016', N'Jack nguồn DC 5.5mm', 2000, 1200, 'jack_dc.jpg', '2025-12-31', N'Không bảo hành'),
-('LK017', 'NSX009', 'LLK017', N'Motor DC 12V 200rpm', 50000, 160, 'motor_12v.jpg', '2025-12-31', N'Bảo hành 6 tháng'),
-('LK018', 'NSX009', 'LLK018', N'Board mạch điện tử đa năng', 75000, 140, 'board.jpg', '2025-12-31', N'Bảo hành 12 tháng'),
-('LK019', 'NSX010', 'LLK019', N'Mạch sạc pin lithium 3.7V TP4056', 12000, 400, 'mach_tp.jpg', '2025-12-31', N'Không bảo hành'),
-('LK020', 'NSX010', 'LLK020', N'Cầu chì 5A 250V chân cắm', 4000, 600, 'cauchi_5a.jpg', '2025-12-31', N'Không bảo hành');
+INSERT INTO LinhKien (idLinhKien, idNSX, idLoaiLinhKien, tenLinhKien, gia, soLuong, thoiGianBaoHanh, dieuKienBaoHanh) VALUES
+('LK001', 'NSX001', 'LLK001', N'Tụ điện 450V 50uF', 25000, 300, 3, N'Bảo hành lỗi từ nhà sản xuất hoặc hư hỏng do vận chuyển'),
+('LK002', 'NSX001', 'LLK002', N'Điện trở công suất 5W 220Ω', 5000, 500, 6, N'Bảo hành lỗi kỹ thuật hoặc sử dụng sai điện áp'),
+('LK003', 'NSX002', 'LLK003', N'Cuộn cảm 10mH 5A lõi ferrite', 18000, 250, 9, N'Bảo hành lỗi vật liệu hoặc môi trường ẩm ướt'),
+('LK004', 'NSX002', 'LLK004', N'Diode Schottky 1N5819', 3000, 1000, 12, N'Bảo hành lỗi sản xuất hoặc quá nhiệt'),
+('LK005', 'NSX003', 'LLK005', N'Triac BTA16-600B', 9000, 400, 15, N'Bảo hành lỗi thiết kế hoặc hư hỏng do ngắn mạch'),
+('LK006', 'NSX003', 'LLK006', N'MOSFET IRF540N 100V 33A', 12000, 600, 18, N'Bảo hành lỗi từ nhà sản xuất hoặc va đập'),
+('LK007', 'NSX004', 'LLK007', N'IC nguồn LNK304PN', 15000, 350, 24, N'Bảo hành lỗi chip hoặc nguồn điện không ổn định'),
+('LK008', 'NSX004', 'LLK008', N'IC vi điều khiển ATmega328P', 40000, 200, 3, N'Bảo hành lỗi lập trình hoặc hư hỏng chân hàn'),
+('LK009', 'NSX005', 'LLK009', N'Relay 12VDC 10A', 18000, 450, 12, N'Bảo hành lỗi cơ học hoặc quá tải'),
+('LK010', 'NSX005', 'LLK010', N'Cảm biến nhiệt độ NTC 10K', 6000, 700, 6, N'Bảo hành lỗi cảm biến hoặc môi trường khắc nghiệt'),
+('LK011', 'NSX006', 'LLK011', N'Cảm biến dòng ACS712 20A', 35000, 300, 7, N'Bảo hành lỗi đo lường hoặc hư hỏng do từ trường'),
+('LK012', 'NSX006', 'LLK012', N'Mạch nguồn xung 5V 2A mini', 48000, 150, 3, N'Bảo hành lỗi linh kiện hoặc điện áp không đúng'),
+('LK013', 'NSX007', 'LLK013', N'Mạch inverter 220V LED', 65000, 100, 12, N'Bảo hành lỗi biến áp hoặc sử dụng sai tải'),
+('LK014', 'NSX007', 'LLK014', N'Mạch điều khiển vi xử lý STM32', 98000, 120, 12, N'Bảo hành lỗi phần mềm hoặc hư hỏng do sét đánh'),
+('LK015', 'NSX008', 'LLK015', N'Socket DIP 28 chân', 3000, 1000, 0, N'Không bảo hành do linh kiện tiêu hao'),
+('LK016', 'NSX008', 'LLK016', N'Jack nguồn DC 5.5mm', 2000, 1200, 0, N'Không bảo hành do hư hỏng vật lý'),
+('LK017', 'NSX009', 'LLK017', N'Motor DC 12V 200rpm', 50000, 160, 12, N'Bảo hành lỗi động cơ hoặc quá tải'),
+('LK018', 'NSX009', 'LLK018', N'Board mạch điện tử đa năng', 75000, 140, 9, N'Bảo hành lỗi hàn hoặc môi trường bụi bẩn'),
+('LK019', 'NSX010', 'LLK019', N'Mạch sạc pin lithium 3.7V TP4056', 12000, 400, 6, N'Bảo hành lỗi mạch hoặc pin bị phồng'),
+('LK020', 'NSX010', 'LLK020', N'Cầu chì 5A 250V chân cắm', 4000, 600, 0, N'Không bảo hành do cháy nổ');
+GO
 
 
 INSERT INTO PhiLapDat (idPhiLapDat, idLinhKien, phi, ngayApDung) VALUES
@@ -683,49 +690,36 @@ VALUES
 ('DDV009', 'KH00025', NULL, 'NVKT008', 'CSKH014', 'TB009', N'Ổ cứng HDD 1TB', N'Khách hàng thường', '2025-02-09 14:00:00', '2025-02-09 15:30:00', 800000, N'Tại nhà', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-09 15:30:00'),
 
 -- Đơn 10: Khách vãng lai, NV kỹ thuật NVKT05
-('DDV010', NULL, 'KVL005', 'NVKT010', 'CSKH015', 'TB010', N'RAM DDR4 8GB', N'Khách vãng lai', '2025-02-10 11:00:00', '2025-02-10 12:30:00', 600000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Hoàn thành', '2025-02-10 12:30:00');
+('DDV010', NULL, 'KVL005', 'NVKT010', 'CSKH015', 'TB010', N'RAM DDR4 8GB', N'Khách vãng lai', '2025-02-10 11:00:00', '2025-02-10 12:30:00', 600000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Hoàn thành', '2025-02-10 12:30:00'),
 
+-- Đơn 11: Khách vãng lai, NV kỹ thuật NVKT05
+('DDV011', NULL, 'KVL005', 'NVKT010', 'CSKH015', 'TB010', N'RAM DDR4 8GB', N'Khách vãng lai', '2025-02-10 11:00:00', '2025-02-10 12:30:00', 600000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Đang sửa chữa', '2025-02-10 12:30:00');
+select * from ChiTietDonDichVu
+select * from LinhKien
 -- Thêm chi tiết đơn dịch vụ cho 10 đơn trên (mỗi đơn 2 chi tiết)
 INSERT INTO ChiTietDonDichVu (idCTDH, idDonDichVu, idLinhKien, idLoi, loaiDichVu, moTa, soLuong, ngayKetThucBH, thoiGianThemLinhKien, hanBaoHanh)
 VALUES
+('CT001', 'DDV001', NULL, 'L021', N'Sửa chữa', N'Sửa lỗi không lên hình', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
+('CT002', 'DDV001', 'LK001', NULL, N'Lắp đặt', N'Thay tụ điện mới', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT003', 'DDV002', NULL, 'L025', N'Sửa chữa', N'Khắc phục lỗi không lên màn hình', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
+('CT004', 'DDV002', 'LK002', NULL, N'Lắp đặt', N'Thay điện trở công suất', 2, NULL, '2025-01-02 10:00:00.000', 1),
+('CT005', 'DDV003', 'LK016', NULL, N'Lắp đặt', N'Thay jack nguồn cho màn hình', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT006', 'DDV003', NULL, 'L028', N'Sửa chữa', N'Cài đặt driver màn hình', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
+('CT007', 'DDV004', NULL, 'L030', N'Sửa chữa', N'Sửa lỗi liệt phím', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
+('CT008', 'DDV004', 'LK004', NULL, N'Lắp đặt', N'Thay diode bàn phím', 3, NULL, '2025-01-02 10:00:00.000', 1),
+('CT009', 'DDV005', NULL, 'L032', N'Sửa chữa', N'Sửa lỗi không nhận chuột', 1, '2025-05-04', '2025-01-02 10:00:00.000', 0),
+('CT010', 'DDV005', 'LK005', NULL, N'Lắp đặt', N'Thay triac cảm biến', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT011', 'DDV006', NULL, 'L034', N'Sửa chữa', N'Sửa lỗi không phát âm thanh', 1, '2025-05-06', '2025-01-02 10:00:00.000', 0),
+('CT012', 'DDV006', 'LK006', NULL, N'Lắp đặt', N'Thay MOSFET khuếch đại', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT013', 'DDV007', NULL, 'L036', N'Sửa chữa', N'Sửa lỗi không kết nối Bluetooth', 1, '2025-05-06', '2025-01-02 10:00:00.000', 0),
+('CT014', 'DDV007', 'LK007', NULL, N'Lắp đặt', N'Thay IC nguồn', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT015', 'DDV008', 'LK008', NULL, N'Lắp đặt', N'Lắp đặt SSD mới', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT016', 'DDV008', NULL, 'L038', N'Sửa chữa', N'Cài đặt hệ điều hành', 1, '2025-05-09', '2025-01-02 10:00:00.000', 0),
+('CT017', 'DDV009', NULL, 'L039', N'Sửa chữa', N'Khôi phục dữ liệu ổ cứng', 1, '2025-05-09', '2025-01-02 10:00:00.000', 0),
+('CT018', 'DDV009', 'LK009', NULL, N'Lắp đặt', N'Thay relay điều khiển', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT019', 'DDV010', 'LK010', NULL, N'Lắp đặt', N'Lắp đặt RAM mới', 1, NULL, '2025-01-02 10:00:00.000', 1),
+('CT020', 'DDV010', NULL, 'L040', N'Sửa chữa', N'Kiểm tra tương thích RAM', 1, '2025-05-09', '2025-01-02 10:00:00.000', 0);
 
-('CT001', 'DDV001', NULL, 'L021', N'Sửa chữa', N'Sửa lỗi không lên hình', 1, NULL, NULL, 0),
-('CT002', 'DDV001', 'LK001', NULL, N'Sửa chữa', N'Thay tụ điện mới', 1, '2025-05-01', '2025-02-01 10:00:00', 1),
-
-
-('CT003', 'DDV002', NULL, 'L025', N'Sửa chữa', N'Khắc phục lỗi không lên màn hình', 1, NULL, NULL, 0),
-('CT004', 'DDV002', 'LK002', NULL, N'Sửa chữa', N'Thay điện trở công suất', 2, '2025-05-02', '2025-02-02 11:45:00', 1),
-
-('CT005', 'DDV003', 'LK016', NULL, N'Lắp đặt', N'Thay jack nguồn cho màn hình', 1, NULL, NULL, 1),
-('CT006', 'DDV003', NULL, 'L028', N'Lắp đặt', N'Cài đặt driver màn hình', 1, NULL, NULL, 0),
-
-
-('CT007', 'DDV004', NULL, 'L030', N'Sửa chữa', N'Sửa lỗi liệt phím', 1, NULL, NULL, 0),
-('CT008', 'DDV004', 'LK004', NULL, N'Sửa chữa', N'Thay diode bàn phím', 3, '2025-05-04', '2025-02-04 15:00:00', 1),
-
-
-('CT009', 'DDV005', NULL, 'L032', N'Sửa chữa', N'Sửa lỗi không nhận chuột', 1, NULL, NULL, 0),
-('CT010', 'DDV005', 'LK005', NULL, N'Sửa chữa', N'Thay triac cảm biến', 1, '2025-05-05', '2025-02-05 11:30:00', 1),
-
-
-('CT011', 'DDV006', NULL, 'L034', N'Sửa chữa', N'Sửa lỗi không phát âm thanh', 1, NULL, NULL, 0),
-('CT012', 'DDV006', 'LK006', NULL, N'Sửa chữa', N'Thay MOSFET khuếch đại', 1, '2025-05-06', '2025-02-06 14:30:00', 1),
-
-
-('CT013', 'DDV007', NULL, 'L036', N'Sửa chữa', N'Sửa lỗi không kết nối Bluetooth', 1, NULL, NULL, 0),
-('CT014', 'DDV007', 'LK007', NULL, N'Sửa chữa', N'Thay IC nguồn', 1, '2025-05-07', '2025-02-07 10:15:00', 1),
-
-
-('CT015', 'DDV008', 'LK008', NULL, N'Lắp đặt', N'Lắp đặt SSD mới', 1, '2025-05-08', '2025-02-08 11:30:00', 1),
-('CT016', 'DDV008', NULL, 'L038', N'Lắp đặt', N'Cài đặt hệ điều hành', 1, NULL, NULL, 0),
-
-
-('CT017', 'DDV009', NULL, 'L039', N'Sửa chữa', N'Khôi phục dữ liệu ổ cứng', 1, NULL, NULL, 0),
-('CT018', 'DDV009', 'LK009', NULL, N'Sửa chữa', N'Thay relay điều khiển', 1, '2025-05-09', '2025-02-09 15:00:00', 1),
-
-
-('CT019', 'DDV010', 'LK010', NULL, N'Lắp đặt', N'Lắp đặt RAM mới', 1, '2025-05-10', '2025-02-10 12:00:00', 1),
-('CT020', 'DDV010', NULL, 'L040', N'Lắp đặt', N'Kiểm tra tương thích RAM', 1, NULL, NULL, 0);
 
 -- select * from [User]
 -- select * from DonDichVu
@@ -763,6 +757,38 @@ VALUES
 
 
 -- KHANH
+--========================================Trigger cập nhật trạng thái nhân viên=============================
+CREATE TRIGGER trg_UpdateTrangThaiNhanVienKyThuat 
+ON ChiTietDonDichVu
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Cập nhật trạng thái của các nhân viên kỹ thuật liên quan
+    UPDATE u
+    SET u.trangThai = 
+        CASE 
+            WHEN NOT EXISTS (
+                SELECT 1
+                FROM DonDichVu ddv
+                WHERE ddv.idNhanVienKyThuat = u.idUser
+                AND ddv.trangThaiDon = N'Hoàn thành'
+            ) THEN 1  -- rảnh
+            ELSE 0     -- bận
+        END
+    FROM [User] u
+    WHERE u.idRole = 'R002' -- chỉ cập nhật nhân viên kỹ thuật
+    AND u.idUser IN (
+        SELECT DISTINCT ddv.idNhanVienKyThuat
+        FROM inserted i
+        INNER JOIN DonDichVu ddv ON i.idDonDichVu = ddv.idDonDichVu
+        WHERE ddv.idNhanVienKyThuat IS NOT NULL
+    );
+END;
+GO
+
+
 --================================================Function tạo id lỗi kế tiếp=======================
 CREATE FUNCTION dbo.fn_GenerateNextLoiID()
 RETURNS CHAR(7)
@@ -863,7 +889,7 @@ BEGIN
     IF @MaxNum IS NULL
         SET @MaxNum = 0
 
-    -- Tạo ID mới, định dạng LK + 4 chữ số
+    -- Tạo ID mới, định dạng LK + 3 chữ số
     SET @NextID = 'LK' + RIGHT('000' + CAST(@MaxNum + 1 AS VARCHAR), 3)
 
     RETURN @NextID
@@ -875,7 +901,7 @@ CREATE PROCEDURE sp_InsertLinhKien
     @idLoaiLinhKien CHAR(7),
     @tenLinhKien NVARCHAR(100),
     @gia DECIMAL(18,2),
-    @soLuong CHAR(7),
+    @soLuong INT,
     @anh NVARCHAR(100),
     @thoiGianBaoHanh DATE,
     @dieuKienBaoHanh NVARCHAR(500)
@@ -925,7 +951,7 @@ CREATE PROCEDURE sp_UpdateLinhKien
     @idLoaiLinhKien CHAR(7) = NULL,
     @tenLinhKien NVARCHAR(100) = NULL,
     @gia DECIMAL(18,2) = NULL,
-    @soLuong CHAR(7) = NULL,
+    @soLuong INT = NULL,
     @anh NVARCHAR(100) = NULL,
     @thoiGianBaoHanh DATE = NULL,
     @dieuKienBaoHanh NVARCHAR(500) = NULL
@@ -965,7 +991,7 @@ EXEC sp_InsertLinhKien
     @idLoaiLinhKien = 'LLK001',
     @tenLinhKien = N'Tụ điện 500V 100uF',
     @gia = 35000,
-    @soLuong = '200',
+    @soLuong = 200,
     @anh = 'tu_dien_500v.jpg',
     @thoiGianBaoHanh = '2025-12-31',
     @dieuKienBaoHanh = N'Bảo hành 5 tháng, không bảo hành khi bị phồng tụ'
@@ -978,7 +1004,7 @@ EXEC sp_UpdateLinhKien
     @idLoaiLinhKien = 'LLK001',
     @tenLinhKien = N'Tụ điện 550V 100uF (Phiên bản mới)',
     @gia = 28000,
-    @soLuong = '350',
+    @soLuong = 350,
     @anh = 'tu_dien_550v_new.jpg'
 
 select * from LinhKien where idLinhKien = 'LK021'
@@ -1276,7 +1302,7 @@ WHERE idDonDichVu = 'DDV001';
 select * from LinhKien
 
 --------------************************************-------------------------
---functioin / proceduce
+--function / proceduce
 
 -- Nếu đã có sequence, xóa đi trước (nếu cần)
 -- Xóa sequence cũ nếu có
@@ -1431,3 +1457,21 @@ EXEC dbo.sp_InsertRole @tenRole = 'Admin';
 
 
 --------------************************************-------------------------
+
+
+INSERT INTO DonDichVu (
+    idDonDichVu, idUser, idKhachVangLai, idNhanVienKyThuat, idUserTaoDon,
+    idLoaiThietBi, tenThietBi, loaiKhachHang, ngayTaoDon, ngayHoanThanh,
+    tongTien, hinhThucDichVu, loaiDonDichVu, phuongThucThanhToan, trangThaiDon, ngayChinhSua
+)
+VALUES
+('DDV013', NULL, 'KVL001', 'NVKT007', 'CSKH012', 'TB002', N'PC Asus Gaming', N'Khách vãng lai', '2025-02-02 10:00:00', '2025-02-02 12:45:00', 1850000, N'Trực tiếp', N'Sửa chữa', N'Chuyển khoản', N'Hoàn thành', '2025-02-02 12:45:00'),
+('DDV014', 'KH00022', NULL, 'NVKT008', 'CSKH013', 'TB003', N'Màn hình LG 24inch', N'Khách hàng thường', '2025-02-03 08:30:00', '2025-02-03 10:15:00', 650000, N'Tại nhà', N'Lắp đặt', N'Tiền mặt', N'Hoàn thành', '2025-02-03 10:15:00'),
+('DDV015', NULL, 'KVL002', 'NVKT009', 'CSKH014', 'TB004', N'Bàn phím cơ', N'Khách vãng lai', '2025-02-04 14:00:00', '2025-02-04 15:30:00', 350000, N'Trực tiếp', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-04 15:30:00'),
+('DDV016', 'KH00023', NULL, 'NVKT010', 'CSKH015', 'TB005', N'Chuột không dây', N'Khách hàng thường', '2025-02-05 11:00:00', '2025-02-05 12:00:00', 250000, N'Tại nhà', N'Sửa chữa', N'Chuyển khoản', N'Hoàn thành', '2025-02-05 12:00:00'),
+('DDV017', NULL, 'KVL003', 'NVKT006', 'CSKH011', 'TB006', N'Loa vi tính', N'Khách vãng lai', '2025-02-06 13:30:00', '2025-02-06 15:00:00', 500000, N'Trực tiếp', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-06 15:00:00'),
+('DDV018', 'KH00024', NULL, 'NVKT007', 'CSKH012', 'TB007', N'Tai nghe Bluetooth', N'Khách hàng thường', '2025-02-07 09:15:00', '2025-02-07 10:45:00', 450000, N'Tại nhà', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-07 10:45:00'),
+('DDV019', NULL, 'KVL004', 'NVKT006', 'CSKH013', 'TB008', N'Ổ cứng SSD 512GB', N'Khách vãng lai', '2025-02-08 10:30:00', '2025-02-08 12:00:00', 1200000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Hoàn thành', '2025-02-08 12:00:00'),
+('DDV020', 'KH00025', NULL, 'NVKT008', 'CSKH014', 'TB009', N'Ổ cứng HDD 1TB', N'Khách hàng thường', '2025-02-09 14:00:00', '2025-02-09 15:30:00', 800000, N'Tại nhà', N'Sửa chữa', N'Tiền mặt', N'Hoàn thành', '2025-02-09 15:30:00'),
+('DDV021', NULL, 'KVL005', 'NVKT010', 'CSKH015', 'TB010', N'RAM DDR4 8GB', N'Khách vãng lai', '2025-02-10 11:00:00', '2025-02-10 12:30:00', 600000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Hoàn thành', '2025-02-10 12:30:00'),
+('DDV022', NULL, 'KVL005', 'NVKT010', 'CSKH015', 'TB010', N'RAM DDR4 8GB', N'Khách vãng lai', '2025-02-10 11:00:00', '2025-02-10 12:30:00', 600000, N'Trực tiếp', N'Lắp đặt', N'Chuyển khoản', N'Đang sửa chữa', '2025-02-10 12:30:00');

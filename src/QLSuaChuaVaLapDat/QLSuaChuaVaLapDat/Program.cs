@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using QLSuaChuaVaLapDat.Models;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddDbContext<QuanLySuaChuaVaLapDatContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add services to the container.
@@ -27,6 +27,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=QuanLi}/{action=Index}/{id?}");
+    pattern: "{controller=TimKiem}/{action=TimKiemDonDichVu}/{id?}");
 
 app.Run();

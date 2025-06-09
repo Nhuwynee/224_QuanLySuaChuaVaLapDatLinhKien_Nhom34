@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>@ViewData["Title"] ?? "Home"</title>
     <link rel="stylesheet" href="~/css/sidebar2.css" />
+    <link rel="stylesheet" href="~/css/style_timkiem.css" />
+    <link rel="stylesheet" href="~/css/export-modal.css" />
+    
+    @RenderSection("Styles", required: false)
+    
     <script src="~/js/sidebar.js" defer></script>
 </head>
 <body>
     <nav id="sidebar">
         <ul>
             <li>
-                <span class="logo">Tên Nhân viên</span>
+                <span class="logo">Tên Nhân viên Quản lý</span>
                 <button onclick=toggleSidebar() id="toggle-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z" /></svg>
                 </button>
@@ -20,6 +25,14 @@
                 <a href="@Url.Action("Index", "QuanLi")">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M240-200h120v-200q0-17 11.5-28.5T400-440h160q17 0 28.5 11.5T600-400v200h120v-360L480-740 240-560v360Zm-80 0v-360q0-19 8.5-36t23.5-28l240-180q21-16 48-16t48 16l240 180q15 11 23.5 28t8.5 36v360q0 33-23.5 56.5T720-120H560q-17 0-28.5-11.5T520-160v-200h-80v200q0 17-11.5 28.5T400-120H240q-33 0-56.5-23.5T160-200Zm320-270Z" /></svg>
                     <span>Home</span>
+                </a>
+            </li>
+            <li class="@(ViewContext.RouteData.Values["action"].ToString() == "TimKiemDonDichVu" || ViewContext.RouteData.Values["action"].ToString() == "TimKiemKhachHang" || ViewContext.RouteData.Values["action"].ToString() == "TimKiemLinhKien" || ViewContext.RouteData.Values["action"].ToString() == "TimKiemBaoHanh" ? "active" : "")">
+                <a href="@Url.Action("TimKiemDonDichVu", "TimKiem")">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                    </svg>
+                    <span>Tìm kiếm</span>
                 </a>
             </li>
             <li class="@(ViewContext.RouteData.Values["action"].ToString() == "thongKe" ? "active" : "")">
@@ -36,8 +49,8 @@
                 </button>
                 <ul class="sub-menu">
                     <div>
-                    <li class="@(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")" >
-                        <a href ="@Url.Action("Index", "LinhKien")">Linh kiện</a>
+                    <li class="@(ViewContext.RouteData.Values["action"].ToString() == "thongKe" ? "active" : "")">
+                        <a href="@Url.Action("Index", "LinhKien")">Linh kiện</a>
                     </li>
                     <li><a href="#">Document</a></li>
                     <li><a href="#">Project</a></li>
@@ -75,13 +88,9 @@
         </ul>
     </nav>
     <main>
-
-
         @RenderBody()
-
-
-
     </main>
+    
     @RenderSection("Scripts", required: false)
 </body>
 </html>

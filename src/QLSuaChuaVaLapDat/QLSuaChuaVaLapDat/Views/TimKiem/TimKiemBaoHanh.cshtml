@@ -1,0 +1,171 @@
+﻿@model QLSuaChuaVaLapDat.ViewModel.BaoHanhSearchVM
+<form id="searchForm" method="post" asp-action="TimKiemBaoHanh">
+    <div class="search-container " id="warranty">
+        <div class="search-header">
+            <div class="search-title">Tìm kiếm Bảo hành</div>
+            <div class="search-actions">
+                <button class="btn btn-secondary">Làm mới</button>
+                <button class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </div>
+
+        <div class="search-fields">
+            <div class="form-group">
+                <label for="war-code">Mã bảo hành</label>
+                <input name="MaDonDichVu" type="text" id="war-code" placeholder="Nhập mã bảo hành...">
+            </div>
+
+            <div class="form-group">
+                <label for="war-component">Mã linh kiện</label>
+                <input name="MaLinhKien" type="text" id="war-component" placeholder="Nhập mã linh kiện...">
+            </div>
+
+            <div class="form-group">
+                <label for="war-customer">Khách hàng</label>
+                <input name="SoDienThoaiKhachHang" type="text" id="war-customer" placeholder="Nhập SĐT khách hàng...">
+            </div>
+
+            <div class="form-group">
+                <label for="war-status">Trạng thái</label>
+                <select name="TrangThai" id="war-status">
+                    <option value="">Tất cả</option>
+                    <option value="active">Đang bảo hành</option>
+                    <option value="expired">Hết hạn</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="war-from">Từ ngày</label>
+                <input name="TuNgay" type="date" id="war-from">
+            </div>
+
+            <div class="form-group">
+                <label for="war-to">Đến ngày</label>
+                <input name="DenNgay" type="date" id="war-to">
+            </div>
+        </div>
+
+        <div class="filter-sort">
+            <div class="filter-section">
+                <span>Lọc theo:</span>
+                <select name="LoaiLinhKien">
+                    <option value=""></option>
+                    @foreach(var item in Model.linhKiens)
+                    {
+                        <option value="@item.IdLoaiLinhKien">@item.TenLoaiLinhKien</option>
+                    }
+
+                </select>
+                <select name="NhaSanXuat">
+                    <option value=""></option>
+                    @foreach (var item in Model.nhaSanXuats)
+                    {
+                        <option value="@item.IdNsx">@item.TenNsx</option>
+                    }
+                </select>
+            </div>
+
+            <div class="sort-section">
+                <span>Sắp xếp theo:</span>
+                <select>
+                    <option value=""></option>
+                    <option value="datedesc">Ngày kích hoạt (mới nhất)</option>
+                    <option value="dateasc">Ngày kích hoạt (cũ nhất)</option>
+                    <option value="outdesc">Ngày hết hạn (sớm nhất)</option>
+                    <option value="outasc">Ngày hết hạn (muộn nhất)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="select-all-container">
+            <label for="select-all-warranty" style="margin-top: 15px;">Chọn tất cả</label>
+        </div>
+
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" class="select-all" data-table="warranty"></th>
+                    <th>Mã BH</th>
+                    <th>Mã đơn</th>
+                    <th>Số ĐT</th>
+                    <th>Mã linh kiện/ lỗi</th>
+                    <th>Linh kiện/ Loại lỗi</th>
+                    <th>Loại dịch vụ</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày kích hoạt</th>
+                    <th>Ngày hết hạn</th>
+                    <th>Trạng thái bảo hành</th>
+                    <th>Điều kiện</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ChiTietDonHangs)
+                {
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                        <td>@item.idDonDichVu</td>
+                        <td>@item.IDChiTietDonDichVu</td>
+                        <td>@item.SDT</td>
+                        @if (@item.MaLinhKien != null && item.MaLoi == null)
+                        {
+                            <td>@item.MaLinhKien</td>
+                        }
+                        else if (@item.MaLinhKien == null && item.MaLoi != null)
+                        {
+                            <td>@item.MaLoi</td>
+                        }
+
+                        @if (item.TenLinhKien != null)
+                        {
+                            <td>@item.TenLinhKien </td>
+                        }
+                        else if (item.TenLoi != null)
+                        {
+                            <td>@item.TenLoi</td>
+                        }
+
+                        <td>@item.LoaiDichVu</td>
+
+
+                        <td>@item.TenKhachHang</td>
+
+
+                        <td>@item.NgayKichHoat</td>
+
+                        <td>@item.NgayHetHan</td>
+                        @if (@item.TrangThaiBaoHanh == true)
+                        {
+                            <td><span class="status status-confirmed">Đang bảo hành</span></td>
+                           
+                        }
+                        else
+                        {
+                            <td><span class="status status-cancelled">Hết bảo hành</span></td>
+                        }
+
+                        @if (@item.DieuKien != null)
+                        {
+                            <td>@item.DieuKien</td>
+                        }
+                        else
+                        {
+                            <td>Không có ĐK</td>
+                        }
+                        
+                       
+                        <td><button class="btn btn-edit">Sửa</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <div class="page-item active">1</div>
+            <div class="page-item">2</div>
+            <div class="page-item">3</div>
+            <div class="page-item">...</div>
+            <div class="page-item">10</div>
+        </div>
+    </div>
+</form>

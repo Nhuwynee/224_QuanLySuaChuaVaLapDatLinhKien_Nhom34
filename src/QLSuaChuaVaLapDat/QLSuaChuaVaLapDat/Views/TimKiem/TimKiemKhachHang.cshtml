@@ -1,0 +1,265 @@
+﻿@model QLSuaChuaVaLapDat.ViewModel.KhachHangSearchVM
+@using QLSuaChuaVaLapDat.Models
+@using QLSuaChuaVaLapDat.Models.Impl
+
+<form id="searchForm" method="post" asp-action="TimKiemKhachHang">
+    <div class="search-container" id="customers">
+        <div class="search-header">
+            <div class="search-title">Tìm kiếm Khách hàng</div>
+            <div class="search-actions">
+                <button class="btn btn-secondary">Làm mới</button>
+                <button class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </div>
+
+        <div class="search-fields">
+            <div class="form-group">
+                <label for="cus-name">Tên khách hàng</label>
+                <input type="text" name="TenKhachHang" id="cus-name" placeholder="Nhập tên khách hàng...">
+            </div>
+
+            <div class="form-group">
+                <label for="cus-phone">Số điện thoại</label>
+                <input type="text" name="SoDienThoai" id="cus-phone" placeholder="Nhập số điện thoại...">
+            </div>
+
+            <div class="form-group">
+                <label >Thành phố</label>
+                <select name="ThanhPho" id="KhachHang_ThanhPho">
+                    <option value="">Tất cả</option>
+                    @foreach (var thanhPho in Model.ThanhPhos)
+                    {
+                        <option value="@thanhPho.IdThanhPho">@thanhPho.TenThanhPho</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label >Quận/Huyện</label>
+                <select name="QuanHuyen" id="KhachHang_QuanHuyen" disabled>
+                    <option value="">Chọn thành phố trước</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Phường/Xã</label>
+                <select name="PhuongXa" id="KhachHang_PhuongXa" disabled>
+                    <option value="">Chọn quận/huyện trước</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="filter-sort">
+            <div class="filter-section">
+                <span>Lọc theo:</span>
+                <select name="LoaiKhachHang" >
+                    <option value=""></option>
+                    <option value="Users">Khách hàng</option>
+                    <option value="KhachVangLais">Khách vãng lai</option>
+                </select>
+               
+            </div>
+
+            <div class="sort-section">
+                <span>Sắp xếp theo:</span>
+                <select name="SapXepTheo">
+                    <option value=""></option>
+                    <option value ="asc">Tên A-Z</option>
+                    <option value ="desc">Tên Z-A</option>
+                    <option value ="ddvdesc">Số đơn nhiều nhất</option>
+                    <option value="ddvasc">Số đơn ít nhất</option>
+                    <option value="ctdesc">Tổng chi tiêu cao nhất</option>
+                    <option value="ctasc">Tổng chi tiêu thấp nhất</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="select-all-container">
+            <label for="select-all-customers" style="margin-top: 15px;">Chọn tất cả</label>
+        </div>
+
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" class="select-all" data-table="customers"></th>
+                    <th>Mã KH</th>
+                    <th>Tên User</th>
+                    <th>Tên khách hàng</th>
+                    <th>Số điện thoại</th>
+                    <th>Địa chỉ</th>
+                    <th>Ngày sinh</th>
+                    <th>Trạng thái </th>
+                    <th>Giới tính</th>
+                    <th>Tổng số đơn</th>
+                    <th>Tổng số tiền sửa chữa</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var user = new List<NguoiDung>();
+                    var khachVangLai = new List<KhachVangLaiImpl>();
+   
+                    user = Model.KhachHangs.Users;
+
+                    khachVangLai = Model.KhachHangs.KhachVangLais;
+                    
+                }
+
+                @foreach (var item in user)
+                {
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                        <td>@item.IdUser</td>
+                        <td>@item.TenUser</td>
+                        <td>@item.HoVaTen</td>
+                        <td>@item.Sdt</td>
+                        <td>@item.DiaChi</td>
+                        <td>@item.NgaySinh</td>
+                        @if (item.TrangThai == true)
+                        {
+                            <td>Đang hoạt động</td>
+                        }
+                        else
+                        {
+                            <td>Không hoạt động</td>
+                        }
+
+                        @if (item.GioiTinh == true)
+                        {
+                            <td>Nam</td>
+                        }
+                        else
+                        {
+                            <td>Nữ</td>
+                        }
+                        <td>@item.TongDon</td>
+                        <td>@(item.tongDonHang.ToString("#,##0") + " vnđ" ?? "0,00 vnđ")</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit">Sửa</button>
+                            <button class="btn btn-lock">Khóa</button>
+                        </td>
+                    </tr>
+                }
+
+                @foreach (var item in khachVangLai)
+                {
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                        <td>@item.IdKhachVangLai</td>
+                        <td>(Trống)</td>
+                        <td>@item.HoVaTen</td>
+                        <td>@item.Sdt</td>
+                        <td>@item.DiaChi</td>
+                        <td>(Trống)</td>
+                        <td>(Trống)</td>
+                        <td>(Trống)</td>
+                        <td>(Trống)</td>
+                        <td>@(item.TongDonHang.ToString("#,##0") + " vnđ" ?? "0,00 vnđ")</td>
+                        <td class="action-buttons">
+                         
+                        </td>
+                    </tr>
+                }
+        </tbody>
+    </table>
+
+        <div class="pagination">
+            @{
+                int totalPage = Model.Paging.TotalPage;
+                int currentPage = Model.Paging.PageActive;
+            }
+
+            @for (int i = 1; i <= totalPage; i++)
+            {
+                <div class="page-item @(i == currentPage ? "active" : "")">@i</div>
+            }
+        </div>
+</div>
+</form>
+
+<script>
+    const quans = @Html.Raw(Json.Serialize(Model.Quans));
+    const phuongs = @Html.Raw(Json.Serialize(Model.Phuongs));
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('searchForm');
+        const citySelect = document.getElementById('KhachHang_ThanhPho');
+        const districtSelect = document.getElementById('KhachHang_QuanHuyen');
+        const wardSelect = document.getElementById('KhachHang_PhuongXa');
+
+        citySelect.addEventListener('change', function () {
+            const cityId = this.value;
+            districtSelect.innerHTML = '<option value="">Chọn quận/huyện trước</option>';
+            wardSelect.innerHTML = '<option value="">Chọn phường/xã trước</option>';
+            console.log(cityId);
+            districtSelect.disabled = !cityId;
+            wardSelect.disabled = true;
+
+            if (cityId) {
+                
+                const filteredQuans = quans.filter(q => q.idThanhPho === cityId);
+                console.log(filteredQuans);
+                filteredQuans.forEach(quan => {
+                    const option = document.createElement('option');
+                    option.value = quan.idQuan;
+                    option.textContent = quan.tenQuan;
+                    districtSelect.appendChild(option);
+                });
+            }
+        });
+
+        // Xử lý thay đổi quận/huyện
+        districtSelect.addEventListener('change', function () {
+            const districtId = this.value;
+            wardSelect.innerHTML = '<option value="">Chọn phường/xã trước</option>';
+            wardSelect.disabled = !districtId;
+
+            if (districtId) {
+                // Lọc danh sách Phường/Xã dựa trên IdQuan
+                const filteredPhuongs = phuongs.filter(p => p.idQuan === districtId);
+                filteredPhuongs.forEach(phuong => {
+                    const option = document.createElement('option');
+                    option.value = phuong.idPhuong;
+                    option.textContent = phuong.tenPhuong;
+                    wardSelect.appendChild(option);
+                });
+            }
+        });
+
+        // Reset form
+        const resetBtn = document.querySelector('.btn-secondary');
+        resetBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            form.reset();
+            districtSelect.innerHTML = '<option value="">Chọn thành phố trước</option>';
+            wardSelect.innerHTML = '<option value="">Chọn quận/huyện trước</option>';
+            districtSelect.disabled = true;
+            wardSelect.disabled = true;
+        });
+    });
+
+      const pageItems = document.querySelectorAll('.page-item');
+
+      pageItems.forEach(item => {
+          item.addEventListener('click', () => {
+              // Xóa class active khỏi tất cả
+              pageItems.forEach(i => i.classList.remove('active'));
+              // Thêm class active cho item được click
+              item.classList.add('active');
+
+              // Lấy số trang từ text của item
+              const pageNumber = item.innerText.trim();
+
+              // Gán vào input hidden
+              document.getElementById('page_active').value = pageNumber;
+
+              // Gửi form
+             submitForm();
+          });
+      }); 
+
+      function submitForm() {
+        document.getElementById("searchForm").submit();
+    }
+
+</script>

@@ -2,13 +2,18 @@
 @{
     Layout = "~/Views/Shared/_LayoutQuanLi.cshtml";
 }
+
+@section Scripts {
+    <script src="~/js/export-excel.js"></script>
+}
+
 @using System.Globalization
 <html>
 <body>
     <div class="container">
         <div class="dashboard">
             <div class="metric-card">
-                <div>Tổng số đơn</div>
+                <div>tổng số đơn</div>
                 <div class="metric-value">@Model.TongDonCN</div>
                 <div class="metric-date">@Model.ThangHT</div>
             </div>
@@ -25,10 +30,9 @@
         </div>
     </div>
 
-
-
     <div class="container">
-        <h3 class="mb-4">Tổng quan doanh thu và khách hàng</h3> <div class="row mb-3">
+        <h3 class="mb-4">Tổng quan doanh thu và khách hàng</h3>
+        <div class="row mb-3">
             <div class="col-md-4">
                 <div class="metric-card">
                     <div class="metric-title">Tổng đơn tháng này (@Model.ThangHT)</div>
@@ -47,8 +51,7 @@
             @{
                 var prevMonthChart = Model.ChartDateFocus.AddMonths(-1);
                 var nextMonthChart = Model.ChartDateFocus.AddMonths(1);
-
-                bool canGoNext = nextMonthChart.Year < DateTime.Today.Year + 2; 
+                bool canGoNext = nextMonthChart.Year < DateTime.Today.Year + 2;
             }
             <a href="@Url.Action("thongKe", "QuanLI", new { year = prevMonthChart.Year, month = prevMonthChart.Month, searchString = Model.CurrentSearchString, page = Model.CurrentPage })" class="btn btn-outline-primary me-2">&lt; Tháng Trước</a>
             <h5 class="mb-0 mx-3">Biểu đồ cho: @Model.ChartDateFocus.ToString("MMMM yyyy", new CultureInfo("vi-VN"))</h5>
@@ -94,10 +97,9 @@
                         var sumPercentages = Model.PTKhachHang + Model.PTKhachVangLai;
                         var totalPercentCssValue = sumPercentages > 100 ? 100 : sumPercentages;
                         var totalPercentCss = totalPercentCssValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                        var remainingColor = "#eee"; 
+                        var remainingColor = "#eee";
 
                         var pieStyle = $"background-image: conic-gradient(#337ab7 0% {regPercentCss}%, #f0ad4e {regPercentCss}% {totalPercentCss}%, {remainingColor} {totalPercentCss}% 100%);";
-
 
                         <div class="css-pie" style="@pieStyle">
                             <div>
@@ -121,6 +123,7 @@
             </div>
         </div>
     </div>
+
     <div class="container mt-5 mb-5">
         <h3>Đơn Dịch Vụ Gần Nhất</h3>
         <form asp-action="thongKe" asp-controller="QuanLI" method="get" class="mb-3">

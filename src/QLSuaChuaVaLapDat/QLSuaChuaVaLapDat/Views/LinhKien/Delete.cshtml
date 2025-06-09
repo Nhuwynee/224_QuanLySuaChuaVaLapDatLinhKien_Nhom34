@@ -32,6 +32,27 @@
             <div style="margin-bottom: 15px;">
                 <strong style="color: var(--secondary-text-clr);">Số lượng:</strong> @Html.DisplayFor(model => model.SoLuong)
             </div>
+            <div style="margin-bottom: 15px;">
+                <strong style="color: var(--secondary-text-clr);">Thời gian bảo hành:</strong>
+                @if (Model.ThoiGianBaoHanh > 0)
+                {
+                    <span>@Model.ThoiGianBaoHanh tháng</span>
+                }
+                else
+                {
+                    <span>Không bảo hành</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Anh))
+            {
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: var(--secondary-text-clr);">Ảnh:</strong>
+                    <div style="margin-top: 10px;">
+                        <img src="@Model.Anh" alt="@Model.TenLinhKien" style="max-width: 150px; max-height: 150px; border-radius: var(--border-radius-sm);" />
+                    </div>
+                </div>
+            }
         </div>
 
         <form asp-action="Delete">

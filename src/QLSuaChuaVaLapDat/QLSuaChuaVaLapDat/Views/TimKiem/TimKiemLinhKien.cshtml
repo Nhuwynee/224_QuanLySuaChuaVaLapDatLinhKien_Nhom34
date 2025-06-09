@@ -1,0 +1,232 @@
+﻿@model QLSuaChuaVaLapDat.ViewModel.TimKiemLinhKiemVM
+@using QLSuaChuaVaLapDat.Models.TimKiem
+
+<form id="searchForm" method="post" asp-action="TimKiemLinhKien">
+    <div class="search-container" id="components">
+        <div class="search-header">
+            <div class="search-title">Tìm kiếm Linh kiện</div>
+            <div class="search-actions">
+                <button type="button" class="btn btn-secondary" id="resetBtn">Làm mới</button>
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </div>
+
+        <div class="search-fields">
+            <div class="form-group">
+                <label for="comp-id">Mã linh kiện</label>
+                <input type="text" id="comp-id" name="MaLinhKien" placeholder="Nhập mã linh kiện...">
+            </div>
+
+            <div class="form-group">
+                <label for="comp-name">Tên linh kiện</label>
+                <input type="text" id="comp-name" name="TenLinhKien" placeholder="Nhập tên linh kiện...">
+            </div>
+
+            <div class="form-group">
+                <label for="comp-type">Loại linh kiện</label>
+                <select id="comp-type" name="LoaiLinhKien">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in Model.LoaiLinhKiens)
+                    {
+                        <option value="@item.TenLoaiLinhKien">@item.TenLoaiLinhKien</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="comp-manu">Nhà sản xuất</label>
+                <select id="comp-manu" name="NhaSanXuat">
+                    <option value="">Tất cả</option>
+                    @foreach (var item in Model.NhaSanXuats)
+                    {
+                        <option value="@item.IdNsx">@item.TenNsx</option>
+                    }
+                </select>
+            </div>
+
+
+
+            <div class="price-range-wrapper">
+                <label><strong>Giá</strong></label>
+                <div class="price-inputs">
+                    <input type="text" id="minPrice" readonly>
+                    <input type="text" id="maxPrice" readonly>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-track"></div>
+                    <div class="slider-range" id="slider-range"></div>
+                    <input type="range" name="GiaTu" id="rangeMin" min="0" max="10000000" style="border: none;" value="0" step="50000">
+                    <input type="range" name="GiaDen" id="rangeMax" min="0" max="10000000" style="border: none;" value="10000000" step="50000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="comp-warranty">Bảo hành</label>
+                <select id="comp-warranty" name="BaoHanh">
+                    <option value="">Tất cả</option>
+                   
+                   
+                    <option value="3">3 Tháng</option>
+                    <option value="6">6 Tháng</option>
+                    <option value="9">9 Tháng</option>
+                    <option value="12">12 Tháng</option>
+                    <option value="15">15 Tháng</option>
+                    <option value="18">18 Tháng</option>
+                    <option value="24">24 Tháng</option>
+                    <option value="30">30 Tháng</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="filter-sort">
+            <div class="filter-section">
+                <span>Lọc theo tình trạng:</span>
+                <select name="TTSanPham">
+                    <option value="1">Còn hàng</option>
+                    <option value="0">Hết hàng</option>
+                </select>
+
+            </div>
+        
+            <div class="sort-section">
+                <span>Sắp xếp theo:</span>
+                <select name="SapXep">
+                    <option value="asc">Tên A-Z</option>
+                    <option value="desc">Tên Z-A</option>
+                    <option value="price_asc">Giá thấp nhất</option>
+                    <option value="price_desc">Giá cao nhất</option>
+                    <option value="warranty_asc">Bảo hành ngắn nhất</option>
+                    <option value="warranty_desc">Bảo hành dài nhất</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="select-all-container">
+            <label for="select-all-components" style="margin-top: 15px;">Chọn tất cả</label>
+        </div>
+
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" class="select-all" data-table="components"></th>
+                    <th>Hình ảnh</th>
+                    <th>Mã linh kiện</th>
+                    <th>Tên linh kiện</th>
+                    <th>Loại</th>
+                    <th>Nhà SX</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Bảo hành</th>
+                    <th>Điều kiện BH</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.LinhKiens)
+                {
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                        <td><img style="width:40px; height:40px; object-fit: cover;" src="~/img/@item.Anh" alt="Alternate Text" /></td>
+                        <td>@item.IdLinhKien</td>
+                        <td>@item.TenLinhKien</td>
+                        <td>@item.IdLoaiLinhKienNavigation.TenLoaiLinhKien</td>
+                        <td>@item.IdNsxNavigation.TenNsx</td>
+                        <td>@(item.Gia.ToString("#,##0") + " vnđ" ?? "0,00 vnđ")</td>
+                        <td>@item.SoLuong</td>
+                        <td>@item.ThoiGianBaoHanh Tháng</td>
+                        <td>@item.DieuKienBaoHanh</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit">Sửa</button>
+                            <button class="btn btn-delete">Xóa</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <div class="page-item active">1</div>
+            <div class="page-item">2</div>
+            <div class="page-item">3</div>
+            <div class="page-item">...</div>
+            <div class="page-item">10</div>
+        </div>
+    </div>
+</form>
+
+<script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('searchForm');
+        const resetBtn = document.getElementById('resetBtn');
+        const rangeMin = document.getElementById('rangeMin');
+        const rangeMax = document.getElementById('rangeMax');
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const hiddenGiaTu = document.getElementById('hiddenGiaTu');
+        const hiddenGiaDen = document.getElementById('hiddenGiaDen');
+
+        // Giá trị mặc định cho slider
+        const DEFAULT_MIN_VALUE = 0;
+        const DEFAULT_MAX_VALUE = 0;
+
+        // Sync slider with price inputs
+        function updatePriceDisplay() {
+            let minVal = parseInt(rangeMin.value);
+            let maxVal = parseInt(rangeMax.value);
+
+            // Đảm bảo min không vượt quá max
+            if (minVal > maxVal) {
+                [minVal, maxVal] = [maxVal, minVal];
+                rangeMin.value = minVal;
+                rangeMax.value = maxVal;
+            }
+
+            // Hiển thị giá trị định dạng trên input text
+            minPrice.value = minVal.toLocaleString('vi-VN') + 'đ';
+            maxPrice.value = maxVal.toLocaleString('vi-VN') + 'đ';
+
+            // Cập nhật giá trị thô vào input hidden
+            hiddenGiaTu.value = minVal;
+            hiddenGiaDen.value = maxVal;
+        }
+
+        // Khởi tạo giá trị ban đầu
+        function initializeValues() {
+            rangeMin.value = DEFAULT_MIN_VALUE;
+            rangeMax.value = DEFAULT_MAX_VALUE;
+            updatePriceDisplay();
+        }
+
+        // Xử lý sự kiện input cho slider
+        rangeMin.addEventListener('input', updatePriceDisplay);
+        rangeMax.addEventListener('input', updatePriceDisplay);
+
+        // Reset form
+        resetBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            form.reset();
+            initializeValues();
+
+            // Reset các dropdown select
+            document.getElementById('comp-type').selectedIndex = 0;
+            document.getElementById('comp-manu').selectedIndex = 0;
+            document.getElementById('comp-warranty').selectedIndex = 0;
+            document.querySelector('select[name="Tình trạng"]').selectedIndex = 0;
+            document.querySelector('select[name="SapXep"]').selectedIndex = 0;
+
+            // Reset các input text
+            document.getElementById('comp-name').value = "";
+            document.getElementById('comp-id').value = "";
+        });
+
+        // Khởi tạo giá trị ban đầu khi trang được tải
+        // initializeValues();
+
+        // Xử lý submit form
+        form.addEventListener('submit', function (e) {
+            // Đảm bảo giá trị hidden được cập nhật lần cuối trước khi submit
+            // updatePriceDisplay();
+        });
+    });
+</script>
