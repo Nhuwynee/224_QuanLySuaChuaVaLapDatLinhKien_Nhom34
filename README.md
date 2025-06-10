@@ -1,5 +1,5 @@
-## 224_Nhom34_QuanLySuaChuaVaLapDatLinhKien
-## Link drive video: https://drive.google.com/drive/folders/1MmzAOai_ZHU0yemI5k31A-WM7WX7nPaX?usp=drive_link
+### 224_Nhom34_QuanLySuaChuaVaLapDatLinhKien
+### Link drive video: https://drive.google.com/drive/folders/1MmzAOai_ZHU0yemI5k31A-WM7WX7nPaX?usp=drive_link
 ## Thành viên:
 ### 1. Lưu Ngọc Yến Như 
 ####   - Nhánh Nhu: https://github.com/Nhuwynee/224_QuanLySuaChuaVaLapDatLinhKien_Nhom34/tree/Nhu
