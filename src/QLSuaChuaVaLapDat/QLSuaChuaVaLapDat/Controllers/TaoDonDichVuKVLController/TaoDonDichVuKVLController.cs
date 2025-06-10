@@ -643,7 +643,12 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
             // Xác định khách hàng có tài khoản hay vãng lai
             string idUser = !string.IsNullOrEmpty(formData.IdUser) ? formData.IdUser : null;
             string idKhachVangLaiToSave = idUser == null ? idKhachVangLai : null;
-
+            // Xác định loại khách hàng
+            string loaiKhachHang = "Khách vãng lai";
+            if (idKhachVangLaiToSave == null && idUser != null)
+            {
+                loaiKhachHang = "Khách hàng thường";
+            }
             // Tạo đối tượng DonDichVu
             var donDichVu = new DonDichVu
             {
@@ -654,7 +659,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                 IdUserTaoDon = HttpContext.Session.GetString("IdUser"), // Lấy ID người dùng từ session
                 IdLoaiThietBi = formData.IdLoaiThietBi,
                 TenThietBi = formData.TenThietBi,
-                LoaiKhachHang = "Khách vãng lai",
+                LoaiKhachHang = loaiKhachHang, // <-- Sửa dòng này,
                 NgayTaoDon = DateTime.Now,
                 NgayHoanThanh = formData.NgayHoanThanh,
                 TongTien = tongTien,

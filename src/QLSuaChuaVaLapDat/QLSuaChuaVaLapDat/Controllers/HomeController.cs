@@ -65,27 +65,27 @@ public class HomeController : Controller
             var user = _context.Users.FirstOrDefault(u => u.TenUser == username && u.MatKhau == password);
             if (user != null)
             {
-
+                var VaiTro = _context.Roles.FirstOrDefault(v => v.IdRole == user.IdRole);
                 // Lưu thông tin session
                 HttpContext.Session.SetString("IdUser", user.IdUser);
                 HttpContext.Session.SetString("Username", username);
                 HttpContext.Session.SetString("HoTen", user.HoVaTen);
                 HttpContext.Session.SetString("Password", password); // không nên lưu password thật trong session
 
-                // Chuyển hướng theo "loại người dùng" dựa trên username
-                if (username.ToLower().Contains("cskh"))
+                HttpContext.Session.SetString("VaiTro", VaiTro.TenRole);
+                ViewBag.TenNhanVien = user.HoVaTen;
+                switch (VaiTro.TenRole)
                 {
-                    return RedirectToAction("IndexDSDK", "DanhSachDangKy");
+                    case "Nhân viên quản lý":
+
+                        return RedirectToAction("", "");
+
+                    case "Nhân viên chăm sóc khách hàng":
+                        return RedirectToAction("IndexDSDK", "DanhSachDangKy");
+                    default:
+                        return RedirectToAction("Index", "Home");
                 }
 
-                else if (username.ToLower().Contains("admin"))
-                {
-                    return RedirectToAction();
-                }
-                else
-                {
-                    return RedirectToAction("Index", "Home"); // giao diện mặc định
-                }
             }
 
             ViewBag.Error = "Tên đăng nhập hoặc mật khẩu không đúng.";

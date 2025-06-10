@@ -1329,7 +1329,57 @@ $(document).ready(function () {
             paymentBtn.removeClass('payment-btn-visible');
         }
     });
+    // Thêm xử lý khi nhấn nút cập nhật đơn
+    $(document).ready(function () {
+        $('.update-order-btn').click(function () {
+            // Lấy thông tin cần thiết
+            const orderId = $('#IdDonDichVu').val();
+            const paymentMethod = $('#paymentMethod').val() || '';
+            const status = $('#statusInput').val() || 'Chưa hoàn thành';
+            const statusToSave = (status === "Đã hoàn thành") ? "Hoàn thành" : status;
+            const selectedStaffId = $('#selectedStaffId').val() || '';
 
+            // Hiển thị thông báo xác nhận
+            if (confirm('Bạn có chắc chắn muốn cập nhật đơn dịch vụ này?')) {
+                // Hiển thị loading
+                showLoadingOverlay('Đang cập nhật đơn dịch vụ...');
+
+                // Gửi yêu cầu cập nhật lên server
+                $.ajax({
+                    url: updateServiceOrderUrl,
+                    type: 'POST',
+                    data: {
+                        IdDonDichVu: orderId,
+                        PhuongThucThanhToan: paymentMethod,
+                        TrangThaiDon: statusToSave,
+                        IdNhanVienKyThuat: selectedStaffId
+                    },
+                    success: function (response) {
+                        // Ẩn loading
+                        hideLoadingOverlay();
+
+                        if (response.success) {
+                            alert('Cập nhật đơn dịch vụ thành công!');
+
+                            // Nếu muốn chuyển về trang danh sách
+                            if (confirm('Bạn có muốn quay về danh sách đơn dịch vụ không?')) {
+                                window.location.href = backToListUrl;
+                            }
+                        } else {
+                            alert('Lỗi: ' + (response.error || 'Không thể cập nhật đơn dịch vụ'));
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Ẩn loading
+                        hideLoadingOverlay();
+
+                        alert('Đã xảy ra lỗi khi cập nhật đơn dịch vụ. Vui lòng thử lại.');
+                        console.error('Error:', error);
+                    }
+                });
+            }
+        });
+    });
     // Hàm kiểm tra trạng thái và hiển thị/ẩn nút thanh toán
     function checkStatusAndTogglePaymentButton(status) {
         if (status === "Đã hoàn thành") {
@@ -1372,6 +1422,51 @@ $(document).ready(function () {
 
     // Lấy dữ liệu từ form và điền vào hóa đơn
     function populateInvoiceData() {
+        // Hiển thị ảnh thiết bị trong hóa đơn
+        const deviceImagesPreview = $('#deviceImagePreview img');
+        const invoiceDeviceImages = $('#invoice-device-images');
+        invoiceDeviceImages.empty();
+        if (deviceImagesPreview.length > 0) {
+            deviceImagesPreview.each(function () {
+                const img = $('<img>').attr('src', $(this).attr('src')).css({
+                    width: '80px',
+                    height: '80px',
+                    objectFit: 'cover',
+                    margin: '5px',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                });
+                img.on('click', function () {
+                    showImageInModal($(this).attr('src'));
+                });
+                invoiceDeviceImages.append(img);
+            });
+        } else {
+            invoiceDeviceImages.html('<div style="color:#888;">Không có ảnh thiết bị</div>');
+        }
+
+        // Hiển thị ảnh phiếu bảo hành trong hóa đơn
+        const warrantyImagesPreview = $('#warrantyImagePreview img');
+        const invoiceWarrantyImages = $('#invoice-warranty-images');
+        invoiceWarrantyImages.empty();
+        if (warrantyImagesPreview.length > 0) {
+            warrantyImagesPreview.each(function () {
+                const img = $('<img>').attr('src', $(this).attr('src')).css({
+                    width: '80px',
+                    height: '80px',
+                    objectFit: 'cover',
+                    margin: '5px',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                });
+                img.on('click', function () {
+                    showImageInModal($(this).attr('src'));
+                });
+                invoiceWarrantyImages.append(img);
+            });
+        } else {
+            invoiceWarrantyImages.html('<div style="color:#888;">Không có ảnh phiếu bảo hành</div>');
+        }
         // Đảm bảo flatpickr đã cập nhật value cho input
         if (window.flatpickr) {
             const startPicker = document.getElementById('startDatetimePicker')._flatpickr;
@@ -1597,42 +1692,75 @@ $(document).ready(function () {
             $('#paymentMethodModal').fadeIn(100);
         });
     });
-    // Xử lý khi chọn phương thức thanh toán
+    // Cập nhật hàm xử lý khi chọn phương thức thanh toán
     $('.payment-method-btn').click(function () {
-        // Thêm lớp selected vào button được chọn và xóa khỏi các button khác
+        // Code hiện tại giữ nguyên
         $('.payment-method-btn').removeClass('selected');
         $(this).addClass('selected');
 
         const paymentMethod = $(this).data('method');
-        let paymentMethodText = paymentMethod === 'cash' ? 'tiền mặt' : 'chuyển khoản';
+        let paymentMethodText = paymentMethod === 'Tiền mặt' ? 'Tiền mặt' : 'Chuyển Khoản';
 
         // Hiển thị thông báo xác nhận
         if (confirm('Bạn có chắc chắn muốn thanh toán bằng ' + paymentMethodText + '?')) {
-            // Xử lý logic thanh toán ở đây
-            alert('Thanh toán bằng ' + paymentMethodText + ' thành công!');
-            $('#paymentMethodModal').fadeOut(200);
+            // Lấy ID đơn dịch vụ
+            const orderId = $('#IdDonDichVu').val();
 
-            // Cập nhật số tiền ứng trước bằng tổng tiền để hiển thị tiền còn lại = 0
-            const totalPrice = $('.price-input').eq(1).val().replace(/[^\d]/g, '');
-            $('#advancePayment').val(totalPrice).trigger('input');
+            // Gửi yêu cầu cập nhật lên server
+            $.ajax({
+                url: updateServiceOrderUrl,
+                type: 'POST',
+                data: {
+                    IdDonDichVu: orderId,
+                    PhuongThucThanhToan: paymentMethod,
+                    TrangThaiDon: 'Hoàn thành' // Tự động cập nhật trạng thái thành "Đã hoàn thành"
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Xử lý logic thanh toán ở đây
+                        alert('Thanh toán bằng ' + paymentMethodText + ' thành công!');
+                        $('#paymentMethodModal').fadeOut(200);
 
-            // Lưu phương thức thanh toán vào một trường ẩn để có thể gửi lên server
-            if (!$('#paymentMethod').length) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'paymentMethod',
-                    name: 'PhuongThucThanhToan',
-                    value: paymentMethod
-                }).appendTo('#serviceOrderForm');
-            } else {
-                $('#paymentMethod').val(paymentMethod);
-            }
+                        // Cập nhật số tiền ứng trước bằng tổng tiền để hiển thị tiền còn lại = 0
+                        const totalPrice = $('.price-input').eq(1).val().replace(/[^\d]/g, '');
+                        $('#advancePayment').val(totalPrice).trigger('input');
+
+                        // Cập nhật trạng thái hiển thị
+                        $('#statusInput').val('Hoàn thành');
+
+                        // Cập nhật UI (nếu có dropdown trạng thái)
+                        const statusDropdown = $('#statusDropdown');
+                        if (statusDropdown.length) {
+                            statusDropdown.find('input').val('Đã hoàn thành');
+                        }
+
+                        // Lưu phương thức thanh toán vào một trường ẩn để có thể gửi lên server
+                        if (!$('#paymentMethod').length) {
+                            $('<input>').attr({
+                                type: 'hidden',
+                                id: 'paymentMethod',
+                                name: 'PhuongThucThanhToan',
+                                value: paymentMethod
+                            }).appendTo('#serviceOrderForm');
+                        } else {
+                            $('#paymentMethod').val(paymentMethod);
+                        }
+                        // Thêm dòng chuyển hướng về danh sách đơn dịch vụ
+                        window.location.href = backToListUrl;
+                    } else {
+                        alert('Lỗi: ' + (response.error || 'Không thể cập nhật đơn hàng'));
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại.');
+                    console.error('Error:', error);
+                }
+            });
         } else {
             // Nếu người dùng chọn Cancel, xóa lớp selected
             $(this).removeClass('selected');
         }
     });
-
     // Đóng popup phương thức thanh toán
     $('.payment-method-popup-close').click(function () {
         $('#paymentMethodModal').fadeOut(200);

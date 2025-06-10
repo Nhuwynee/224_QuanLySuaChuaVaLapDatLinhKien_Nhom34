@@ -2,10 +2,6 @@
     Layout = "~/Views/Shared/_LayoutCSKH.cshtml";
 }
 
-@{
-    Layout = "~/Views/Shared/_LayoutCSKH.cshtml";
-}
-
 <style>
     .file-preview {
         display: flex;
@@ -76,7 +72,7 @@
     .image-modal {
         display: none;
         position: fixed;
-        z-index: 1000;
+        z-index: 12000;
         left: 0;
         top: 0;
         width: 100%;
@@ -381,16 +377,114 @@
     .payment-invoice-value {
         width: 60%;
         color: #333;
+    }
+
+    .payment-parts-list {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+
+    .payment-part-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border-bottom: 1px solid #eee;
+    }
+
+        .payment-part-item:last-child {
+            border-bottom: none;
+        }
+
+    .payment-part-name {
+        font-weight: 500;
+    }
+
+    .payment-part-price {
+        color: #d9534f;
+    }
+
+    .payment-amount-section {
+        background-color: #e6f7ff;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .payment-amount-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+
+        .payment-amount-row.total {
+            font-size: 18px;
+            font-weight: bold;
+            border-top: 1px dashed #bbb;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+
+            .payment-amount-row.total .payment-amount-value {
+                color: #d9534f;
+            }
+
+    .payment-popup-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+        margin-top: 15px;
+    }
+
+    .payment-confirm-btn,
+    .payment-cancel-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+
+    .payment-confirm-btn {
+        background-color: #28a745;
+        color: white;
+        margin-left: 10px;
+    }
+
+        .payment-confirm-btn:hover {
+            background-color: #218838;
+        }
+
+    .payment-cancel-btn {
+        background-color: #f8f9fa;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+        .payment-cancel-btn:hover {
+            background-color: #e2e6ea;
+        }
+
+    /* Date-time styling in payment popup */
+    #invoice-start-time, #invoice-end-time {
+        font-weight: normal;
+        color: #333;
+    }
+
+    .payment-invoice-value {
         word-break: break-word; /* Allow long date strings to break properly */
     }
-    
+
     /* Payment method styles */
     .payment-methods {
         display: flex;
         justify-content: space-around;
         margin: 20px 0;
     }
-    
+
     .payment-method-btn {
         display: flex;
         flex-direction: column;
@@ -407,57 +501,57 @@
         transition: all 0.3s;
         cursor: pointer;
     }
-    
-    .payment-method-btn:hover {
-        border-color: #4CAF50;
-        background-color: #f5fff5;
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    
-    .payment-method-btn i {
-        font-size: 36px;
-        margin-bottom: 10px;
-        color: #28a745;
-    }
-    
-    .payment-method-btn[data-method="cash"] i {
-        color: #28a745;
-    }
-    
-    .payment-method-btn[data-method="transfer"] i {
-        color: #007bff;
-    }
-    
-    /* Additional styles for payment method selection */
-    .payment-method-btn.selected {
-        border-color: #4CAF50;
-        background-color: #f0fff0;
-        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
-    }
-    
-    .payment-method-btn[data-method="cash"].selected i {
-        color: #218838;
-    }
-    
-    .payment-method-btn[data-method="transfer"].selected i {
-        color: #0069d9;
-    }
+
+        .payment-method-btn:hover {
+            border-color: #4CAF50;
+            background-color: #f5fff5;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .payment-method-btn i {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: #28a745;
+        }
+
+        .payment-method-btn[data-method="cash"] i {
+            color: #28a745;
+        }
+
+        .payment-method-btn[data-method="transfer"] i {
+            color: #007bff;
+        }
+
+        /* Additional styles for payment method selection */
+        .payment-method-btn.selected {
+            border-color: #4CAF50;
+            background-color: #f0fff0;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+        }
+
+        .payment-method-btn[data-method="cash"].selected i {
+            color: #218838;
+        }
+
+        .payment-method-btn[data-method="transfer"].selected i {
+            color: #0069d9;
+        }
 </style>
 
 <!-- Main Content -->
 <div class="main-content">
     <h1 class="page-title">Đơn sửa chữa</h1>
 
-    <form method="post" action="@Url.Action("CreateServiceOrder", "TaoDonDichVuKVL")" enctype="multipart/form-data" id="serviceOrderForm">
+<form method="post" action="@Url.Action("UpdateServiceOrder", "EditTaoDonDichVuKVL")" enctype="multipart/form-data" id="serviceOrderForm">
 
-        <div class="order-info">
-            <div class="order-id">Mã đơn dịch vụ: <span class="highlight">@ViewBag.NextServiceOrderId</span></div>
-            <input type="hidden" id="IdDonDichVu" name="IdDonDichVu" value="@ViewBag.NextServiceOrderId" />
-            <div class="order-date">Ngày tạo: @ViewBag.OrderDate</div>
-            <div class="staff-name">Nhân viên: @Context.Session.GetString("HoTen")</div>
-            <div class="turn-back"><a href="javascript:void(0);" onclick="confirmBack()" style="text-decoration: none;">Quay lại DS</a> </div>
-        </div>
+<div class="order-info">
+    <div class="order-id">Mã đơn dịch vụ: <span class="highlight">@ViewBag.OrderId</span></div>
+    <input type="hidden" id="IdDonDichVu" name="IdDonDichVu" value="@ViewBag.OrderId" />
+    <div class="order-date">Ngày tạo: @ViewBag.OrderDate</div>
+    <div class="staff-name">Nhân viên: @Context.Session.GetString("HoTen")</div>
+    <div class="turn-back"><a href="javascript:void(0);" onclick="confirmBack()" style="text-decoration: none;">Quay lại DS</a> </div>
+</div>
 
         <div class="form-container">
             <!-- Customer Information Section -->
@@ -467,6 +561,14 @@
 
                     <div class="flex-date-time">
                         <div class="form-group">
+                            <label>Mã khách hàng (có tài khoản):</label>
+                            <div class="input-with-icon" style="position: relative;">
+                                <input type="text" id="customerIdInput" class="form-control" placeholder="Nhập mã hoặc tên khách hàng...">
+                                <input type="hidden" id="IdUser" name="IdUser" value="">
+                                <div id="customerIdDropdown" class="custom-dropdown"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label>Họ và tên khách hàng: <span class="required">(*)</span></label>
                             <input type="text" name="HoVaTen">
                         </div>
@@ -475,7 +577,7 @@
                             <input type="text" name="Sdt">
                         </div>
                         <div class="form-group">
-                            <label>Email: <span class="required">(*)</span></label>
+                            <label>Email:</label>
                             <input type="email" name="Email">
                         </div>
                     </div>
@@ -546,14 +648,32 @@
                         <div class="split">
                             <div class="form-group">
                                 <label>Loại linh kiện: <span class="required">(*)</span></label>
-                                @Html.DropDownList("IdLoaiLinhKien", ViewBag.LoaiLinhKiens as List<SelectListItem>, "Chọn loại linh kiện", new { @class = "form-control select-linhkien" })
+                                <select name="IdLoaiLinhKien" class="form-control select-linhkien">
+                                    <option value="">Chọn loại linh kiện</option>
+                                    @foreach (var item in ViewBag.LoaiLinhKiens)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
                             </div>
-
+                            <div class="form-group">
+                                <label for="part">Linh kiện:  <span class="required">(*)</span></label>
+                                <select class="form-control part-select" id="part" name="ErrorDetails[0].IdLinhKien">
+                                    <option value="">Chọn linh kiện</option>
+                                </select>
+                            </div>
 
                             <div class="flex-date-time">
                                 <div class="form-group">
                                     <label>Lỗi: <span class="required">(*)</span></label>
-                                    @Html.DropDownList("IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new { @class = "form-control error-type-select error-loi-select", @onchange = "layGiaTheoLoi(this.value)" })
+                                    @Html.DropDownList("ErrorDetails[0].IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new
+                                        {
+                                            @class = "form-control error-type-select error-loi-select",
+                                            @onchange = "layGiaTheoLoi(this.value)",
+                                            @id = "IdLoi-0",
+                                            @name = "ErrorDetails[0].IdLoi"  // Thêm dòng này
+                                        })
+                                    @* @Html.DropDownList("IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new { @class = "form-control error-type-select error-loi-select", @onchange = "layGiaTheoLoi(this.value)", @name = "ErrorDetails[0].IdLoi" }) *@
                                 </div>
                                 <div class="form-group">
                                     <label>Đơn giá (VND): <span class="required">(*)</span></label>
@@ -563,11 +683,11 @@
                                     <label>Bảo hành: <span class="required">(*)</span></label>
                                     <div class="checkbox-container">
                                         <div class="checkbox">
-                                            <input type="radio" id="warranty-yes" name="ErrorDetails[0].ConBaoHanh" value="true">
+                                            <input type="radio" id="warranty-yes" name="ErrorDetails[0].HanBaoHanh" value="true">
                                             <label for="warranty-yes">Còn bảo hành</label>
                                         </div>
                                         <div class="checkbox">
-                                            <input type="radio" id="warranty-no" name="ErrorDetails[0].ConBaoHanh" value="false" checked>
+                                            <input type="radio" id="warranty-no" name="ErrorDetails[0].HanBaoHanh" value="false" checked>
                                             <label for="warranty-no">Hết bảo hành</label>
                                         </div>
                                     </div>
@@ -669,6 +789,11 @@
                             <span class="staff-name">Chưa chọn nhân viên</span>
                         </div>
                         <input type="hidden" id="selectedStaffId" name="IdNhanVienKyThuat" value="">
+                        
+                        <!-- Hidden fields for initial staff data -->
+                        <input type="hidden" id="initialStaffId" value="@ViewBag.NhanVienKyThuatId">
+                        <input type="hidden" id="initialStaffName" value="@ViewBag.StaffName">
+                        <input type="hidden" id="initialStaffSpecialty" value="@ViewBag.StaffSpecialty">
                     </div>
                 </div>
             </div>
@@ -797,9 +922,9 @@
                                 <input type="text" value="Chưa hoàn thành" readonly id="statusInput" name="TrangThaiDon">
                                 <i class="fa-solid fa-chevron-down"></i>
                                 <div class="dropdown-content">
-                                    <div class="dropdown-item">Đã hoàn thành</div>
                                     <div class="dropdown-item">Chưa hoàn thành</div>
-
+                                    <div class="dropdown-item">Đang sửa chữa</div>
+                                    <div class="dropdown-item">Đã hoàn thành</div>
                                 </div>
                             </div>
                         </div>
@@ -811,7 +936,7 @@
             </div>
         </div>
         <div class="form-actions">
-            <button type="submit" class="edit-order-btn">Cập nhật đơn</button>
+            <button type="submit" class="update-order-btn">Cập nhật đơn</button>
         </div>
     </form>
 </div>
@@ -878,6 +1003,16 @@
                 <div class="payment-invoice-row">
                     <div class="payment-invoice-label">Mô tả lỗi:</div>
                     <div class="payment-invoice-value" id="invoice-error-description"></div>
+                </div>
+                <!-- Device Images Section -->
+                <div class="payment-invoice-section">
+                    <h3>Ảnh thiết bị</h3>
+                    <div id="invoice-device-images" class="file-preview"></div>
+                </div>
+                <!-- Warranty Images Section -->
+                <div class="payment-invoice-section">
+                    <h3>Ảnh phiếu bảo hành</h3>
+                    <div id="invoice-warranty-images" class="file-preview"></div>
                 </div>
             </div>
 
@@ -951,11 +1086,11 @@
         </div>
         <div class="payment-popup-body">
             <div class="payment-methods">
-                <button class="payment-method-btn" data-method="cash">
+                <button class="payment-method-btn" data-method="Tiền mặt">
                     <i class="fa-solid fa-money-bill-wave"></i>
                     <span>Tiền mặt</span>
                 </button>
-                <button class="payment-method-btn" data-method="transfer">
+                <button class="payment-method-btn" data-method="Chuyển khoản">
                     <i class="fa-solid fa-credit-card"></i>
                     <span>Chuyển khoản</span>
                 </button>
@@ -968,8 +1103,7 @@
 
 
     <!-- Định nghĩa URLs cho JavaScript -->
-    <!--Định nghĩa các URLs cho tddvkvl2.js -->
-    <script>
+    <!--Định nghĩa các URLs cho tddvkvl2.js -->    <script>
 
         var backToListUrl = '@Url.Action("IndexDSDDV", "DanhSachDonDichVu")';
         var searchLinhKienUrl = '@Url.Action("TimKiemLinhKien", "TaoDonDichVuKVL")';
@@ -978,12 +1112,115 @@
         var layDanhSachQuanUrl = '@Url.Action("LayDanhSachQuan", "TaoDonDichVuKVL")';
         var layDanhSachPhuongUrl = '@Url.Action("LayDanhSachPhuong", "TaoDonDichVuKVL")';
         var createServiceOrderUrl = '@Url.Action("CreateServiceOrder", "TaoDonDichVuKVL")';
-    </script>    <!-- Tải script JS bên ngoài -->
+        var layLinhKienUrl = '@Url.Action("LayLinhKienTheoLoai", "TaoDonDichVuKVL")';
+        var layThongTinLinhKienUrl = '@Url.Action("LayThongTinLinhKien", "EditTaoDonDichVuKVL")';
+        var layThongTinDonUrl = '@Url.Action("LayThongTinDon", "EditTaoDonDichVuKVL")';
+        var updateServiceOrderUrl = '@Url.Action("UpdateServiceOrder", "EditTaoDonDichVuKVL")';
+                                                       // Thêm URL mới
+        var layDanhSachNhanVienKyThuatUrl = '@Url.Action("LayDanhSachNhanVienKyThuat", "EditTaoDonDichVuKVL")';
+    </script><!-- Tải script JS bên ngoài -->
     <script src="/js/tddvkvl2.js"></script>
-
+    <script src="/js/editTDDV.js"></script>
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
+    <script>
+        var searchCustomerUrl = '@Url.Action("TimKiemKhachHang", "TaoDonDichVuKVL")';
+
+        $(document).ready(function () {
+            var typingTimer;
+            var doneTypingInterval = 400;
+
+            $('#customerIdInput').on('input', function () {
+                clearTimeout(typingTimer);
+                var keyword = $(this).val().trim();
+                if (keyword.length > 0) {
+                    typingTimer = setTimeout(function () {
+                        $.get(searchCustomerUrl, { keyword: keyword }, function (data) {
+                            var dropdown = $('#customerIdDropdown');
+                            dropdown.empty();
+                            if (data && data.length > 0) {
+                                data.forEach(function (item) {
+                                    var div = $('<div class="dropdown-item"></div>');
+                                    div.text(item.id + ' - ' + item.hoVaTen + ' (' + item.sdt + ')');
+                                    div.data('customer', item);
+                                    div.on('click', function () {
+                                        // Điền mã vào input
+                                        $('#customerIdInput').val(item.id);
+                                        $('#IdUser').val(item.id); // <-- Thêm dòng này
+                                        dropdown.hide();
+                                        // Điền thông tin khách hàng
+                                        $('input[name="HoVaTen"]').val(item.hoVaTen);
+                                        $('input[name="Sdt"]').val(item.sdt);
+                                        //$('input[name="Email"]').val(item.email);
+                                        // Địa chỉ
+                                        $('#cityInput').val(item.thanhPho || '');
+                                        $('#districtInput').val(item.quan || '');
+                                        $('#wardInput').val(item.phuong || '');
+                                        $('#wardId').val(item.idPhuong || '');
+                                        $('input[placeholder="Số nhà, đường"]').val(item.duongSoNha || '');
+                                    });
+                                    dropdown.append(div);
+                                });
+                                dropdown.show();
+                            } else {
+                                dropdown.html('<div class="dropdown-item">Không tìm thấy khách hàng</div>').show();
+                            }
+                        });
+                    }, doneTypingInterval);
+                } else {
+                    $('#customerIdDropdown').hide();
+                }
+            });
+
+            // Ẩn dropdown khi click ra ngoài
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#customerIdInput').length) {
+                    $('#customerIdDropdown').hide();
+                }
+            });
+        });
+                // Thêm đoạn này vào script trong IndexEditTaoDDVKVL.cshtml hoặc file JS tương ứng
+        $(document).ready(function() {
+            // Sự kiện khi chọn loại linh kiện
+            $(document).on('change', '.select-linhkien, select[name="IdLoaiLinhKien"]', function() {
+                var idLoaiLinhKien = $(this).val();
+                var partSelect = $(this).closest('.split').find('.part-select');
+
+                if (idLoaiLinhKien) {
+                    console.log("Đã chọn loại linh kiện:", idLoaiLinhKien);
+
+                    // Lấy danh sách linh kiện theo loại
+                    $.ajax({
+                        url: layLinhKienUrl,
+                        type: 'GET',
+                        data: { idLoaiLinhKien: idLoaiLinhKien },
+                        dataType: 'json',
+                        success: function(data) {
+                            console.log("Đã nhận được danh sách linh kiện:", data);
+
+                            // Xóa options cũ và thêm options mới
+                            partSelect.empty();
+                            partSelect.append('<option value="">Chọn linh kiện</option>');
+
+                            if (data && data.length > 0) {
+                                data.forEach(function(lk) {
+                                    partSelect.append('<option value="' + lk.idLinhKien + '">' + lk.tenLinhKien + '</option>');
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Lỗi khi lấy danh sách linh kiện:", error);
+                        }
+                    });
+                } else {
+                    // Nếu không chọn loại linh kiện, xóa danh sách linh kiện
+                    partSelect.empty();
+                    partSelect.append('<option value="">Chọn linh kiện</option>');
+                }
+            });
+        });
+    </script>
 }
 
 

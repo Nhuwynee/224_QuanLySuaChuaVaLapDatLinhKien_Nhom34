@@ -423,6 +423,7 @@
 
                         // Fill the modal with data
                         $('#detail-madon').text(data.maDon);
+                        $('#detail-trangthai').text(data.trangThaiDon);
                         $('#detail-tenkhachhang').text(data.tenKhachHang);
                         $('#detail-loaikhachhang').text(data.loaiKhachHang);
                         $('#detail-ngaytaodon').text(ngayTao);
@@ -529,11 +530,16 @@
             });
 
             // Add event handler for edit button
-            $('#editOrderBtn').click(function() {
-                var orderId = $('#detail-madon').text();
-                // Redirect to edit page or show edit modal
-                window.location.href = '@Url.Action("", "DanhSachDonDichVu")/' + orderId;
-            });
+                $('#editOrderBtn').click(function() {
+        var orderId = $('#detail-madon').text();
+        // Gọi API lấy dữ liệu đơn dịch vụ
+        $.get('/EditTaoDonDichVuKVL/LayThongTinDon', { id: orderId }, function(data) {
+            // Lưu vào localStorage để truyền sang trang chỉnh sửa
+            localStorage.setItem('editOrderData', JSON.stringify(data));
+            // Chuyển sang trang chỉnh sửa
+            window.location.href = '/EditTaoDonDichVuKVL/IndexEditTaoDDVKVL?id=' + orderId;
+        });
+    });
 
             // Add event handler for delete icon
             $('.delete-icon').click(function() {
@@ -562,4 +568,31 @@
             });
         });
 </script>
+<script>
+    $(document).ready(function() {
+        // Xử lý nút chỉnh sửa trong modal chi tiết đơn
+        $('#orderDetailModal').off('click', '#editOrderBtn').on('click', '#editOrderBtn', function() {
+            var orderId = $('#detail-madon').text();
+            console.log("Chỉnh sửa đơn: " + orderId);
 
+            // Hiển thị loading
+            var loadingHtml = '<div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div>';
+            $(this).html(loadingHtml);
+
+            // Gọi API lấy thông tin đơn
+            $.get('/EditTaoDonDichVuKVL/LayThongTinDon', { id: orderId })
+                .done(function(data) {
+                    console.log("Dữ liệu nhận được:", data);
+                    // Lưu data vào localStorage
+                    localStorage.setItem('editOrderData', JSON.stringify(data));
+                    // Chuyển đến trang chỉnh sửa
+                    window.location.href = '/EditTaoDonDichVuKVL/IndexEditTaoDDVKVL?id=' + orderId;
+                })
+                .fail(function(error) {
+                    console.error("Lỗi khi lấy thông tin đơn:", error);
+                    alert("Có lỗi xảy ra khi lấy thông tin đơn. Vui lòng thử lại.");
+                    $(this).html('<i class="fa-solid fa-edit me-2"></i>Chỉnh sửa');
+                });
+        });
+    });
+</script>
