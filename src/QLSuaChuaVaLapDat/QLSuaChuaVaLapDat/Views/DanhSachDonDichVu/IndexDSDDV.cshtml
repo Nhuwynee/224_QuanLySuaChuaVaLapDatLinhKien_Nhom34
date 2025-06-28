@@ -1,0 +1,598 @@
+﻿﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "~/Views/Shared/_LayoutCSKH.cshtml";
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@* @model List<QLSuaChuaVaLapDat.Models.DonDichVuViewModel> *@
+@model QLSuaChuaVaLapDat.Models.viewmodel.DonDichVuPagedViewModel
+
+
+<!-- Main Content -->
+<div class="main-content">
+    <h1 class="page-title">Danh sách đơn dịch vụ</h1>
+
+    <div class="filter-bar">
+        <div class="filter-options">
+            <div class="search-filter">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Tìm kiếm đơn dịch vụ...">
+            </div>
+
+            <!-- <div class="filter-group">
+                <div class="filter-label">Ngày</div>
+                <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+            </div> -->
+
+            <div class="filter-group">
+                <div class="filter-label">Trạng thái</div>
+                <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-list">
+        <div class="list-header">
+            <div>Mã đơn</div>
+            <div>Khách hàng</div>
+            <div>Mô tả đơn dịch vụ</div>
+            <div>Trạng thái</div>
+            <div>Tiền đơn dịch vụ</div>
+            <div>Cập nhật</div>
+        </div>
+
+        @foreach (var item in Model.DonDichVus)
+        {
+            <div class="list-item">
+                <div>@item.MaDon</div>
+                <div>@item.TenKhachHang</div>
+                <div>@item.MoTa</div>
+                <div>
+                    <span class="status-badge @(item.TrangThai == "Hoàn thành" ? "hoan-thanh" : "dang-tien-hanh")">
+                        @item.TrangThai
+                    </span>
+                </div>
+                <div>@string.Format("{0:N0} VND", item.TongTien)</div>
+                <div class="action-buttons">
+                    <i class="fa-solid fa-pen-to-square action-icon"></i>
+                    <i class="fa-solid fa-trash delete-icon"></i>
+                </div>
+            </div>
+        }
+
+    </div>
+    @* <nav> *@
+    @*     <ul class="pagination"> *@
+    @*         @for (int i = 1; i <= Model.TotalPages; i++) *@
+    @*         { *@
+    @*             <li class="page-item @(i == Model.CurrentPage ? "active" : "")"> *@
+    @*                 <a class="page-link" href="?page=@i">@i</a> *@
+    @*             </li> *@
+    @*         } *@
+    @*     </ul> *@
+    @* </nav> *@
+    <div class="pagination-container">
+        <ul class="pagination">
+            @if (Model.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("IndexDSDDV", "DanhSachDonDichVu", new { page = Model.CurrentPage - 1 })">Trước</a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("IndexDSDDV", "DanhSachDonDichVu", new { page = i })">@i</a>
+                </li>
+            }
+
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("IndexDSDDV", "DanhSachDonDichVu", new { page = Model.CurrentPage + 1 })">Tiếp</a>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end;">
+        <button class="add-button" onclick="confirmRedirect()">
+            <i class="fa-solid fa-plus add-icon"></i>
+            @* <a href="taodonsua.html" style="text-decoration: none; color: white;"> *@
+            Thêm đơn
+            @* </a> *@
+        </button>
+    </div>
+</div>
+
+<!-- Modal for Service Order Details -->
+<div class="modal fade" id="orderDetailModal" tabindex="-1" role="dialog" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="orderDetailModalLabel"><i class="fa-solid fa-clipboard-list me-2"></i>Chi tiết đơn dịch vụ</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Thông tin đơn hàng và tình trạng -->
+                <div class="order-status-section mb-4">
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fa-solid fa-info-circle me-2"></i>Thông tin cơ bản</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group d-flex">
+                                        <label class="col-5 font-weight-bold">Mã đơn:</label>
+                                        <span id="detail-madon" class="col-7 text-primary font-weight-bold"></span>
+                                    </div>
+                                    <div class="form-group d-flex">
+                                        <label class="col-5 font-weight-bold">Trạng thái:</label>
+                                        <span id="detail-trangthai" class="col-7">
+                                            <span class="badge badge-pill" style="font-size: 90%"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group d-flex">
+                                        <label class="col-5 font-weight-bold">Tổng tiền:</label>
+                                        <span id="detail-tongtien" class="col-7 text-success font-weight-bold"></span>
+                                    </div>
+                                    <div class="form-group d-flex">
+                                        <label class="col-5 font-weight-bold">Phương thức thanh toán:</label>
+                                        <span id="detail-phuongthuc" class="col-7"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Thông tin khách hàng -->
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fa-solid fa-user me-2"></i>Thông tin khách hàng</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Tên khách hàng:</label>
+                                    <span id="detail-tenkhachhang"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Loại khách hàng:</label>
+                                    <span id="detail-loaikhachhang"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thông tin thiết bị -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fa-solid fa-laptop me-2"></i>Thông tin thiết bị</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Tên thiết bị:</label>
+                                    <span id="detail-tenthietbi"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Loại thiết bị:</label>
+                                    <span id="detail-loaithietbi"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin dịch vụ -->
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fa-solid fa-tools me-2"></i>Thông tin dịch vụ</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Hình thức dịch vụ:</label>
+                                    <span id="detail-hinhthuc"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Loại đơn dịch vụ:</label>
+                                    <span id="detail-loaidon"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thông tin nhân viên xử lý -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fa-solid fa-user-tie me-2"></i>Nhân viên xử lý</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Nhân viên kỹ thuật:</label>
+                                    <span id="detail-nvkythuat"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Người tạo đơn:</label>
+                                    <span id="detail-nguoitaodon"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Thông tin lỗi -->
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="fa-solid fa-bug me-2"></i>Thông tin lỗi</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="error-detail-container">
+                            <!-- Chi tiết lỗi sẽ được thêm vào đây bằng JavaScript -->
+                            <div class="text-center text-muted" id="no-error-message">
+                                <i class="fa fa-info-circle me-2"></i>Không có thông tin lỗi.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin thời gian -->
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="fa-solid fa-calendar-alt me-2"></i>Thông tin thời gian</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Ngày tạo đơn:</label>
+                                    <span id="detail-ngaytaodon"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Ngày hoàn thành:</label>
+                                    <span id="detail-ngayhoanthanh"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Ngày chỉnh sửa:</label>
+                                    <span id="detail-ngaychinhsua"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="editOrderBtn">
+                    <i class="fa-solid fa-edit me-2"></i>Chỉnh sửa
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fa-solid fa-times me-2"></i>Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal xem ảnh lớn -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" role="dialog" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center" style="padding:0;">
+                <img id="preview-img" src="" alt="Ảnh lỗi" style="max-width:100%;max-height:80vh;display:block;margin:auto;" />
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add this CSS for better styling -->
+<style>
+    /* Modal styling */
+    #orderDetailModal .modal-header {
+        background-color: #2A83E9;
+        border-radius: 0.3rem 0.3rem 0 0;
+    }
+
+    #orderDetailModal .modal-title {
+        color: white;
+        font-weight: 500;
+    }
+
+    #orderDetailModal .close {
+        color: white;
+        text-shadow: none;
+        opacity: 0.8;
+    }
+
+        #orderDetailModal .close:hover {
+            opacity: 1;
+        }
+
+    #orderDetailModal .card {
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    #orderDetailModal .card-header {
+        border-bottom: 1px solid rgba(0,0,0,0.125);
+        padding: 0.75rem 1.25rem;
+    }
+
+    #orderDetailModal .form-group {
+        margin-bottom: 0.5rem;
+    }
+
+    #orderDetailModal label {
+        margin-bottom: 0.25rem;
+        color: #6c757d;
+    }
+
+    #orderDetailModal span:not(.badge) {
+        color: #212529;
+    }
+    /* Badge styling for status */
+    #detail-trangthai .badge {
+        padding: 0.4rem 0.6rem;
+    }
+
+    /* Error detail table styling */
+    #error-detail-container table {
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    #error-detail-container th {
+        background-color: #f8f9fa;
+    }
+
+    #error-detail-container .table td,
+    #error-detail-container .table th {
+        padding: 0.5rem;
+        vertical-align: middle;
+    }
+
+    #no-error-message {
+        padding: 20px;
+        color: #6c757d;
+    }
+
+    @@media (max-width: 767.98px) {
+        #orderDetailModal .form-group.d-flex {
+            flex-direction: column;
+        }
+
+            #orderDetailModal .form-group.d-flex label,
+            #orderDetailModal .form-group.d-flex span {
+                width: 100%;
+                max-width: 100%;
+                flex: 0 0 100%;
+            }
+
+        #error-detail-container .table {
+            font-size: 12px;
+        }
+    }
+</style>
+
+
+
+<script>
+    function confirmRedirect() {
+        const confirmResult = confirm("Bạn có muốn tạo đơn sửa chữa mới không?");
+        if (confirmResult) {
+            window.location.href = '@Url.Action("IndexTDDVKVL", "TaoDonDichVuKVL")';
+        }
+        // Ngược lại thì không làm gì cả
+    }
+</script>
+<!-- Add this JavaScript code to enhance the modal functionality -->
+<script>
+        $(document).ready(function() {
+            // Attach event listener to all action icons
+            $('.action-icon').click(function() {
+                // Get the service order ID from the parent list item
+                var orderId = $(this).closest('.list-item').children().first().text();
+
+                // Call AJAX to get order details
+                $.ajax({
+                    url: '@Url.Action("ChiTietDonDichVu", "DanhSachDonDichVu")',
+                    type: 'GET',
+                    data: { id: orderId },
+                    success: function(data) {
+                        // Format dates
+                        var ngayTao = data.ngayTaoDon ? new Date(data.ngayTaoDon).toLocaleDateString('vi-VN') : 'N/A';
+                        var ngayHoanThanh = data.ngayHoanThanh ? new Date(data.ngayHoanThanh).toLocaleDateString('vi-VN') : 'N/A';
+                        var ngayChinhSua = data.ngayChinhSua ? new Date(data.ngayChinhSua).toLocaleDateString('vi-VN') : 'N/A';
+
+                        // Format money
+                        var tongTien = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.tongTien);
+
+                        // Fill the modal with data
+                        $('#detail-madon').text(data.maDon);
+                        $('#detail-trangthai').text(data.trangThaiDon);
+                        $('#detail-tenkhachhang').text(data.tenKhachHang);
+                        $('#detail-loaikhachhang').text(data.loaiKhachHang);
+                        $('#detail-ngaytaodon').text(ngayTao);
+                        $('#detail-ngayhoanthanh').text(ngayHoanThanh);
+                        $('#detail-nvkythuat').text(data.tenNhanVienKyThuat);
+                        $('#detail-nguoitaodon').text(data.tenNguoiTaoDon);
+                        $('#detail-tenthietbi').text(data.tenThietBi);
+                        $('#detail-loaithietbi').text(data.loaiThietBi);
+                        $('#detail-hinhthuc').text(data.hinhThucDichVu);
+                        $('#detail-loaidon').text(data.loaiDonDichVu);
+                        $('#detail-phuongthuc').text(data.phuongThucThanhToan || 'N/A');
+                        $('#detail-tongtien').text(tongTien);
+                          // Thông tin lỗi - Hiển thị tất cả các chi tiết lỗi
+                        var errorContainer = $('#error-detail-container');
+                        errorContainer.empty(); // Xóa nội dung cũ
+
+                        if (data.danhSachChiTietLoi && data.danhSachChiTietLoi.length > 0) {
+                            $('#no-error-message').hide();
+
+                            // Tạo bảng để hiển thị các chi tiết lỗi
+                            var table = $('<table class="table table-striped table-bordered"></table>');
+                            var thead = $('<thead class="thead-light"></thead>');
+                            var headerRow = $('<tr></tr>');
+                            headerRow.append('<th scope="col">#</th>');
+                            headerRow.append('<th scope="col">Linh kiện</th>');
+                            headerRow.append('<th scope="col">Lỗi</th>');
+                            headerRow.append('<th scope="col">Mô tả</th>');
+                            headerRow.append('<th scope="col">Đơn giá</th>');
+                            headerRow.append('<th scope="col">Số lượng</th>');
+                        headerRow.append('<th scope="col">Ảnh</th>'); // Thêm cột ảnh
+                            thead.append(headerRow);
+
+                            var tbody = $('<tbody></tbody>');
+                                $.each(data.danhSachChiTietLoi, function(index, item) {
+                                var row = $('<tr></tr>');
+                                row.append('<td>' + (index + 1) + '</td>');
+                                row.append('<td>' + (item.tenLinhKien || 'Không có') + '</td>');
+                                row.append('<td>' + (item.moTaLoi || 'Không có') + '</td>');
+                                row.append('<td>' + (item.moTaChiTiet || 'Không có') + '</td>');
+                                // Kiểm tra nếu item và donGiaLoi tồn tại, nếu không dùng 0
+                                var price = item.donGiaLoi;
+
+                                // Đảm bảo giá trị luôn là một số
+                                if (price === null || price === undefined || isNaN(price)) {
+                                    price = 0;
+                                }
+
+                                var donGia = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+                                row.append('<td class="text-danger">' + donGia + '</td>');
+                                row.append('<td>' + item.soLuong + '</td>');
+                                // Thêm ảnh
+                                var imgHtml = '';
+                                if (item.danhSachAnh && item.danhSachAnh.length > 0) {
+                                    item.danhSachAnh.forEach(function(url) {
+                                imgHtml += '<img src="' + url + '" alt="Ảnh lỗi" class="img-error-thumb" style="max-width:60px;max-height:60px;margin:2px;border-radius:4px;border:1px solid #ccc;cursor:pointer;" />';
+                                    });
+                                } else {
+                                    imgHtml = '<span class="text-muted">Không có</span>';
+                                }
+                                row.append('<td>' + imgHtml + '</td>');
+                                tbody.append(row);
+                            });
+
+                            table.append(thead);
+                            table.append(tbody);
+                            errorContainer.append(table);
+                                // Gắn sự kiện click cho ảnh
+                            errorContainer.find('.img-error-thumb').off('click').on('click', function() {
+                                var src = $(this).attr('src');
+                                $('#preview-img').attr('src', src);
+                                $('#imagePreviewModal').modal('show');
+                            });
+                        } else {
+                            // Hiển thị thông báo không có thông tin lỗi
+                            $('#no-error-message').show();
+                        }
+
+                        // Set status with appropriate badge color
+                        var statusBadge = $('#detail-trangthai .badge');
+                        statusBadge.text(data.trangThaiDon);
+
+                        // Set badge color based on status
+                        statusBadge.removeClass('badge-success badge-warning badge-danger badge-info');
+                        if (data.trangThaiDon === 'Hoàn thành') {
+                            statusBadge.addClass('badge-success');
+                        } else if (data.trangThaiDon === 'Đang tiến hành') {
+                            statusBadge.addClass('badge-warning');
+                        } else if (data.trangThaiDon === 'Chờ xử lý') {
+                            statusBadge.addClass('badge-info');
+                        } else if (data.trangThaiDon === 'Hủy') {
+                            statusBadge.addClass('badge-danger');
+                        }
+
+                        $('#detail-ngaychinhsua').text(ngayChinhSua);
+
+                        // Show the modal
+                        $('#orderDetailModal').modal('show');
+                    },
+                    error: function(error) {
+                        console.error('Error loading order details:', error);
+                        alert('Không thể tải thông tin chi tiết đơn dịch vụ. Vui lòng thử lại sau.');
+                    }
+                });
+            });
+
+            // Add event handler for edit button
+                $('#editOrderBtn').click(function() {
+        var orderId = $('#detail-madon').text();
+        // Gọi API lấy dữ liệu đơn dịch vụ
+        $.get('/EditTaoDonDichVuKVL/LayThongTinDon', { id: orderId }, function(data) {
+            // Lưu vào localStorage để truyền sang trang chỉnh sửa
+            localStorage.setItem('editOrderData', JSON.stringify(data));
+            // Chuyển sang trang chỉnh sửa
+            window.location.href = '/EditTaoDonDichVuKVL/IndexEditTaoDDVKVL?id=' + orderId;
+        });
+    });
+
+            // Add event handler for delete icon
+            $('.delete-icon').click(function() {
+                var orderId = $(this).closest('.list-item').children().first().text();
+                if (confirm('Bạn có chắc chắn muốn xóa đơn dịch vụ này không?')) {
+                    $.ajax({
+                        url: '@Url.Action("XoaDonDichVu", "DanhSachDonDichVu")',
+                        type: 'POST',
+                        data: { id: orderId },
+                        success: function(response) {
+                            if (response.success) {
+                                // Remove the element from the DOM
+                                $('[data-id="' + orderId + '"]').remove();
+                                // Reload the page to refresh the list
+                                location.reload();
+                            } else {
+                                alert(response.message || 'Không thể xóa đơn dịch vụ. Vui lòng thử lại sau.');
+                            }
+                        },
+                        error: function(error) {
+                            console.error('Error deleting order:', error);
+                            alert('Có lỗi xảy ra khi xóa đơn dịch vụ. Vui lòng thử lại sau.');
+                        }
+                    });
+                }
+            });
+        });
+</script>
+<script>
+    $(document).ready(function() {
+        // Xử lý nút chỉnh sửa trong modal chi tiết đơn
+        $('#orderDetailModal').off('click', '#editOrderBtn').on('click', '#editOrderBtn', function() {
+            var orderId = $('#detail-madon').text();
+            console.log("Chỉnh sửa đơn: " + orderId);
+
+            // Hiển thị loading
+            var loadingHtml = '<div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div>';
+            $(this).html(loadingHtml);
+
+            // Gọi API lấy thông tin đơn
+            $.get('/EditTaoDonDichVuKVL/LayThongTinDon', { id: orderId })
+                .done(function(data) {
+                    console.log("Dữ liệu nhận được:", data);
+                    // Lưu data vào localStorage
+                    localStorage.setItem('editOrderData', JSON.stringify(data));
+                    // Chuyển đến trang chỉnh sửa
+                    window.location.href = '/EditTaoDonDichVuKVL/IndexEditTaoDDVKVL?id=' + orderId;
+                })
+                .fail(function(error) {
+                    console.error("Lỗi khi lấy thông tin đơn:", error);
+                    alert("Có lỗi xảy ra khi lấy thông tin đơn. Vui lòng thử lại.");
+                    $(this).html('<i class="fa-solid fa-edit me-2"></i>Chỉnh sửa');
+                });
+        });
+    });
+</script>

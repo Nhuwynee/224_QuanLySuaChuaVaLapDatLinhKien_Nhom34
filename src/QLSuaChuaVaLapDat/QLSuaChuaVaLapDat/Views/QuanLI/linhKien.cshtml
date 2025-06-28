@@ -1,0 +1,176 @@
+﻿@model IEnumerable<QLSuaChuaVaLapDat.Models.LinhKien>
+
+@{
+    ViewData["Title"] = "Quản lý Linh kiện";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">📱 Quản lý Linh kiện</h3>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Thêm mới
+                    </a>
+                </div>
+
+                <div class="card-body">
+                    <!-- Tìm kiếm và sắp xếp -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <form asp-action="Index" method="get" class="form-inline">
+                                <div class="input-group">
+                                    <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]"
+                                           placeholder="Tìm kiếm theo tên..." class="form-control">
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-outline-secondary">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <div class="btn-group">
+                                <a asp-action="Index" asp-route-sortOrder="@ViewData["TenSortParm"]"
+                                   class="btn btn-outline-info btn-sm">Sắp xếp A-Z</a>
+                                <a asp-action="Index" asp-route-sortOrder="@ViewData["GiaSortParm"]"
+                                   class="btn btn-outline-success btn-sm">Sắp xếp giá</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông báo -->
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    }
+
+                    <!-- Bảng danh sách -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Mã LK</th>
+                                    <th>Ảnh</th>
+                                    <th>Tên linh kiện</th>
+                                    <th>Loại</th>
+                                    <th>NSX</th>
+                                    <th>Giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Bảo hành</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr class="@(item.SoLuong <= 5 ? "table-warning" : "")">
+                                        <td><strong>@item.IdLinhKien</strong></td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.Anh))
+                                            {
+                                                <img src="@item.Anh" alt="@item.TenLinhKien"
+                                                     class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light d-flex align-items-center justify-content-center"
+                                                     style="width: 50px; height: 50px; border-radius: 4px;">
+                                                    <i class="fas fa-image text-muted"></i>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td>
+                                            <strong>@item.TenLinhKien</strong>
+                                            @if (item.SoLuong <= 5)
+                                            {
+                                                <span class="badge badge-warning ml-1">Sắp hết</span>
+                                            }
+                                        </td>
+                                        <td>@item.IdLoaiLinhKienNavigation?.TenLoaiLinhKien</td>
+                                        <td>@item.IdNsxNavigation?.TenNsx</td>
+                                        <td><span class="text-success font-weight-bold">@item.Gia.ToString("N0") VNĐ</span></td>
+                                        <td>
+                                            <span class="badge @(item.SoLuong <= 5 ? "badge-warning" : "badge-info")">
+                                                @item.SoLuong
+                                            </span>
+                                        </td>
+                                        <td>@item.ThoiGianBaoHanh.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a asp-action="Details" asp-route-id="@item.IdLinhKien"
+                                                   class="btn btn-info btn-sm" title="Chi tiết">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@item.IdLinhKien"
+                                                   class="btn btn-warning btn-sm" title="Sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@item.IdLinhKien"
+                                                   class="btn btn-danger btn-sm" title="Xóa"
+                                                   onclick="return confirm('Bạn có chắc muốn xóa linh kiện này?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Chưa có linh kiện nào</h5>
+                            <a asp-action="Create" class="btn btn-primary mt-2">
+                                <i class="fas fa-plus"></i> Thêm linh kiện đầu tiên
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table th {
+        border-top: none;
+        font-weight: 600;
+    }
+
+    .card {
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        border: none;
+    }
+
+    .card-header {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: white;
+        border-bottom: none;
+    }
+
+    .btn-group-sm .btn {
+        margin: 0 1px;
+    }
+
+    .table-warning {
+        background-color: rgba(255, 193, 7, 0.1) !important;
+    }
+</style>
+
+<script>
+    // Auto hide alerts
+    setTimeout(function () {
+        $('.alert').fadeOut('slow');
+    }, 5000);
+</script>

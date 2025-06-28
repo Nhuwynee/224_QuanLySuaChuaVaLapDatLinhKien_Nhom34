@@ -1,0 +1,267 @@
+﻿@model QLSuaChuaVaLapDat.Models.ChiTietThangViewModel
+
+@{
+    Layout = "~/Views/Shared/_LayoutQuanLi.cshtml";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/chi-tiet-thang.css" />
+}
+
+<div class="container-fluid chi-tiet-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1 class="page-title">
+                    <i class="fas fa-chart-line"></i>
+                    Chi tiết Doanh thu
+                </h1>
+                <p class="page-subtitle">Báo cáo chi tiết cho @Model.ThangVaNam</p>
+            </div>
+            <div class="header-right">
+                <a asp-action="thongKe" asp-controller="QuanLI" class="btn btn-return">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.ThongTinkh != null && Model.ThongTinkh.Any())
+    {
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>@Model.ThongTinkh.Count()</h3>
+                    <p>Tổng khách hàng</p>
+                </div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>@Model.ThongTinkh.Sum(kh => kh.SoLuongTieu).ToString("N0")</h3>
+                    <p>Tổng doanh thu (VNĐ)</p>
+                </div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>@((Model.ThongTinkh.Sum(kh => kh.SoLuongTieu) / Model.ThongTinkh.Count()).ToString("N0"))</h3>
+                    <p>Trung bình/khách (VNĐ)</p>
+                </div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>@Model.ThongTinkh.Max(kh => kh.SoLuongTieu).ToString("N0")</h3>
+                    <p>Cao nhất (VNĐ)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-section">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Biểu đồ Top 10 Khách hàng</h3>
+                    <div class="chart-controls">
+                        <button class="btn btn-sm btn-outline" id="chartTypeBar" onclick="changeChartType('bar')">
+                            <i class="fas fa-chart-bar"></i> Cột
+                        </button>
+                        <button class="btn btn-sm btn-outline active" id="chartTypePie" onclick="changeChartType('pie')">
+                            <i class="fas fa-chart-pie"></i> Tròn
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="filters-section">
+            <div class="filters-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchCustomer" placeholder="Tìm kiếm khách hàng..." />
+                </div>
+                <div class="filter-group">
+                    <label>Sắp xếp theo:</label>
+                    <select id="sortBy" class="form-select">
+                        <option value="revenue-desc">Doanh thu (Cao → Thấp)</option>
+                        <option value="revenue-asc">Doanh thu (Thấp → Cao)</option>
+                        <option value="name-asc">Tên (A → Z)</option>
+                        <option value="name-desc">Tên (Z → A)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Hiển thị:</label>
+                    <select id="pageSize" class="form-select">
+                        <option value="10">10 khách hàng</option>
+                        <option value="25" selected>25 khách hàng</option>
+                        <option value="50">50 khách hàng</option>
+                        <option value="all">Tất cả</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-section">
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Danh sách chi tiết khách hàng</h3>
+                    <div class="table-info">
+                        <span id="tableInfo">Hiển thị @Model.ThongTinkh.Count() khách hàng</span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" id="customerTable">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên Khách Hàng</th>
+                                <th>Doanh thu (VNĐ)</th>
+                                <th>% Tổng doanh thu</th>
+                                <th>Xếp hạng</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerTableBody">
+                            @{
+                                var sortedCustomers = Model.ThongTinkh.OrderByDescending(kh => kh.SoLuongTieu).ToList();
+                                var totalRevenue = Model.ThongTinkh.Sum(kh => kh.SoLuongTieu);
+                            }
+                            @for (int i = 0; i < sortedCustomers.Count; i++)
+                            {
+                                var customer = sortedCustomers[i];
+                                var percentage = totalRevenue > 0 ? (customer.SoLuongTieu / totalRevenue * 100) : 0;
+                                var rank = i + 1;
+                                var rankClass = rank <= 3 ? "top-rank" : rank <= 10 ? "good-rank" : "normal-rank";
+
+                                <tr class="customer-row" data-name="@customer.Ten.ToLower()" data-revenue="@customer.SoLuongTieu">
+                                    <td>@rank</td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <span class="customer-name">@customer.Ten</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="revenue-amount">@customer.SoLuongTieu.ToString("N0")</span>
+                                    </td>
+                                    <td>
+                                        <div class="percentage-bar">
+                                            <div class="percentage-fill" style="width: @percentage.ToString("F1")%"></div>
+                                            <span class="percentage-text">@percentage.ToString("F1")%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="rank-badge @rankClass">
+                                            @if (rank == 1)
+                                            {
+                                                <i class="fas fa-trophy"></i>
+                                            }
+                                            else if (rank == 2)
+                                            {
+                                                <i class="fas fa-medal"></i>
+                                            }
+                                            else if (rank == 3)
+                                            {
+                                                <i class="fas fa-award"></i>
+                                            }
+                                            #@rank
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info" onclick="viewCustomerDetails('@customer.Ten')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container" id="paginationContainer">
+                    <!-- Pagination will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <div class="summary-container">
+                <h3>Phân tích doanh thu</h3>
+                <div class="analysis-grid">
+                    <div class="analysis-item">
+                        <h4>Top 3 khách hàng</h4>
+                        <p>Chiếm <strong>@((sortedCustomers.Take(3).Sum(c => c.SoLuongTieu) / totalRevenue * 100).ToString("F1"))%</strong> tổng doanh thu</p>
+                    </div>
+                    <div class="analysis-item">
+                        <h4>Top 10 khách hàng</h4>
+                        <p>Chiếm <strong>@((sortedCustomers.Take(10).Sum(c => c.SoLuongTieu) / totalRevenue * 100).ToString("F1"))%</strong> tổng doanh thu</p>
+                    </div>
+                    <div class="analysis-item">
+                        <h4>Khách hàng VIP</h4>
+                        <p><strong>@sortedCustomers.Count(c => c.SoLuongTieu >= 1000000)</strong> khách hàng có doanh thu ≥ 1M</p>
+                    </div>
+                    <div class="analysis-item">
+                        <h4>Độ tập trung</h4>
+                        <p>
+                            @(sortedCustomers.Count() > 0 && sortedCustomers[0].SoLuongTieu > 0 ?
+                                (sortedCustomers[0].SoLuongTieu / totalRevenue * 100).ToString("F1") + "% từ khách hàng top 1" : "N/A")
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h3>Không có dữ liệu</h3>
+            <p>Không có dữ liệu chi tiết doanh thu cho @Model.ThangVaNam</p>
+            <a asp-action="thongKe" asp-controller="QuanLI" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại Thống kê
+            </a>
+        </div>
+    }
+</div>
+
+<!-- Customer Details Modal -->
+<div class="modal fade" id="customerDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết khách hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="customerDetailsContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/chi-tiet-thang.js"></script>
+}

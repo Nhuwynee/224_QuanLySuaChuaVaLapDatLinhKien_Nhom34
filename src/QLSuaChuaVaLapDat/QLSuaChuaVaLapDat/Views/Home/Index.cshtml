@@ -1,0 +1,110 @@
+﻿﻿@* @{ *@
+@*     ViewData["Title"] = "Home Page"; *@
+@* } *@
+
+@* <div class="text-center"> *@
+@*     <h1 class="display-4">Welcome</h1> *@
+@*     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p> *@
+@* </div> *@
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Hệ thống quản lý sửa chữa và lắp đặt linh kiện</title>
+    <link rel="stylesheet" href="/css/login.css" asp-append-version="true">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <div class="left-panel">
+                <div class="overlay"></div>
+                <div class="content">
+                    <h1>Quản lý sửa chữa & lắp đặt linh kiện</h1>
+                    <p>Hệ thống quản lý chuyên nghiệp dành cho doanh nghiệp của bạn</p>
+                </div>
+            </div>
+            <div class="right-panel">
+                <div class="login-form">
+                    <div class="logo">
+                        <i class="fas fa-tools"></i>
+                        <h2>Điện Máy<span> Xanh</span></h2>
+                    </div>
+                    <h3>Đăng nhập</h3>
+                    @if (!string.IsNullOrEmpty(ViewBag.Error))
+                    {
+                        <div class="error-message" style="color: red; margin-bottom: 10px; text-align: center;">
+                            @ViewBag.Error
+                        </div>
+                    }
+                    <p>Chào mừng trở lại! Vui lòng đăng nhập để tiếp tục.</p>
+                    <form id="loginForm" asp-controller="Home" asp-action="Login" method="post">
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <input type="text" id="username" name="username" placeholder="Tên đăng nhập" required>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
+                            <div class="toggle-password">
+                                <i class="far fa-eye" id="togglePassword"></i>
+                            </div>
+                        </div>
+                        <div class="remember-forgot">
+                            <div class="remember-me">
+                                <input type="checkbox" id="remember" name="remember">
+                                <label for="remember">Nhớ đăng nhập</label>
+                            </div>
+                            <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                        </div>
+                        <button type="submit" class="login-btn">
+                            <span>Đăng nhập</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const password = document.getElementById('password');
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // Add animations on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginContainer = document.querySelector('.login-container');
+            setTimeout(() => {
+                loginContainer.classList.add('loaded');
+            }, 100);
+        });
+
+        // Form submission
+        @* document.getElementById('loginForm').addEventListener('submit', function() {
+           
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Here you would typically handle authentication
+            console.log('Authenticating with', username, password);
+            // Redirect to home page after successful login
+            // window.location.href = 'home.html';
+        }); *@
+    </script>
+</body>
+</html>

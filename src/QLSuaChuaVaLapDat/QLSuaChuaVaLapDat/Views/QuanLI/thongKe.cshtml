@@ -1,0 +1,256 @@
+﻿@model QLSuaChuaVaLapDat.Models.ThongKeModel
+@{
+    Layout = "~/Views/Shared/_LayoutQuanLi.cshtml";
+}
+
+@section Scripts {
+    <script src="~/js/export-excel.js"></script>
+}
+
+@using System.Globalization
+<html>
+<body>
+    <div class="container">
+        <div class="dashboard">
+            <div class="metric-card">
+                <div>tổng số đơn</div>
+                <div class="metric-value">@Model.TongDonCN</div>
+                <div class="metric-date">@Model.ThangHT</div>
+            </div>
+            <div class="metric-card">
+                <div>Tổng doanh thu</div>
+                <div class="metric-value">@Model.TongDoanhTHu.ToString("C0", new CultureInfo("vi-VN"))</div>
+                <div class="metric-date">@Model.ThangHT</div>
+            </div>
+            <div class="metric-card">
+                <div>Tổng nhân viên</div>
+                <div class="metric-value">@Model.TongNhanVien</div>
+                <div class="metric-date">@Model.ThangHT</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3 class="mb-4">Tổng quan doanh thu và khách hàng</h3>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="metric-card">
+                    <div class="metric-title">Tổng đơn tháng này (@Model.ThangHT)</div>
+                    <div class="metric-value">@Model.TongDon</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-card">
+                    <div class="metric-title">Doanh thu tháng này</div>
+                    <div class="metric-value">@Model.TongDoanhThuThangHT.ToString("N0") VNĐ</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-navigation mb-3 d-flex justify-content-center align-items-center">
+            @{
+                var prevMonthChart = Model.ChartDateFocus.AddMonths(-1);
+                var nextMonthChart = Model.ChartDateFocus.AddMonths(1);
+                bool canGoNext = nextMonthChart.Year < DateTime.Today.Year + 2;
+            }
+            <a href="@Url.Action("thongKe", "QuanLI", new { year = prevMonthChart.Year, month = prevMonthChart.Month, searchString = Model.CurrentSearchString, page = Model.CurrentPage })" class="btn btn-outline-primary me-2">&lt; Tháng Trước</a>
+            <h5 class="mb-0 mx-3">Biểu đồ cho: @Model.ChartDateFocus.ToString("MMMM yyyy", new CultureInfo("vi-VN"))</h5>
+            @if (canGoNext)
+            {
+                <a href="@Url.Action("thongKe", "QuanLI", new { year = nextMonthChart.Year, month = nextMonthChart.Month, searchString = Model.CurrentSearchString, page = Model.CurrentPage })" class="btn btn-outline-primary ms-2">Tháng Sau &gt;</a>
+            }
+            else
+            {
+                <a href="#" class="btn btn-outline-primary ms-2 disabled" aria-disabled="true">Tháng Sau &gt;</a>
+            }
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-title">Doanh thu (Đơn hoàn thành)</div>
+                @if (Model.DoanhThuThang != null && Model.DoanhThuThang.Count > 0)
+                {
+                    <div class="revenue-chart-bars">
+                        @foreach (var monthData in Model.DoanhThuThang)
+                        {
+                            var detailUrl = Url.Action("ChiTietDoanhThuThang", "QuanLI", new { year = monthData.Nam, month = monthData.Thang });
+                            <a href="@detailUrl" class="revenue-bar-item">
+                                <div class="revenue-bar" style="height: @(monthData.ChieuCaoCot.ToString(System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                                <div class="revenue-bar-value-tooltip">@monthData.TongDoanhThuTheoThang.ToString("N0") VND</div>
+                                <div class="revenue-bar-label">@monthData.ThangVaNam</div>
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-center text-muted">Không có dữ liệu doanh thu để hiển thị.</p>
+                }
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Phân loại khách hàng (Theo đơn hàng)</div>
+                <div class="visitors-data">
+                    @if (Model.KhachHang > 0 || Model.KhacVangLai > 0)
+                    {
+                        var regPercentCss = Model.PTKhachHang.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        var sumPercentages = Model.PTKhachHang + Model.PTKhachVangLai;
+                        var totalPercentCssValue = sumPercentages > 100 ? 100 : sumPercentages;
+                        var totalPercentCss = totalPercentCssValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        var remainingColor = "#eee";
+
+                        var pieStyle = $"background-image: conic-gradient(#337ab7 0% {regPercentCss}%, #f0ad4e {regPercentCss}% {totalPercentCss}%, {remainingColor} {totalPercentCss}% 100%);";
+
+                        <div class="css-pie" style="@pieStyle">
+                            <div>
+                                @((Model.KhachHang + Model.KhacVangLai))<br />Đơn
+                            </div>
+                        </div>
+                        <div class="visitors-legend">
+                            <div class="legend-item">
+                                <div class="legend-color direct"></div> <div>Có tài khoản: @Model.KhachHang (@Model.PTKhachHang.ToString("F1"))%</div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color organic"></div> <div>Khách vãng lai: @Model.KhacVangLai (@Model.PTKhachVangLai.ToString("F1"))%</div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-center text-muted">Không có dữ liệu khách hàng để hiển thị.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5 mb-5">
+        <h3>Đơn Dịch Vụ Gần Nhất</h3>
+        <form asp-action="thongKe" asp-controller="QuanLI" method="get" class="mb-3">
+            <input type="hidden" name="year" value="@Model.ChartDateFocus.Year" />
+            <input type="hidden" name="month" value="@Model.ChartDateFocus.Month" />
+
+            <div class="input-group">
+                <input type="text" name="searchString" class="form-control" placeholder="Tìm theo ID đơn, thiết bị, khách hàng, NV..." value="@Model.CurrentSearchString" />
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                @if (!string.IsNullOrEmpty(Model.CurrentSearchString))
+                {
+                    <a asp-action="thongKe" asp-controller="QuanLI"
+                       asp-route-year="@Model.ChartDateFocus.Year"
+                       asp-route-month="@Model.ChartDateFocus.Month"
+                       class="btn btn-outline-secondary">Xóa tìm kiếm</a>
+                }
+            </div>
+        </form>
+
+        @if (Model.DonDichVuGanNhat != null && Model.DonDichVuGanNhat.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID Đơn</th>
+                            <th>Tên Thiết Bị</th>
+                            <th>Khách Hàng</th>
+                            <th>Ngày Tạo</th>
+                            <th>NV Kỹ Thuật</th>
+                            <th>Tổng Tiền</th>
+                            <th>Trạng Thái</th>
+                            <th>Chi Tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var don in Model.DonDichVuGanNhat)
+                        {
+                            <tr>
+                                <td>@don.IdDonDichVu</td>
+                                <td>@Html.DisplayFor(modelItem => don.TenThietBi)</td>
+                                <td>
+                                    @if (don.IdUserNavigation != null && !string.IsNullOrEmpty(don.IdUserNavigation.HoVaTen))
+                                    {
+                                        @don.IdUserNavigation.HoVaTen
+                                    }
+                                    else if (don.IdKhachVangLaiNavigation != null && !string.IsNullOrEmpty(don.IdKhachVangLaiNavigation.HoVaTen))
+                                    {
+                                        @don.IdKhachVangLaiNavigation.HoVaTen
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">@don.LoaiKhachHang</span>
+                                    }
+                                </td>
+                                <td>@don.NgayTaoDon?.ToString("dd/MM/yy HH:mm")</td>
+                                <td>
+                                    @(don.IdNhanVienKyThuatNavigation?.HoVaTen ?? "N/A")
+                                </td>
+                                <td class="text-end">@don.TongTien?.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VNĐ</td>
+                                <td>
+                                    <span class="badge @(don.TrangThaiDon.ToLower() == "hoàn thành" ? "bg-success" : (don.TrangThaiDon.ToLower() == "đã hủy" ? "bg-danger" : "bg-warning text-dark"))">
+                                        @don.TrangThaiDon
+                                    </span>
+                                </td>
+                                <td>
+                                    <a asp-controller="DonDichVu" asp-action="Details" asp-route-id="@don.IdDonDichVu" class="btn btn-sm btn-info">Xem</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="thongKe" asp-controller="QuanLI"
+                                   asp-route-year="@Model.ChartDateFocus.Year"
+                                   asp-route-month="@Model.ChartDateFocus.Month"
+                                   asp-route-searchString="@Model.CurrentSearchString"
+                                   asp-route-page="@(Model.CurrentPage - 1)">Trước</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
+                        }
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-action="thongKe" asp-controller="QuanLI"
+                                   asp-route-year="@Model.ChartDateFocus.Year"
+                                   asp-route-month="@Model.ChartDateFocus.Month"
+                                   asp-route-searchString="@Model.CurrentSearchString"
+                                   asp-route-page="@i">@i</a>
+                            </li>
+                        }
+
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="thongKe" asp-controller="QuanLI"
+                                   asp-route-year="@Model.ChartDateFocus.Year"
+                                   asp-route-month="@Model.ChartDateFocus.Month"
+                                   asp-route-searchString="@Model.CurrentSearchString"
+                                   asp-route-page="@(Model.CurrentPage + 1)">Sau</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled"><a class="page-link" href="#">Sau</a></li>
+                        }
+                    </ul>
+                </nav>
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted">Không có đơn dịch vụ nào gần đây hoặc không tìm thấy kết quả phù hợp.</p>
+        }
+    </div>
+
+</body>
+</html>

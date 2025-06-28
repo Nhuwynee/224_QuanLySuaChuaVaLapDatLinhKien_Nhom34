@@ -1,0 +1,359 @@
+﻿@model QLSuaChuaVaLapDat.ViewModel.TimKiemDichVuVM
+@{
+    ViewData["Title"] = "Tìm kiếm";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+<form id="searchForm" method="post" asp-action="TimKiemDonDichVu">
+    <div class="search-container" id="service-orders">
+        <div class="search-header">
+            <div class="search-title">Tìm kiếm Đơn dịch vụ</div>
+            <div class="search-actions">
+                <button class="btn btn-secondary2"><i class="fa-solid fa-table-cells"></i> Xuất Excel</button>
+                <input type="hidden" name="isexport" id="isexport" value="@ViewBag.IsExport" />
+
+                <button class="btn btn-primary2 mar"> <i class="fa-solid fa-download"></i> Xuất báo cáo</button>
+                <input type="hidden" name="isBaoCao" id="isBaoCao" value="@ViewBag.IsBaoCao" />
+
+                <script>
+                    document.querySelector('.btn.btn-secondary2').addEventListener('click', function (event) {
+                        event.preventDefault();
+                        document.getElementById('isexport').value = '1';
+                        document.getElementById('isBaoCao').value = '0';
+                        document.querySelector('form').submit();
+                        document.getElementById('isexport').value = '0';
+                    });
+
+                    document.querySelector('.btn.btn-primary2.mar').addEventListener('click', function (event) {
+                        event.preventDefault();
+                        document.getElementById('isBaoCao').value = '1';
+                        document.getElementById('isexport').value = '0'; 
+                        document.querySelector('form').submit();
+                        document.getElementById('isBaoCao').value = '0';
+                    });
+
+                   
+                </script>
+
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Làm mới</button>
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </div>
+
+        <div class="search-fields">
+            <div class="form-group">
+                <label for="so-id">Mã đơn dịch vụ</label>
+                <input type="text" id="so-id" name="MaDonDichVu"
+                @(Model.donDichVuSearch.MaDonDichVu != null
+                    ? $"value={Model.donDichVuSearch.MaDonDichVu}"
+                    : "")
+                       placeholder="Nhập mã đơn...">
+            </div>
+
+            <div class="form-group">
+                <label for="so-customer">Khách hàng</label>
+                <input type="text" id="so-customer" name="TenKhachHang"
+                @(Model.donDichVuSearch.TenKhachHang != null
+                    ? $"value={Model.donDichVuSearch.TenKhachHang}"
+                    : "")
+                       placeholder="Nhập tên hoặc SĐT...">
+            </div>
+
+            <div class="form-group">
+                <label for="so-technician">Kỹ thuật viên</label>
+                <input type="text" id="so-technician" name="IDKyThuatVien"
+                @(Model.donDichVuSearch.IDKyThuatVien != null
+                    ? $"value={Model.donDichVuSearch.IDKyThuatVien}"
+                    : "")
+                       placeholder="Nhập id kỹ thuật viên...">
+            </div>
+            @{
+                var trangthai = Model.donDichVuSearch.TrangThaiDV;
+            }
+            <div class="form-group">
+                <label for="so-status">Trạng thái</label>
+                <select id="so-status" name="TrangThaiDV" onchange="submitForm()">
+                    @if (trangthai == null)
+                    {
+                        <option value="" selected>Tất cả</option>
+                    }
+                    else
+                    {
+                        <option value="">Tất cả</option>
+                    }
+                    @if (trangthai == "Đang sửa chữa")
+                    {
+                        <option value="Đang sửa chữa" selected>Đang xử lý</option>
+                    }
+                    else
+                    {
+                        <option value="Đang sửa chữa">Đang xử lý</option>
+                    }
+                    @if (trangthai == "Hoàn thành")
+                    {
+                        <option value="Hoàn thành" selected>Hoàn thành</option>
+                    }
+                    else
+                    {
+                        <option value="Hoàn thành">Hoàn thành</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="so-date-from">Từ ngày</label>
+                <input type="date" id="so-date-from" name="TuNgay" @(Model.donDichVuSearch.TuNgay != null
+                       ? $"value={Model.donDichVuSearch.TuNgay}"
+                       : "")>
+            </div>
+
+            <div class="form-group">
+                <label for="so-date-to">Đến ngày</label>
+                <input type="date" id="so-date-to" name="DenNgay" @(Model.donDichVuSearch.DenNgay != null
+                       ? $"value={Model.donDichVuSearch.DenNgay}"
+                       : "")>
+            </div>
+        </div>
+
+        <div class="filter-sort">
+            <div class="filter-section">
+                <span>Lọc theo:</span>
+                <select name="IdLoaiThietBi" onchange="submitForm()">
+                    @{
+                        var idTB = Model.donDichVuSearch.IdLoaiThietBi;
+                    }
+                    <option value="">Tất cả Thiết Bị</option>
+                    @foreach (var item in Model.loaiTB)
+                    {
+                        if (item.IdLoaiThietBi == idTB)
+                        {
+                            <option value="@item.IdLoaiThietBi" selected>@item.TenLoaiThietBi</option>
+                        }
+                        else
+                        {
+                            <option value="@item.IdLoaiThietBi">@item.TenLoaiThietBi</option>
+                        }
+                    }
+                </select>
+
+                @{
+                    var loaiDV = Model.donDichVuSearch.LoaiDichVu;
+                }
+                <select name="LoaiDichVu" onchange="submitForm()">
+                    @if (loaiDV == null)
+                    {
+                        <option value="" selected>Loại dịch vụ</option>
+                    }
+                    else
+                    {
+                        <option value="">Loại dịch vụ</option>
+                    }
+                    @if (loaiDV == "Sửa chữa")
+                    {
+                        <option value="Sửa chữa" selected>Sửa chữa</option>
+                    }
+                    else
+                    {
+                        <option value="Sửa chữa">Sửa chữa</option>
+                    }
+                    @if (loaiDV == "Lắp đặt")
+                    {
+                        <option value="Lắp đặt" selected>Lắp đặt</option>
+                    }
+                    else
+                    {
+                        <option value="Lắp đặt">Lắp đặt</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="select-all-container">
+            <label for="select-all-service-orders" style="margin-top: 15px;">
+                Chọn tất cả
+            </label>
+        </div>
+
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" class="select-all" data-table="service-orders"></th>
+                    <th class="cursor-pointer" onclick="sortTable('IdDonDichVu')">
+                        Mã đơn <span class="sort-icon">@(Model.donDichVuSearch.SapXepTheoIdDonDichVu == "IdDonDichVuAsc" ? "↑" : Model.donDichVuSearch.SapXepTheoIdDonDichVu == "IdDonDichVuDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_IdDonDichVu" name="SapXepTheoIdDonDichVu" value="@Model.donDichVuSearch.SapXepTheoIdDonDichVu" />
+
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('TenKhachHang')">
+                        Khách hàng <span class="sort-icon">@(Model.donDichVuSearch.SapXepTheoTenKhachHang == "TenKhachHangAsc" ? "↑" : Model.donDichVuSearch.SapXepTheoTenKhachHang == "TenKhachHangDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TenKhachHang" name="SapXepTheoTenKhachHang" value="@Model.donDichVuSearch.SapXepTheoTenKhachHang" />
+
+                    </th>
+                    <th class="cursor-pointer">
+                        Thiết bị
+                    </th>
+                    <th class="cursor-pointer">
+                        Loại DV
+                    </th>
+                    <th class="cursor-pointer">
+                        Trạng thái
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('TongTien')">
+                        Tổng tiền <span class="sort-icon">@(Model.donDichVuSearch.SapXepTheoTongTien == "TongTienAsc" ? "↑" : Model.donDichVuSearch.SapXepTheoTongTien == "TongTienDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TongTien" name="SapXepTheoTongTien" value="@Model.donDichVuSearch.SapXepTheoTongTien" />
+
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('NgayTao')">
+                        Ngày tạo <span class="sort-icon">@(Model.donDichVuSearch.SapXepTheoNgayTao == "NgayTaoAsc" ? "↑" : Model.donDichVuSearch.SapXepTheoNgayTao == "NgayTaoDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_NgayTao" name="SapXepTheoNgayTao" value="@Model.donDichVuSearch.SapXepTheoNgayTao" />
+                    </th>
+                    <th>Cập nhật</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.DonDichVu)
+                {
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                        <td>@item.IdDonDichVu</td>
+                        @if (item.IdKhachVangLaiNavigation != null)
+                        {
+                            <td>@item.IdKhachVangLaiNavigation.HoVaTen</td>
+                        }
+                        else
+                        {
+                            <td>@item.IdUserNavigation.HoVaTen</td>
+                        }
+                        <td>@item.IdLoaiThietBiNavigation.TenLoaiThietBi</td>
+                        <td>@item.LoaiDonDichVu</td>
+                        @if (item.TrangThaiDon == "Hoàn thành")
+                        {
+                            <td><span class="status status-completed">@item.TrangThaiDon</span></td>
+                        }
+                        else if (item.TrangThaiDon == "Đang xử lý" || item.TrangThaiDon == "Đang sửa chữa")
+                        {
+                            <td><span class="status status-partial">@item.TrangThaiDon</span></td>
+                        }
+                        else if (item.TrangThaiDon == "Đã xác nhận")
+                        {
+                            <td><span class="status status-confirmed">@item.TrangThaiDon</span></td>
+                        }
+                        else if (item.TrangThaiDon == "Đã hủy")
+                        {
+                            <td><span class="status status-cancelled">@item.TrangThaiDon</span></td>
+                        }
+                        <td>@(item.TongTien?.ToString("#,##0") + " VND" ?? "0,00 VND")</td>
+                        <td>@(item.NgayTaoDon.HasValue ? item.NgayTaoDon.Value.ToString("dd/MM/yyyy") : "")</td>
+                        <td>@item.NgayChinhSua</td>
+                        <td><button class="btn btn-edit">Sửa</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            @{
+                int totalPage = Model.Paging.TotalPage;
+                int currentPage = Model.Paging.PageActive;
+            }
+            @for (int i = 1; i <= totalPage; i++)
+            {
+                <div class="page-item @(i == currentPage ? "active" : "")">@i</div>
+            }
+        </div>
+    </div>
+    <input type="hidden" id="page_active" name="PageActive" value="1" />
+</form>
+<style>
+    .results-table th {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .sort-icon {
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .results-table th {
+        text-align: left;
+        font-size: 14px;
+    }
+
+    .btn-secondary2 {
+        background-color: #fffee8;
+        color: black;
+        border-radius: 5px;
+        border: #ffebaf solid 1px;
+    }
+
+        .btn-secondary2:hover {
+            background-color: lightblue;
+        }
+
+    .btn-primary2:hover {
+        background-color: lightpink;
+    }
+
+    .mar {
+        margin-right: 50px;
+        color: black;
+        background-color: #fff0f2;
+        border-radius: 5px;
+        border: #ffcdc0 solid 1px;
+    }
+
+    .hei {
+        margin-bottom: 25px;
+    }
+</style>
+<script>
+    const pageItems = document.querySelectorAll('.page-item');
+    pageItems.forEach(item => {
+        item.addEventListener('click', () => {
+            pageItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            const pageNumber = item.innerText.trim();
+            document.getElementById('page_active').value = pageNumber;
+            submitForm();
+        });
+    });
+
+    function resetForm() {
+        const inputs = document.querySelectorAll('#searchForm input, #searchForm select');
+        inputs.forEach(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+                input.checked = false;
+            } else {
+                input.value = '';
+            }
+        });
+        document.getElementById('page_active').value = '1';
+        submitForm();
+    }
+
+    function submitForm() {
+        document.getElementById('isBaoCao').value = '0';
+        document.getElementById('isexport').value = '0';
+        document.getElementById("searchForm").submit();
+    }
+
+    function sortTable(column) {
+        const columns = ['IdDonDichVu', 'TenKhachHang', 'TongTien', 'NgayTao'];
+        columns.forEach(col => {
+            const input = document.getElementById(`sort_column_${col}`);
+            if (col === column) {
+                const currentSort = input.value;
+                let newSort = `${col}Asc`;
+                if (currentSort === `${col}Asc`) {
+                    newSort = `${col}Desc`;
+                } else if (currentSort === `${col}Desc`) {
+                    newSort = `${col}Asc`;
+                }
+                input.value = newSort;
+            } else {
+                
+            }
+        });
+        submitForm();
+    }
+</script>

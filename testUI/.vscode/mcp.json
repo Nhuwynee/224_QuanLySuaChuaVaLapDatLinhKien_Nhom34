@@ -1,0 +1,11 @@
+{
+    "servers": {
+        "figma": {
+                // "type": "stdio",
+                "command": "cmd",
+                "args": [
+                    "/c", "npx", "-y", "figma-developer-mcp", "--figma-api-key=figd_X5XB0HdmdjXb7R63fR8KPIRv6OIpmMkV9f0VMbSK", "--stdio"
+                ]
+            }
+    }
+}

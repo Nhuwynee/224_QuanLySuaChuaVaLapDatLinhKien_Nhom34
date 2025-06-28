@@ -1,0 +1,1167 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutCSKH.cshtml";
+}
+
+<style>
+    .file-preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .file-item {
+        position: relative;
+        width: 120px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        background: #f9f9f9;
+        margin-bottom: 5px;
+    }
+
+        .file-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 3px;
+            display: block;
+        }
+
+    .file-info {
+        font-size: 12px;
+        color: #555;
+        margin-top: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .delete-file {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ff4d4f;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 10px;
+    }
+
+    .file-btn {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #1890ff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .file-btn:hover {
+            background-color: #40a9ff;
+        }
+
+    /* CSS cho modal xem ảnh */
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-content {
+        margin: auto;
+        display: block;
+        max-width: 90%;
+        max-height: 90%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    .modal-content {
+        animation-name: zoom;
+        animation-duration: 0.3s;
+    }
+
+    @@keyframes zoom {
+        from {
+            transform: translate(-50%, -50%) scale(0)
+        }
+
+        to {
+            transform: translate(-50%, -50%) scale(1)
+        }
+    }
+
+    .file-item img {
+        cursor: pointer; /* Thêm con trỏ để biểu thị hình ảnh có thể bấm vào */
+    }
+    /* CSS cho input với icon dropdown */
+    .input-with-icon {
+        position: relative;
+        width: 100%;
+    }
+
+        .input-with-icon input {
+            width: 100%;
+            padding-right: 30px; /* Để có chỗ cho icon */
+        }
+
+    .location-dropdown-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #555;
+        cursor: pointer;
+    }
+
+        .location-dropdown-icon:hover {
+            color: #1890ff;
+        }
+
+    /* Loading indicator */
+    .loading-indicator {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        color: #999;
+        font-size: 14px;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-top: 2px solid #1890ff;
+        border-radius: 50%;
+        margin-right: 8px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    /* Custom dropdown styling */
+    .custom-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        z-index: 1000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        margin-top: 2px;
+        animation: slideDown 0.2s ease;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .dropdown-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f0f0f0;
+        }
+
+    .selected {
+        background-color: #e6f7ff;
+        font-weight: 500;
+    }
+
+    .input-active {
+        border-color: #40a9ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
+
+    .location-dropdown-icon.active {
+        color: #1890ff;
+        transform: translateY(-50%) rotate(180deg);
+        transition: transform 0.3s;
+    }
+
+    .remaining-amount {
+        display: block;
+        font-size: 16px;
+        font-weight: bold;
+        color: #d9534f;
+        margin-top: 8px;
+        padding: 8px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+        border-left: 3px solid #d9534f;
+    }
+
+    .payment-btn {
+        padding: 0px 20px;
+        font-size: 18px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        max-height: 50px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        margin-left: 10px;
+        display: none; /* Ẩn nút thanh toán mặc định */
+    }
+
+    .form-actions2 {
+        display: flex;
+        justify-content: left;
+        margin-top: 25px;
+    }
+
+    .payment-btn:hover {
+        background-color: #218838;
+    }
+
+    .payment-btn-visible {
+        display: inline-block !important;
+    }
+
+    /* Styles for Payment Popup */
+    .payment-popup {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .payment-popup-content {
+        background-color: white;
+        margin: 5% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 800px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        animation: popupFadeIn 0.3s;
+        position: relative;
+    }
+
+    @@keyframes popupFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .payment-popup-header {
+        border-bottom: 2px solid #f1f1f1;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        position: relative;
+    }
+
+        .payment-popup-header h2 {
+            margin: 0;
+            padding: 0;
+            color: #333;
+            font-size: 24px;
+            text-align: center;
+        }
+
+    .payment-popup-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: #999;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+        .payment-popup-close:hover {
+            color: #555;
+        }
+
+    .payment-popup-body {
+        max-height: 60vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 10px;
+    }
+
+    .payment-invoice-section {
+        background-color: #f9f9f9;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+        .payment-invoice-section h3 {
+            color: #1890ff;
+            margin-top: 0;
+            font-size: 18px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+
+    .payment-invoice-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 15px;
+    }
+
+    .payment-invoice-label {
+        font-weight: 500;
+        color: #555;
+        width: 40%;
+    }
+
+    .payment-invoice-value {
+        width: 60%;
+        color: #333;
+    }
+
+    .payment-parts-list {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+
+    .payment-part-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border-bottom: 1px solid #eee;
+    }
+
+        .payment-part-item:last-child {
+            border-bottom: none;
+        }
+
+    .payment-part-name {
+        font-weight: 500;
+    }
+
+    .payment-part-price {
+        color: #d9534f;
+    }
+
+    .payment-amount-section {
+        background-color: #e6f7ff;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .payment-amount-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+
+        .payment-amount-row.total {
+            font-size: 18px;
+            font-weight: bold;
+            border-top: 1px dashed #bbb;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+
+            .payment-amount-row.total .payment-amount-value {
+                color: #d9534f;
+            }
+
+    .payment-popup-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+        margin-top: 15px;
+    }
+
+    .payment-confirm-btn,
+    .payment-cancel-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+
+    .payment-confirm-btn {
+        background-color: #28a745;
+        color: white;
+        margin-left: 10px;
+    }
+
+        .payment-confirm-btn:hover {
+            background-color: #218838;
+        }
+
+    .payment-cancel-btn {
+        background-color: #f8f9fa;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+        .payment-cancel-btn:hover {
+            background-color: #e2e6ea;
+        }
+
+    /* Date-time styling in payment popup */
+    #invoice-start-time, #invoice-end-time {
+        font-weight: normal;
+        color: #333;
+    }
+
+    .payment-invoice-value {
+        word-break: break-word; /* Allow long date strings to break properly */
+    }
+
+    /* Payment method styles */
+    .payment-methods {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px 0;
+    }
+
+    .payment-method-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 160px;
+        height: 120px;
+        border: 2px solid #e1e1e1;
+        border-radius: 10px;
+        background-color: white;
+        font-weight: 500;
+        font-size: 18px;
+        color: #333;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+        .payment-method-btn:hover {
+            border-color: #4CAF50;
+            background-color: #f5fff5;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .payment-method-btn i {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: #28a745;
+        }
+
+        .payment-method-btn[data-method="cash"] i {
+            color: #28a745;
+        }
+
+        .payment-method-btn[data-method="transfer"] i {
+            color: #007bff;
+        }
+
+        /* Additional styles for payment method selection */
+        .payment-method-btn.selected {
+            border-color: #4CAF50;
+            background-color: #f0fff0;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+        }
+
+        .payment-method-btn[data-method="cash"].selected i {
+            color: #218838;
+        }
+
+        .payment-method-btn[data-method="transfer"].selected i {
+            color: #0069d9;
+        }
+</style>
+
+<!-- Main Content -->
+<div class="main-content">
+    <h1 class="page-title">Đơn sửa chữa</h1>
+
+    <form method="post" action="@Url.Action("CreateServiceOrder", "TaoDonDichVuKVL")" enctype="multipart/form-data" id="serviceOrderForm">
+
+        <div class="order-info">
+            <div class="order-id">Mã đơn dịch vụ: <span class="highlight">@ViewBag.NextServiceOrderId</span></div>
+            <input type="hidden" id="IdDonDichVu" name="IdDonDichVu" value="@ViewBag.NextServiceOrderId" />
+            <div class="order-date">Ngày tạo: @ViewBag.OrderDate</div>
+            <div class="staff-name">Nhân viên: @Context.Session.GetString("HoTen")</div>
+            <div class="turn-back"><a href="javascript:void(0);" onclick="confirmBack()" style="text-decoration: none;">Quay lại DS</a> </div>
+        </div>
+
+        <div class="form-container">
+            <!-- Customer Information Section -->
+            <div class="section">
+                <div class="section-title">Thông tin khách hàng</div>
+                <div class="split">
+
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Mã khách hàng (có tài khoản):</label>
+                            <div class="input-with-icon" style="position: relative;">
+                                <input type="text" id="customerIdInput" class="form-control" placeholder="Nhập mã hoặc tên khách hàng...">
+                                <input type="hidden" id="IdUser" name="IdUser" value="">
+                                <div id="customerIdDropdown" class="custom-dropdown"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Họ và tên khách hàng: <span class="required">(*)</span></label>
+                            <input type="text" name="HoVaTen">
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại: <span class="required">(*)</span></label>
+                            <input type="text" name="Sdt">
+                        </div>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" name="Email">
+                        </div>
+                    </div>
+
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Thành phố/Tỉnh: <span class="required">(*)</span></label>
+                            <div class="input-with-icon">
+                                <input id="cityInput" type="text" placeholder="Chọn thành phố/tỉnh" readonly style="cursor: pointer; background-color: #fff;">
+                                <input type="hidden" id="cityId" value="">
+                                <i class="fa-solid fa-chevron-down location-dropdown-icon" id="cityDropdownIcon"></i>
+                                <div id="cityDropdown" class="custom-dropdown">
+                                    <!-- Sẽ được tải từ database -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Quận/Huyện: <span class="required">(*)</span></label>
+                            <div class="input-with-icon">
+                                <input id="districtInput" type="text" placeholder="Chọn quận/huyện" readonly style="cursor: pointer; background-color: #fff;">
+                                <input type="hidden" id="districtId" value="">
+                                <i class="fa-solid fa-chevron-down location-dropdown-icon" id="districtDropdownIcon"></i>
+                                <div id="districtDropdown" class="custom-dropdown">
+                                    <!-- Sẽ được tải từ database dựa theo thành phố -->
+                                </div>
+                                <div id="districtError" class="error-message" style="display: none;"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Phường/Xã: <span class="required">(*)</span></label>
+                            <div class="input-with-icon">
+                                <input id="wardInput" type="text" placeholder="Chọn phường/xã" readonly style="cursor: pointer; background-color: #fff;">
+                                <input type="hidden" id="wardId" name="IdPhuong" value="">
+                                <i class="fa-solid fa-chevron-down location-dropdown-icon" id="wardDropdownIcon"></i>
+                                <div id="wardDropdown" class="custom-dropdown">
+                                    <!-- Sẽ được tải từ database dựa theo quận/huyện -->
+                                </div>
+                                <div id="wardError" class="error-message" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Đường/Số nhà: <span class="required">(*)</span></label>
+                        <input type="text" placeholder="Số nhà, đường" name="DuongSoNha">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Information Section -->
+            <div class="section">
+                <div class="section-title">Thông tin thiết bị</div>
+                <div class="split">
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Loại thiết bị: <span class="required">(*)</span></label>
+                            @Html.DropDownList("IdLoaiThietBi", ViewBag.LoaiThietBis as List<SelectListItem>, "Chọn loại thiết bị", new { @class = "form-control" })
+                        </div>
+                        <div class="form-group" style="padding-bottom: 10px;">
+                            <label>
+                                Tên thiết bị: <span class="required">(*)</span>
+                            </label>
+                            <input type="text" name="TenThietBi">
+                        </div>
+                    </div>
+
+
+                    <div class="split-with-button">
+                        <div class="split">
+                            <div class="form-group">
+                                <label>Loại linh kiện: <span class="required">(*)</span></label>
+                                <select name="IdLinhKien" class="form-control select-linhkien">
+                                    <option value="">Chọn loại linh kiện</option>
+                                    @foreach (var item in ViewBag.LoaiLinhKiens)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="part">Linh kiện:  <span class="required">(*)</span></label>
+                                <select class="form-control part-select" id="part" name="ErrorDetails[0].IdLinhKien">
+                                    <option value="">Chọn linh kiện</option>
+                                </select>
+                            </div>
+
+                            <div class="flex-date-time">
+                                <div class="form-group">
+                                    <label>Lỗi: <span class="required">(*)</span></label>
+                                    @Html.DropDownList("ErrorDetails[0].IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new
+                                        {
+                                            @class = "form-control error-type-select error-loi-select",
+                                            @onchange = "layGiaTheoLoi(this.value)",
+                                            @id = "IdLoi-0"
+                                        })
+                                    @* @Html.DropDownList("IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new { @class = "form-control error-type-select error-loi-select", @onchange = "layGiaTheoLoi(this.value)", @name = "ErrorDetails[0].IdLoi" }) *@
+                                </div>
+                                <div class="form-group">
+                                    <label>Đơn giá (VND): <span class="required">(*)</span></label>
+                                    <input type="text" id="donGia" name="donGia" value="0" readonly class="price-field">
+                                </div>
+                                <div class="form-group checkbox-group">
+                                    <label>Bảo hành: <span class="required">(*)</span></label>
+                                    <div class="checkbox-container">
+                                        <div class="checkbox">
+                                            <input type="radio" id="warranty-yes" name="ErrorDetails[0].ConBaoHanh" value="true">
+                                            <label for="warranty-yes">Còn bảo hành</label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <input type="radio" id="warranty-no" name="ErrorDetails[0].ConBaoHanh" value="false" checked>
+                                            <label for="warranty-no">Hết bảo hành</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="flex-date-time">
+                                <div class="form-group">
+                                    <label>Mô tả lỗi: <span class="required">(*)</span></label>
+                                    <textarea name="ErrorDetails[0].MoTaLoi"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ghi chú:</label>
+                                    <textarea name="ErrorDetails[0].GhiChu"></textarea>
+                                </div>
+                            </div>
+
+                            @* <!-- Hidden fields for error details --> *@
+                            @* <input type="hidden" name="ErrorDetails[0].IdLoi" id="ErrorLoi" value=""> *@
+                            @* <input type="hidden" name="ErrorDetails[0].IdLinhKien" id="ErrorLinhKien" value=""> *@
+                            @* <input type="hidden" name="ErrorDetails[0].SoLuong" value="1"> *@
+
+                        </div>
+                        <div class="buttons-container">
+                            <button type="button" class="add-part-btn" title="Thêm phần mới"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="flex-date-time" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label>Tải ảnh: <span class="required">(*)</span></label>
+                            <div class="file-upload">
+                                <input type="file" id="deviceImageInput" name="DeviceImages" accept="image/*" style="display: none;" multiple />
+                                <button class="file-btn" type="button" id="deviceImageButton">Chọn tệp</button>
+                                <div class="file-preview" id="deviceImagePreview">
+                                    <!-- Ảnh sẽ được hiển thị ở đây sau khi tải lên -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tải ảnh phiếu bảo hành:</label>
+                            <div class="file-upload">
+                                <input type="file" id="warrantyImageInput" name="WarrantyImages" accept="image/*" style="display: none;" multiple />
+                                <button class="file-btn" type="button" id="warrantyImageButton">Chọn tệp</button>
+                                <div class="file-preview" id="warrantyImagePreview">
+                                    <!-- Ảnh sẽ được hiển thị ở đây sau khi tải lên -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Service Type Section -->
+            <div class="section">
+                <div class="section-title">Loại dịch vụ</div>
+                <div class="split">
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Chọn loại dịch vụ: <span class="required">(*)</span></label>
+                            <div class="dropdown">
+                                <input type="text" placeholder="Sửa chữa hoặc lắp đặt" readonly name="LoaiDonDichVu">
+                                <i class="fa-solid fa-chevron-down"></i>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-item">Sửa chữa</div>
+                                    <div class="dropdown-item">Lắp đặt</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Chọn nơi thực hiện: <span class="required">(*)</span></label>
+                            <div class="dropdown">
+                                <input type="text" placeholder="Trực tiếp hoặc tại nhà" readonly name="HinhThucDichVu">
+                                <i class="fa-solid fa-chevron-down"></i>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-item">Tại nhà</div>
+                                    <div class="dropdown-item">Trực tiếp</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Staff Assignment Section -->
+            <div class="section">
+                <div class="section-title">Phân công nhân viên kỹ thuật</div>
+                <div class="split">
+                    <div class="staff-selection">
+                        <div class="staff-action-buttons">
+                            <button type="button" class="select-staff-btn">Chọn nhân viên</button>
+                            <button type="button" class="clear-staff-btn" style="display: none;">Xóa</button>
+                        </div>
+                        <div class="selected-staff">
+                            <span class="staff-name">Chưa chọn nhân viên</span>
+                        </div>
+                        <input type="hidden" id="selectedStaffId" name="IdNhanVienKyThuat" value="">
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Staff Assignment Popup -->
+            <div class="staff-popup" id="staffPopup">
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h2>Chọn chuyên môn:</h2>
+                        <div class="specialty-dropdown">
+                            <select>
+                                <option value="">Chọn chuyên môn</option>
+                                <option value="hardware">Phần cứng điện tử</option>
+                                <option value="software">Phần mềm</option>
+                                <option value="network">Mạng</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="popup-divider"></div>
+                    <div class="staff-list-section">
+                        <h2>Danh sách nhân viên:</h2>
+                        <div class="staff-list">
+                            <div class="staff-item available">
+                                <span>Nguyễn Văn A - Sẵn sàng</span>
+                            </div>
+                            <div class="staff-item busy">
+                                <span>Nguyễn Văn B - Đang bận</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date and Time Section -->
+            <div class="section">
+                <div class="section-title">Ngày giờ</div>
+                <div class="split">
+                    <div class="flex-date-time">
+                        <div class="form-group">
+                            <label>Ngày giờ thực hiện:</label>
+                            <div class="date-time-input">
+                                <input id="startDatetimePicker" type="text">
+                                <i class="fa-regular fa-calendar date-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ngày giờ hoàn thành:</label>
+                            <div class="date-time-input">
+                                <input id="endDatetimePicker" type="text" name="NgayHoanThanh">
+                                <i class="fa-regular fa-calendar date-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="note-text">
+                        *Lưu ý: Nhân viên phải thực hiện sửa chữa xong trong vòng 48 tiếng kể từ thời gian nhận yêu cầu !
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other Section -->
+            <div class="section">
+                <div class="section-title">Khác</div>
+                <div class="split">
+                    <!-- First row: Chọn linh kiện and Tiền khách hàng ứng trước in one row -->
+                    <div class="two-column-row">
+                        @* <div class="form-group"> *@
+                        @*     <label>Chọn linh kiện thay thế:</label> *@
+                        @*     <div class="search-parts"> *@
+                        @*         <input type="text" id="partSearchInput" placeholder="Tìm kiếm linh kiện..."> *@
+                        @*         <i class="fa-solid fa-magnifying-glass search-icon"></i> *@
+                        @*         <div id="partsDropdown" class="parts-dropdown-content"> *@
+                        @*             <!-- Dropdown content will be populated by JavaScript --> *@
+                        @*         </div> *@
+                        @*     </div> *@
+                        @*     <div class="parts-list" id="selectedParts"> *@
+                        @*         <!-- Selected parts will appear here --> *@
+                        @*     </div> *@
+                        @* </div> *@
+
+                        <div class="form-group">
+                            <label>Chọn linh kiện thay thế:</label>
+                            <div class="search-parts-container">
+                                <input type="text" id="searchPartsInput" class="form-control" placeholder="Tìm kiếm linh kiện..." name="IdLinhKien">
+                                <div id="partsDropdown" class="parts-dropdown-content" style="display: none;">
+                                    <!-- Kết quả tìm kiếm sẽ hiển thị ở đây -->
+                                </div>
+                                <div id="selectedPartsContainer" class="selected-parts-container">
+                                    <!-- Linh kiện đã chọn sẽ hiển thị ở đây -->
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label>Tiền khách hàng ứng trước (VND):</label>
+                            <input type="number" id="advancePayment" name="TienKhachHangUngTruoc">
+                        </div>
+                    </div>
+
+                    <!-- Second row: Giá tiền and Chọn trạng thái -->
+                    <div class="two-column-row">
+                        <div class="form-group">
+                            <label>Tiền lỗi (VND):</label>
+                            <input type="text" class="price-input" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Tổng tiền (VND):</label>
+                            <input type="text" class="price-input" id="tongTienInput" name="TongTien" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Tiền còn lại (VND):</label>
+                            <span id="remainingAmount" class="remaining-amount">0</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="two-column-row">
+                        <div class="form-group">
+                            <label>Chọn trạng thái: <span class="required">(*)</span></label>
+                            <div class="dropdown" id="statusDropdown">
+                                <input type="text" value="Chưa hoàn thành" readonly id="statusInput" name="TrangThaiDon">
+                                <i class="fa-solid fa-chevron-down"></i>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-item">Đã hoàn thành</div>
+                                    <div class="dropdown-item">Chưa hoàn thành</div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions2">
+                            <button type="button" class="payment-btn">Thanh toán</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="create-order-btn">Tạo đơn</button>
+        </div>
+    </form>
+</div>
+
+
+<!-- Modal để hiển thị ảnh khi bấm vào -->
+<div id="imageModal" class="image-modal">
+    <span class="modal-close">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="payment-popup">
+    <div class="payment-popup-content">
+        <div class="payment-popup-header">
+            <h2>Hóa đơn thanh toán</h2>
+            <span class="payment-popup-close">&times;</span>
+        </div>
+        <div class="payment-popup-body">
+            <!-- Invoice Information -->
+            <div class="payment-invoice-section">
+                <h3>Thông tin đơn hàng</h3>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Mã đơn dịch vụ:</div>
+                    <div class="payment-invoice-value" id="invoice-order-id"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Ngày tạo:</div>
+                    <div class="payment-invoice-value" id="invoice-order-date"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Nhân viên:</div>
+                    <div class="payment-invoice-value" id="invoice-staff-name"></div>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="payment-invoice-section">
+                <h3>Thông tin khách hàng</h3>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Họ và tên:</div>
+                    <div class="payment-invoice-value" id="invoice-customer-name"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Số điện thoại:</div>
+                    <div class="payment-invoice-value" id="invoice-customer-phone"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Địa chỉ:</div>
+                    <div class="payment-invoice-value" id="invoice-customer-address"></div>
+                </div>
+            </div>
+            <!-- Device Information -->
+            <div class="payment-invoice-section">
+                <h3>Thông tin thiết bị</h3>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Loại thiết bị:</div>
+                    <div class="payment-invoice-value" id="invoice-device-type"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Lỗi:</div>
+                    <div class="payment-invoice-value" id="invoice-error-type"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Mô tả lỗi:</div>
+                    <div class="payment-invoice-value" id="invoice-error-description"></div>
+                </div>
+            </div>
+
+            <!-- Service Information -->
+            <div class="payment-invoice-section">
+                <h3>Thông tin dịch vụ</h3>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Loại dịch vụ:</div>
+                    <div class="payment-invoice-value" id="invoice-service-type"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Nơi thực hiện:</div>
+                    <div class="payment-invoice-value" id="invoice-service-location"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Nhân viên kỹ thuật:</div>
+                    <div class="payment-invoice-value" id="invoice-technician"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Ngày giờ thực hiện:</div>
+                    <div class="payment-invoice-value" id="invoice-start-time"></div>
+                </div>
+                <div class="payment-invoice-row">
+                    <div class="payment-invoice-label">Ngày giờ hoàn thành:</div>
+                    <div class="payment-invoice-value" id="invoice-end-time"></div>
+                </div>
+            </div>
+
+            <!-- Parts Information -->
+            <div class="payment-invoice-section">
+                <h3>Linh kiện thay thế</h3>
+                <div id="invoice-parts-list" class="payment-parts-list">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Payment Information -->
+            <div class="payment-amount-section">
+                <h3>Thông tin thanh toán</h3>
+                <div class="payment-amount-row">
+                    <div class="payment-invoice-label">Tiền lỗi:</div>
+                    <div class="payment-invoice-value" id="invoice-error-cost"></div>
+                </div>
+                <div class="payment-amount-row">
+                    <div class="payment-invoice-label">Tiền linh kiện:</div>
+                    <div class="payment-invoice-value" id="invoice-parts-cost"></div>
+                </div>
+                <div class="payment-amount-row">
+                    <div class="payment-invoice-label">Tiền ứng trước:</div>
+                    <div class="payment-invoice-value" id="invoice-advance-payment"></div>
+                </div>
+                <div class="payment-amount-row total">
+                    <div class="payment-invoice-label">Tổng tiền cần thanh toán:</div>
+                    <div class="payment-amount-value" id="invoice-remaining-amount"></div>
+                </div>
+            </div>
+        </div>
+        <div class="payment-popup-footer">
+            <button class="payment-cancel-btn">Đóng</button>
+            <button class="payment-confirm-btn">Xác nhận thanh toán</button>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Method Modal -->
+<div id="paymentMethodModal" class="payment-popup">
+    <div class="payment-popup-content" style="max-width: 500px;">
+        <div class="payment-popup-header">
+            <h2>Chọn phương thức thanh toán</h2>
+            <span class="payment-method-popup-close">&times;</span>
+        </div>
+        <div class="payment-popup-body">
+            <div class="payment-methods">
+                <button class="payment-method-btn" data-method="cash">
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    <span>Tiền mặt</span>
+                </button>
+                <button class="payment-method-btn" data-method="transfer">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Chuyển khoản</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+
+    <!-- Định nghĩa URLs cho JavaScript -->
+    <!--Định nghĩa các URLs cho tddvkvl2.js -->
+    <script>
+
+        var backToListUrl = '@Url.Action("IndexDSDDV", "DanhSachDonDichVu")';
+        var searchLinhKienUrl = '@Url.Action("TimKiemLinhKien", "TaoDonDichVuKVL")';
+        var layGiaTheoLoiUrl = '@Url.Action("LayGiaTheoLoi", "TaoDonDichVuKVL")';
+        var layDanhSachThanhPhoUrl = '@Url.Action("LayDanhSachThanhPho", "TaoDonDichVuKVL")';
+        var layDanhSachQuanUrl = '@Url.Action("LayDanhSachQuan", "TaoDonDichVuKVL")';
+        var layDanhSachPhuongUrl = '@Url.Action("LayDanhSachPhuong", "TaoDonDichVuKVL")';
+        var createServiceOrderUrl = '@Url.Action("CreateServiceOrder", "TaoDonDichVuKVL")';
+        var layLinhKienUrl = '@Url.Action("LayLinhKienTheoLoai", "TaoDonDichVuKVL")';
+    </script>    <!-- Tải script JS bên ngoài -->
+    <script src="/js/tddvkvl2.js"></script>
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
+    <script>
+        var searchCustomerUrl = '@Url.Action("TimKiemKhachHang", "TaoDonDichVuKVL")';
+
+        $(document).ready(function () {
+            var typingTimer;
+            var doneTypingInterval = 400;
+
+            $('#customerIdInput').on('input', function () {
+                clearTimeout(typingTimer);
+                var keyword = $(this).val().trim();
+                if (keyword.length > 0) {
+                    typingTimer = setTimeout(function () {
+                        $.get(searchCustomerUrl, { keyword: keyword }, function (data) {
+                            var dropdown = $('#customerIdDropdown');
+                            dropdown.empty();
+                            if (data && data.length > 0) {
+                                data.forEach(function (item) {
+                                    var div = $('<div class="dropdown-item"></div>');
+                                    div.text(item.id + ' - ' + item.hoVaTen + ' (' + item.sdt + ')');
+                                    div.data('customer', item);
+                                    div.on('click', function () {
+                                        // Điền mã vào input
+                                        $('#customerIdInput').val(item.id);
+                                        $('#IdUser').val(item.id); // <-- Thêm dòng này
+                                        dropdown.hide();
+                                        // Điền thông tin khách hàng
+                                        $('input[name="HoVaTen"]').val(item.hoVaTen);
+                                        $('input[name="Sdt"]').val(item.sdt);
+                                        $('input[name="Email"]').val(item.email);
+                                        // Địa chỉ
+                                        $('#cityInput').val(item.thanhPho || '');
+                                        $('#districtInput').val(item.quan || '');
+                                        $('#wardInput').val(item.phuong || '');
+                                        $('#wardId').val(item.idPhuong || '');
+                                        $('input[placeholder="Số nhà, đường"]').val(item.duongSoNha || '');
+                                    });
+                                    dropdown.append(div);
+                                });
+                                dropdown.show();
+                            } else {
+                                dropdown.html('<div class="dropdown-item">Không tìm thấy khách hàng</div>').show();
+                            }
+                        });
+                    }, doneTypingInterval);
+                } else {
+                    $('#customerIdDropdown').hide();
+                }
+            });
+
+            // Ẩn dropdown khi click ra ngoài
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#customerIdInput').length) {
+                    $('#customerIdDropdown').hide();
+                }
+            });
+        });
+    </script>
+}
+
+

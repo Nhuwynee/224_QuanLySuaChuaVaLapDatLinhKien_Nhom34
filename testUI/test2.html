@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/testUI/css/test2.css" />
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <title>Tổng quan thống kê - Quản lý cửa hàng</title>
+</head>
+
+<body>
+    <div class="page d-flex">
+        <div class="sidebar bg-dark text-white">
+            <div class="top-row ps-4 navbar" style="background-color: #2A83E9;">
+               <div class="container-fluid" style="background-image: url(/testUI/images_test/logoDMX.png); height: 200px; background-size: contain; background-repeat: no-repeat;">
+</div>
+
+            </div>
+
+            <input type="checkbox" title="Navigation menu" class="navbar-toggler d-none" />
+
+            <div class="nav-scrollable">
+                <nav class="nav flex-column">
+                    <div class="nav-item px-0">
+                        <a class="nav-link text-white " href="home.html" style="font-size: 18px;">
+                            <i class="fa-solid fa-table-list " style="color: #FFD43B; margin-right: 10px;"></i>
+                             Danh sách đăng ký
+                        </a>
+                    </div>
+                    <div class="nav-item px-0">
+                        <a class="nav-link text-white active-menu" href="counter.html" style="font-size: 18px;">
+                            <i class="fa-solid fa-list" style="color: #74C0FC; margin-right: 10px;"></i>
+                            Danh sách đơn
+                        </a>
+                    </div>
+                    
+                </nav>
+            </div>
+        </div>
+
+        <main class="flex-grow-1">
+            <!-- header -->
+            <div class="top-row shadow-sm" style="display: flex; align-items: center; justify-content: space-around; padding: 10px; background-color: #2A83E9;">
+                <div class="d-flex align-items-center">
+                    <!-- <img src="/testUI/images_test/logoDMX.png" alt="Logo" height="40px" class="d-inline-block align-text-top me-2"> -->
+                    <!-- <h5 class="mb-0 text-success">Cửa hàng của bạn</h5> -->
+                     <div class="slogan">Mua sắm tiện lợi, Sửa chữa chuyên nghiệp, Lắp đặt tận tâm"</div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <div class="search-box me-3"style="margin-right: 10px;">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm..." aria-label="Search" >
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-light" type="button">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown me-3" style="margin-right: 10px;">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="notificationDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa-solid fa-bell text-secondary"></i>
+                            <span class="badge badge-danger">3</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown">
+                            <a class="dropdown-item" href="#">Có 5 đơn hàng mới</a>
+                            <a class="dropdown-item" href="#">2 sản phẩm sắp hết hàng</a>
+                            <a class="dropdown-item" href="#">Cập nhật phiên bản mới</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-center" href="#">Xem tất cả</a>
+                        </div>
+                    </div>
+                    
+                    <div class="user-info d-flex align-items-center">
+                        <div class="avatar me-2">
+                            <img src="/testUI/images_test/defaultavatar.png" alt="User Avatar" class="rounded-circle" width="40" height="40">
+                        </div>
+                        <div class="user-details d-none d-sm-block">
+                            <h6 class="mb-0 text-light">CSKH</h6>
+                            <small class="text-light">Nguyễn Vũ Khanh</small>
+                        </div>
+                    </div>
+                    <a id="logout" href="#" class="btn btn-danger btn-sm ms-3 text-light"style="margin-left: 30px;">
+                        <i class="fa-solid fa-sign-out-alt me-1 "></i> Đăng xuất
+                    </a>
+                </div>
+            </div>
+
+
+                 <!-- Main Content -->
+            <div class="main-content">
+            <h1 class="page-title">Danh sách đơn dịch vụ</h1>
+            
+            <div class="filter-bar">
+                <div class="filter-options">
+                    <div class="search-filter">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Tìm kiếm đơn dịch vụ...">
+                    </div>
+                    
+                    <!-- <div class="filter-group">
+                        <div class="filter-label">Ngày</div>
+                        <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                    </div> -->
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Trạng thái</div>
+                        <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="order-list">
+                <div class="list-header">
+                    <div>Mã đơn</div>
+                    <div>Khách hàng</div>
+                    <div>Mô tả đơn dịch vụ</div>
+                    <div>Trạng thái</div>
+                    <div>Tiền đơn hàng</div>
+                    <div>Cập nhật</div>
+                </div>
+                
+                <div class="list-item">
+                    <div>DH001</div>
+                    <div>Nguyễn Vũ Khanh</div>
+                    <div>Lorem ipsum dolor sit amet,...</div>
+                    <div><span class="status-badge in-progress">Đang tiến hành</span></div>
+                    <div>1.000.000 VND</div>
+                    <div class="action-buttons">
+                        <i class="fa-solid fa-pen-to-square action-icon"></i>
+                        <!-- <i class="fa-solid fa-eye action-icon"></i> -->
+                        <i class="fa-solid fa-trash delete-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="list-item">
+                    <div>DH002</div>
+                    <div>Trần Phước Lộc</div>
+                    <div>Lorem ipsum dolor sit amet,...</div>
+                    <div><span class="status-badge in-progress">Đang tiến hành</span></div>
+                    <div>1.000.000 VND</div>
+                    <div class="action-buttons">
+                        <i class="fa-solid fa-pen-to-square action-icon"></i>
+                        <i class="fa-solid fa-trash delete-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="list-item">
+                    <div>DH003</div>
+                    <div>Lưu Ngọc Yến Như</div>
+                    <div>Lorem ipsum dolor sit amet,...</div>
+                    <div><span class="status-badge completed">Hoàn thành</span></div>
+                    <div>1.000.000 VND</div>
+                    <div class="action-buttons">
+                        <i class="fa-solid fa-pen-to-square action-icon"></i>
+                        <i class="fa-solid fa-trash delete-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="list-item">
+                    <div>DH004</div>
+                    <div>Nguyễn Văn Huyn</div>
+                    <div>Lorem ipsum dolor sit amet,...</div>
+                    <div><span class="status-badge completed">Hoàn thành</span></div>
+                    <div>1.000.000 VND</div>
+                    <div class="action-buttons">
+                        <i class="fa-solid fa-pen-to-square action-icon"></i>
+                        <i class="fa-solid fa-trash delete-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="add-button">
+                    <i class="fa-solid fa-plus add-icon"></i>
+                    <a href="taodonsua.html" style="text-decoration: none; color: white;">Thêm đơn</a>
+                </button>
+            </div>
+        </div>
+
+
+        </main>
+    </div>
+
+</body>
+
+</html>

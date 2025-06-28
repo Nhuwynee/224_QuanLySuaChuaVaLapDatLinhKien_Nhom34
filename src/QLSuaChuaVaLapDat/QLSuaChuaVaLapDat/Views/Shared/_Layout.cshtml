@@ -1,0 +1,128 @@
+
+﻿@{
+    ViewData["Title"] = "Tìm kiếm";
+    Layout = "_layoutQuanLI";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý</title>
+    <link rel="stylesheet" href="~/css/style_timkiem.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hệ thống Quản lý</h1>
+            <div class="search-actions">
+                <button class="btn btn-secondary">Xuất Excel</button>
+                <button class="btn btn-primary">+ Tạo mới</button>
+            </div>
+        </header>
+
+        <div class="search-tabs">
+            <a class="search-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "TimKiemDonDichVu" ? "active" : "")"
+               asp-action="TimKiemDonDichVu" asp-controller="TimKiem">Đơn dịch vụ</a>
+
+            <a class="search-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "TimKiemKhachHang" ? "active" : "")"
+               asp-action="TimKiemKhachHang" asp-controller="TimKiem">Khách hàng</a>
+
+            <a class="search-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "TimKiemLinhKien" ? "active" : "")"
+               asp-action="TimKiemLinhKien" asp-controller="TimKiem">Linh kiện</a>
+
+            <a class="search-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "TimKiemBaoHanh" ? "active" : "")"
+               asp-action="TimKiemBaoHanh" asp-controller="TimKiem">Bảo hành</a>
+        </div>
+
+        
+        @* Body *@
+        @RenderBody()
+    </div>
+
+    <script>
+        // Xử lý khi click vào các nút giá nhanh
+        document.querySelectorAll('.price-quick-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const price = this.textContent.replace(/[^\d]/g, ''); // Lấy số từ text (bỏ ký tự không phải số)
+                document.getElementById('comp-price-to').value = price;
+                document.getElementById('comp-price-from').value = '';
+            });
+        });
+
+    
+
+        // Select All functionality
+        document.querySelectorAll('.select-all').forEach(selectAll => {
+            selectAll.addEventListener('change', function() {
+                const tableId = this.getAttribute('data-table');
+                const checkboxes = document.querySelectorAll(`#${tableId} .row-checkbox`);
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                    const row = checkbox.closest('tr');
+                    row.classList.toggle('selected', this.checked);
+                });
+            });
+        });
+
+        // Individual checkbox functionality
+        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const table = this.closest('.search-container');
+                const selectAll = table.querySelector('.select-all');
+                const allCheckboxes = table.querySelectorAll('.row-checkbox');
+                const row = this.closest('tr');
+
+                // Toggle selected class for the row
+                row.classList.toggle('selected', this.checked);
+
+                // Update select-all checkbox state
+                selectAll.checked = Array.from(allCheckboxes).every(cb => cb.checked);
+            });
+        });
+    </script>
+
+    <script>
+        const rangeMin = document.getElementById("rangeMin");
+        const rangeMax = document.getElementById("rangeMax");
+        const minPrice = document.getElementById("minPrice");
+        const maxPrice = document.getElementById("maxPrice");
+        const sliderRange = document.getElementById("slider-range");
+
+        function formatCurrency(value) {
+            return parseInt(value).toLocaleString('vi-VN') + "₫";
+        }
+
+        function updateSlider() {
+            let minVal = parseInt(rangeMin.value);
+            let maxVal = parseInt(rangeMax.value);
+
+            if (minVal > maxVal - 1000000) {
+                minVal = maxVal - 1000000;
+                rangeMin.value = minVal;
+            }
+            if (maxVal < minVal + 1000000) {
+                maxVal = minVal + 1000000;
+                rangeMax.value = maxVal;
+            }
+
+            const rangeWidth = parseInt(rangeMin.max) - parseInt(rangeMin.min);
+            const leftPercent = ((minVal - parseInt(rangeMin.min)) / rangeWidth) * 100;
+            const rightPercent = ((maxVal - parseInt(rangeMin.min)) / rangeWidth) * 100;
+
+            sliderRange.style.left = leftPercent + "%";
+            sliderRange.style.width = (rightPercent - leftPercent) + "%";
+
+            minPrice.value = formatCurrency(minVal);
+            maxPrice.value = formatCurrency(maxVal);
+        }
+
+        rangeMin.addEventListener("input", updateSlider);
+        rangeMax.addEventListener("input", updateSlider);
+        window.addEventListener("DOMContentLoaded", updateSlider);
+    </script>
+
+</body>
+</html>
+    
