@@ -10,4 +10,5 @@ public partial class NhaSanXuat
     public string TenNsx { get; set; } = null!;
 
     public virtual ICollection<LinhKien> LinhKiens { get; set; } = new List<LinhKien>();
+
 }

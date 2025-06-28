@@ -14,4 +14,6 @@ public partial class HinhAnh
     public string LoaiHinhAnh { get; set; } = null!;
 
     public virtual ChiTietDonDichVu? IdCtdhNavigation { get; set; }
+
 }
+

@@ -20,4 +20,5 @@ public partial class Phuong
     public virtual ICollection<KhachVangLai> KhachVangLais { get; set; } = new List<KhachVangLai>();
 
     public virtual ICollection<User> Users { get; set; } = new List<User>();
+
 }

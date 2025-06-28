@@ -14,4 +14,5 @@ public partial class Quan
     public virtual ThanhPho? IdThanhPhoNavigation { get; set; }
 
     public virtual ICollection<Phuong> Phuongs { get; set; } = new List<Phuong>();
+
 }

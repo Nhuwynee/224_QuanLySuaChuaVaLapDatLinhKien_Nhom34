@@ -14,4 +14,6 @@ public partial class DonGia
     public DateOnly? NgayCapNhat { get; set; }
 
     public virtual LoaiLoi? IdLoiNavigation { get; set; }
+
 }
+

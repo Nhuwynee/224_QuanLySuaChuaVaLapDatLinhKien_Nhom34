@@ -13,14 +13,21 @@ public partial class ChiTietDonDichVu
 
     public string? IdLoi { get; set; }
 
+
     public string LoaiDichVu { get; set; }
     // = null! cho biết rằng trường này không được phép null
+
+//    public string LoaiDichVu { get; set; } = null!;
+
 
     public string? MoTa { get; set; }
 
     public int SoLuong { get; set; }
 
-    public DateOnly? NgayKetThucBh { get; set; } = new DateOnly(2025, 12, 31);
+    //public DateOnly? NgayKetThucBh { get; set; } = new DateOnly(2025, 12, 31);
+
+    public DateOnly? NgayKetThucBh { get; set; }
+
 
     public DateTime? ThoiGianThemLinhKien { get; set; }
 
@@ -33,4 +40,5 @@ public partial class ChiTietDonDichVu
     public virtual LinhKien? IdLinhKienNavigation { get; set; }
 
     public virtual LoaiLoi? IdLoiNavigation { get; set; }
+
 }

@@ -1,0 +1,66 @@
+﻿@model QLSuaChuaVaLapDat.Models.LinhKien
+
+@{
+    Layout = "~/Views/Shared/_LayoutQuanLi.cshtml";
+    ViewData["Title"] = "Xóa linh kiện";
+}
+
+<div class="container">
+    <h3 style="color: var(--danger-clr);">Xóa linh kiện</h3>
+
+    <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border: 1px solid #f5c6cb; border-radius: var(--border-radius-sm); margin-bottom: 25px;">
+        <strong>Cảnh báo:</strong> Bạn có chắc chắn muốn xóa linh kiện này không? Hành động này không thể hoàn tác.
+    </div>
+
+    <div style="max-width: 600px;">
+        <div style="background-color: var(--light-grey-bg); padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--line-clr); margin-bottom: 25px;">
+            <div style="margin-bottom: 15px;">
+                <strong style="color: var(--secondary-text-clr);">ID:</strong> @Html.DisplayFor(model => model.IdLinhKien)
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong style="color: var(--secondary-text-clr);">Tên linh kiện:</strong> @Html.DisplayFor(model => model.TenLinhKien)
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong style="color: var(--secondary-text-clr);">Loại:</strong> @Html.DisplayFor(model => model.IdLoaiLinhKienNavigation.TenLoaiLinhKien)
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong style="color: var(--secondary-text-clr);">Nhà sản xuất:</strong> @Html.DisplayFor(model => model.IdNsxNavigation.TenNsx)
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong style="color: var(--secondary-text-clr);">Giá:</strong> @Model.Gia.ToString("N0") VNĐ
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong style="color: var(--secondary-text-clr);">Số lượng:</strong> @Html.DisplayFor(model => model.SoLuong)
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong style="color: var(--secondary-text-clr);">Thời gian bảo hành:</strong>
+                @if (Model.ThoiGianBaoHanh > 0)
+                {
+                    <span>@Model.ThoiGianBaoHanh tháng</span>
+                }
+                else
+                {
+                    <span>Không bảo hành</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Anh))
+            {
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: var(--secondary-text-clr);">Ảnh:</strong>
+                    <div style="margin-top: 10px;">
+                        <img src="@Model.Anh" alt="@Model.TenLinhKien" style="max-width: 150px; max-height: 150px; border-radius: var(--border-radius-sm);" />
+                    </div>
+                </div>
+            }
+        </div>
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="IdLinhKien" />
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" style="padding: 12px 24px; background-color: var(--danger-clr); color: white; border: none; border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 500;">Xác nhận xóa</button>
+                <a asp-action="Index" style="padding: 12px 24px; background-color: var(--light-grey-bg); color: var(--text-clr); text-decoration: none; border-radius: var(--border-radius-sm); border: 1px solid var(--line-clr);">Hủy bỏ</a>
+            </div>
+        </form>
+    </div>
+</div>

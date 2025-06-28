@@ -14,4 +14,5 @@ public partial class PhiLapDat
     public DateOnly? NgayApDung { get; set; }
 
     public virtual LinhKien? IdLinhKienNavigation { get; set; }
+
 }

@@ -71,14 +71,13 @@ public class HomeController : Controller
                 HttpContext.Session.SetString("Username", username);
                 HttpContext.Session.SetString("HoTen", user.HoVaTen);
                 HttpContext.Session.SetString("Password", password); // không nên lưu password thật trong session
-
                 HttpContext.Session.SetString("VaiTro", VaiTro.TenRole);
                 ViewBag.TenNhanVien = user.HoVaTen;
                 switch (VaiTro.TenRole)
                 {
                     case "Nhân viên quản lý":
 
-                        return RedirectToAction("", "");
+                        return RedirectToAction("TimKiemDonDichVu", "TimKiem");
 
                     case "Nhân viên chăm sóc khách hàng":
                         return RedirectToAction("IndexDSDK", "DanhSachDangKy");

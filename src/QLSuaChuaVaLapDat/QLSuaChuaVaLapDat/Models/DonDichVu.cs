@@ -50,4 +50,5 @@ public partial class DonDichVu
     public virtual User? IdUserNavigation { get; set; }
 
     public virtual User IdUserTaoDonNavigation { get; set; } = null!;
+
 }

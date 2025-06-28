@@ -18,4 +18,5 @@ public partial class KhachVangLai
     public virtual ICollection<DonDichVu> DonDichVus { get; set; } = new List<DonDichVu>();
 
     public virtual Phuong? IdPhuongNavigation { get; set; }
+
 }

@@ -1,0 +1,404 @@
+﻿@model QLSuaChuaVaLapDat.ViewModel.TimKiemLinhKiemVM
+@using QLSuaChuaVaLapDat.Models.TimKiem
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+<form id="searchForm" method="post" asp-action="TimKiemLinhKien">
+    <div class="search-container" id="components">
+        <div class="search-header">
+            <div class="search-title">Tìm kiếm Linh kiện</div>
+            <div class="search-actions">
+                <button class="btn btn-secondary2"><i class="fa-solid fa-table-cells"></i> Xuất Excel</button>
+                <input type="hidden" name="isexport" id="isexport" value="@ViewBag.IsExport" />
+
+                <button class="btn btn-primary2 mar"> <i class="fa-solid fa-download"></i> Xuất báo cáo</button>
+                <input type="hidden" name="isBaoCao" id="isBaoCao" value="@ViewBag.IsBaoCao" />
+
+                <script>
+                    document.querySelector('.btn.btn-secondary2').addEventListener('click', function (event) {
+                    event.preventDefault();
+                    document.getElementById('isexport').value = '1';
+                    document.getElementById('isBaoCao').value = '0';
+                    document.querySelector('form').submit();
+                    document.getElementById('isexport').value = '0';
+                    });
+
+                    document.querySelector('.btn.btn-primary2.mar').addEventListener('click', function (event) {
+                    event.preventDefault();
+                    document.getElementById('isBaoCao').value = '1';
+                    document.getElementById('isexport').value = '0';
+                    document.querySelector('form').submit();
+                    document.getElementById('isBaoCao').value = '0';
+                    });
+
+
+                </script>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Làm mới</button>
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </div>
+
+        <div class="search-fields">
+            <div class="form-group">
+                <label for="comp-id">Mã linh kiện</label>
+                <input type="text" id="comp-id" name="MaLinhKien" @(Model.linhKienSearch.MaLinhKien != null
+                       ? $"value={Model.linhKienSearch.MaLinhKien}"
+                       : "") placeholder="Nhập mã linh kiện...">
+            </div>
+
+            <div class="form-group">
+                <label for="comp-name">Tên linh kiện</label>
+                <input type="text" id="comp-name" name="TenLinhKien" @(Model.linhKienSearch.TenLinhKien != null
+                       ? $"value={Model.linhKienSearch.TenLinhKien}"
+                       : "") placeholder="Nhập tên linh kiện...">
+            </div>
+
+            <div class="form-group">
+                <label for="comp-type">Loại linh kiện</label>
+                <select id="comp-type" name="LoaiLinhKien" onchange="submitForm()">
+                    @{
+                        var loaiLK = Model.linhKienSearch.LoaiLinhKien;
+                    }
+                    <option value="">Tất cả</option>
+                    @foreach (var item in Model.LoaiLinhKiens)
+                    {
+                        if (item.TenLoaiLinhKien == loaiLK)
+                        {
+                            <option value="@item.TenLoaiLinhKien" selected>@item.TenLoaiLinhKien</option>
+                        }
+                        else
+                        {
+                            <option value="@item.TenLoaiLinhKien">@item.TenLoaiLinhKien</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="comp-manu">Nhà sản xuất</label>
+                <select id="comp-manu" name="NhaSanXuat">
+                    <option value="">Tất cả</option>
+                    @{
+                        var idNsx = Model.linhKienSearch.NhaSanXuat;
+                    }
+                    @foreach (var item in Model.NhaSanXuats)
+                    {
+                        if (item.IdNsx == idNsx)
+                        {
+                            <option value="@item.IdNsx" selected>@item.TenNsx</option>
+                        }
+                        else
+                        {
+                            <option value="@item.IdNsx">@item.TenNsx</option>
+                        }
+
+                    }
+                </select>
+            </div>
+
+
+
+            <div class="price-range-wrapper">
+                <label><strong>Giá</strong></label>
+                <div class="price-inputs">
+                    <input type="text" id="minPrice" readonly>
+                    <input type="text" id="maxPrice" readonly>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-track"></div>
+                    <div class="slider-range" id="slider-range"></div>
+                    <input type="range" name="GiaTu" id="rangeMin" min="0" max="1500000" style="border: none;" value="0" step="10000">
+                    <input type="range" name="GiaDen" id="rangeMax" min="0" max="1500000" style="border: none;" value="1500000" step="10000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="comp-warranty">Bảo hành</label>
+                <select id="comp-warranty" name="BaoHanh">
+                    <option value="">Tất cả</option>
+
+
+                    <option value="3">3 Tháng</option>
+                    <option value="6">6 Tháng</option>
+                    <option value="9">9 Tháng</option>
+                    <option value="12">12 Tháng</option>
+                    <option value="15">15 Tháng</option>
+                    <option value="18">18 Tháng</option>
+                    <option value="24">24 Tháng</option>
+                    <option value="30">30 Tháng</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="filter-sort">
+            <div class="filter-section">
+                @{
+                    var ttSanPham = Model.linhKienSearch.TTSanPham;
+                }
+                <span>Lọc theo tình trạng:</span>
+                <select name="TTSanPham" onchange="submitForm()">
+                    @if (ttSanPham == null)
+                    {
+                        <option value="" selected>Tất cả</option>
+                    }
+                    else
+                    {
+                        <option value="">Tất cả</option>
+                    }
+
+                    @if (ttSanPham == 1)
+                    {
+                        <option value="1" selected>Còn hàng</option>
+                    }
+                    else
+                    {
+                        <option value="1">Còn hàng</option>
+                    }
+
+
+                    @if (ttSanPham == 0)
+                    {
+                        <option value="0" selected>Hết hàng</option>
+                    }
+                    else
+                    {
+                        <option value="0">Hết hàng</option>
+                    }
+
+                </select>
+
+            </div>
+
+        </div>
+
+        <div class="select-all-container">
+            <label for="select-all-components" style="margin-top: 15px;">Chọn tất cả</label>
+        </div>
+
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" class="select-all" data-table="warranty"></th>
+                    <th>Hình ảnh</th>
+                    <th class="cursor-pointer" onclick="sortTable('MaLinhKien')" style="width: 40px;">
+                        ID <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoMaLinhKien == "MaLinhKienAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoMaLinhKien == "MaLinhKienDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_MaLinhKien" name="SapXepTheoMaLinhKien" value="@Model.linhKienSearch?.SapXepTheoMaLinhKien" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('TenLinhKien')">
+                        Tên LK <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoTenLinhKien == "TenLinhKienAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoTenLinhKien == "TenLinhKienDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_TenLinhKien" name="SapXepTheoTenLinhKien" value="@Model.linhKienSearch?.SapXepTheoTenLinhKien" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('LoaiLinhKien')">
+                        Loại <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoLoaiLinhKien == "LoaiLinhKienAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoLoaiLinhKien == "LoaiLinhKienDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_LoaiLinhKien" name="SapXepTheoLoaiLinhKien" value="@Model.linhKienSearch?.SapXepTheoLoaiLinhKien" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('NhaSanXuat')">
+                        Nhà SX <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoNhaSanXuat == "NhaSanXuatAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoNhaSanXuat == "NhaSanXuatDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_NhaSanXuat" name="SapXepTheoNhaSanXuat" value="@Model.linhKienSearch?.SapXepTheoNhaSanXuat" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('Gia')">
+                        Giá <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoGia == "GiaAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoGia == "GiaDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_Gia" name="SapXepTheoGia" value="@Model.linhKienSearch?.SapXepTheoGia" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('SoLuong')">
+                        Sl <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoSoLuong == "SoLuongAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoSoLuong == "SoLuongDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_SoLuong" name="SapXepTheoSoLuong" value="@Model.linhKienSearch?.SapXepTheoSoLuong" />
+                    </th>
+                    <th class="cursor-pointer" onclick="sortTable('BaoHanh')">
+                        Bảo hành <span class="sort-icon">@(Model.linhKienSearch?.SapXepTheoBaoHanh == "BaoHanhAsc" ? "↑" : Model.linhKienSearch?.SapXepTheoBaoHanh == "BaoHanhDesc" ? "↓" : "↕")</span>
+                        <input type="hidden" id="sort_column_BaoHanh" name="SapXepTheoBaoHanh" value="@Model.linhKienSearch?.SapXepTheoBaoHanh" />
+                    </th>
+                    <th>ĐKBH</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.LinhKiens)
+                {
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox"></td>
+                        <td><img style="width:40px; height:40px; object-fit: cover;" src="~/img/@item.Anh" alt="Alternate Text" /></td>
+                        <td>@item.IdLinhKien</td>
+                        <td>@item.TenLinhKien</td>
+                        <td>@item.IdLoaiLinhKienNavigation?.TenLoaiLinhKien</td>
+                        <td>@item.IdNsxNavigation?.TenNsx</td>
+                        <td>@(item.Gia.ToString("#,##0") + " vnđ" ?? "0,00 vnđ")</td>
+                        <td>@item.SoLuong</td>
+                        <td>@item.ThoiGianBaoHanh Tháng</td>
+                        <td>@item.DieuKienBaoHanh</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit">Sửa</button>
+                            <button class="btn btn-delete">Xóa</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            @{
+                int totalPage = Model.Paging.TotalPage;
+                int currentPage = Model.Paging.PageActive;
+            }
+
+            @for (int i = 1; i <= totalPage; i++)
+            {
+                <div class="page-item @(i == currentPage ? "active" : "")">@i</div>
+            }
+        </div>
+    </div>
+    <input type="hidden" id="page_active" name="PageActive" value="1" />
+</form>
+<style>
+    .sort-icon {
+        margin-left: 5px;
+        cursor: pointer;
+    }
+
+    .btn-secondary2 {
+        background-color: #fffee8;
+        color: black;
+        border-radius: 5px;
+        border: #ffebaf solid 1px;
+    }
+
+        .btn-secondary2:hover {
+            background-color: lightblue;
+        }
+
+    .btn-primary2:hover {
+        background-color: lightpink;
+    }
+
+    .mar {
+        margin-right: 50px;
+        color: black;
+        background-color: #fff0f2;
+        border-radius: 5px;
+        border: #ffcdc0 solid 1px;
+
+    }
+
+    .hei {
+        margin-bottom: 25px;
+    }
+</style>
+<script>
+        const pageItems = document.querySelectorAll('.page-item');
+
+      pageItems.forEach(item => {
+          item.addEventListener('click', () => {
+              // Xóa class active khỏi tất cả
+              pageItems.forEach(i => i.classList.remove('active'));
+              // Thêm class active cho item được click
+              item.classList.add('active');
+
+              // Lấy số trang từ text của item
+              const pageNumber = item.innerText.trim();
+
+              // Gán vào input hidden
+              document.getElementById('page_active').value = pageNumber;
+
+              // Gửi form
+             submitForm();
+          });
+      });
+
+       function submitForm() {
+        document.getElementById("searchForm").submit();
+    }
+
+         function sortTable(column) {
+        const columns = ['MaLinhKien', 'TenLinhKien', 'LoaiLinhKien', 'NhaSanXuat', 'Gia', 'SoLuong', 'BaoHanh'];
+        columns.forEach(col => {
+            const input = document.getElementById(`sort_column_${col}`);
+            if (col === column) {
+                const currentSort = input.value;
+                let newSort = `${col}Asc`;
+                if (currentSort === `${col}Asc`) {
+                    newSort = `${col}Desc`;
+                } else if (currentSort === `${col}Desc`) {
+                    newSort = `${col}Asc`;
+                }
+                input.value = newSort;
+            } else {
+
+            }
+        });
+        submitForm();
+    }
+      document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('searchForm');
+        const resetBtn = document.getElementById('resetBtn');
+        const rangeMin = document.getElementById('rangeMin');
+        const rangeMax = document.getElementById('rangeMax');
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const hiddenGiaTu = document.getElementById('hiddenGiaTu');
+        const hiddenGiaDen = document.getElementById('hiddenGiaDen');
+
+        // Giá trị mặc định cho slider
+        const DEFAULT_MIN_VALUE = 0;
+        const DEFAULT_MAX_VALUE = 0;
+
+        // Sync slider with price inputs
+        function updatePriceDisplay() {
+            let minVal = parseInt(rangeMin.value);
+            let maxVal = parseInt(rangeMax.value);
+
+            // Đảm bảo min không vượt quá max
+            if (minVal > maxVal) {
+                [minVal, maxVal] = [maxVal, minVal];
+                rangeMin.value = minVal;
+                rangeMax.value = maxVal;
+            }
+
+            // Hiển thị giá trị định dạng trên input text
+            minPrice.value = minVal.toLocaleString('vi-VN') + 'đ';
+            maxPrice.value = maxVal.toLocaleString('vi-VN') + 'đ';
+
+            // Cập nhật giá trị thô vào input hidden
+            hiddenGiaTu.value = minVal;
+            hiddenGiaDen.value = maxVal;
+        }
+
+        // Khởi tạo giá trị ban đầu
+        function initializeValues() {
+            rangeMin.value = DEFAULT_MIN_VALUE;
+            rangeMax.value = DEFAULT_MAX_VALUE;
+            updatePriceDisplay();
+        }
+
+
+
+        // Xử lý sự kiện input cho slider
+        rangeMin.addEventListener('input', updatePriceDisplay);
+        rangeMax.addEventListener('input', updatePriceDisplay);
+
+        // Reset form
+        resetBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            form.reset();
+            initializeValues();
+
+            // Reset các dropdown select
+            document.getElementById('comp-type').selectedIndex = 0;
+            document.getElementById('comp-manu').selectedIndex = 0;
+            document.getElementById('comp-warranty').selectedIndex = 0;
+            document.querySelector('select[name="Tình trạng"]').selectedIndex = 0;
+            document.querySelector('select[name="SapXep"]').selectedIndex = 0;
+
+            // Reset các input text
+            document.getElementById('comp-name').value = "";
+            document.getElementById('comp-id').value = "";
+        });
+
+        // Khởi tạo giá trị ban đầu khi trang được tải
+        // initializeValues();
+
+        // Xử lý submit form
+        form.addEventListener('submit', function (e) {
+            // Đảm bảo giá trị hidden được cập nhật lần cuối trước khi submit
+            // updatePriceDisplay();
+        });
+    });
+</script>

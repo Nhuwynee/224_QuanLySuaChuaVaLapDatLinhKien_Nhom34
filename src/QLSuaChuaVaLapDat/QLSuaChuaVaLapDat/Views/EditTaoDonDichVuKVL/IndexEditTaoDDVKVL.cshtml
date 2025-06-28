@@ -1,5 +1,5 @@
-﻿@{
-    Layout = "~/Views/Shared/_LayoutCSKH.cshtml";
+﻿﻿@{
+Layout = "~/Views/Shared/_LayoutCSKH.cshtml";
 }
 
 <style>
@@ -543,15 +543,15 @@
 <div class="main-content">
     <h1 class="page-title">Đơn sửa chữa</h1>
 
-<form method="post" action="@Url.Action("UpdateServiceOrder", "EditTaoDonDichVuKVL")" enctype="multipart/form-data" id="serviceOrderForm">
+    <form method="post" action="@Url.Action("UpdateServiceOrder", "EditTaoDonDichVuKVL")" enctype="multipart/form-data" id="serviceOrderForm">
 
-<div class="order-info">
-    <div class="order-id">Mã đơn dịch vụ: <span class="highlight">@ViewBag.OrderId</span></div>
-    <input type="hidden" id="IdDonDichVu" name="IdDonDichVu" value="@ViewBag.OrderId" />
-    <div class="order-date">Ngày tạo: @ViewBag.OrderDate</div>
-    <div class="staff-name">Nhân viên: @Context.Session.GetString("HoTen")</div>
-    <div class="turn-back"><a href="javascript:void(0);" onclick="confirmBack()" style="text-decoration: none;">Quay lại DS</a> </div>
-</div>
+        <div class="order-info">
+            <div class="order-id">Mã đơn dịch vụ: <span class="highlight">@ViewBag.OrderId</span></div>
+            <input type="hidden" id="IdDonDichVu" name="IdDonDichVu" value="@ViewBag.OrderId" />
+            <div class="order-date">Ngày tạo: @ViewBag.OrderDate</div>
+            <div class="staff-name">Nhân viên: @Context.Session.GetString("HoTen")</div>
+            <div class="turn-back"><a href="javascript:void(0);" onclick="confirmBack()" style="text-decoration: none;">Quay lại DS</a> </div>
+        </div>
 
         <div class="form-container">
             <!-- Customer Information Section -->
@@ -667,12 +667,12 @@
                                 <div class="form-group">
                                     <label>Lỗi: <span class="required">(*)</span></label>
                                     @Html.DropDownList("ErrorDetails[0].IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new
-                                        {
-                                            @class = "form-control error-type-select error-loi-select",
-                                            @onchange = "layGiaTheoLoi(this.value)",
-                                            @id = "IdLoi-0",
-                                            @name = "ErrorDetails[0].IdLoi"  // Thêm dòng này
-                                        })
+                                    {
+                                        @class = "form-control error-type-select error-loi-select",
+                                                                        @onchange = "layGiaTheoLoi(this.value)",
+                                                                        @id = "IdLoi-0",
+                                                                        @name = "ErrorDetails[0].IdLoi"  // Thêm dòng này
+                                                                        })
                                     @* @Html.DropDownList("IdLoi", ViewBag.LoaiLois as List<SelectListItem>, "Chọn lỗi", new { @class = "form-control error-type-select error-loi-select", @onchange = "layGiaTheoLoi(this.value)", @name = "ErrorDetails[0].IdLoi" }) *@
                                 </div>
                                 <div class="form-group">
@@ -789,7 +789,7 @@
                             <span class="staff-name">Chưa chọn nhân viên</span>
                         </div>
                         <input type="hidden" id="selectedStaffId" name="IdNhanVienKyThuat" value="">
-                        
+
                         <!-- Hidden fields for initial staff data -->
                         <input type="hidden" id="initialStaffId" value="@ViewBag.NhanVienKyThuatId">
                         <input type="hidden" id="initialStaffName" value="@ViewBag.StaffName">
@@ -1105,19 +1105,19 @@
     <!-- Định nghĩa URLs cho JavaScript -->
     <!--Định nghĩa các URLs cho tddvkvl2.js -->    <script>
 
-        var backToListUrl = '@Url.Action("IndexDSDDV", "DanhSachDonDichVu")';
-        var searchLinhKienUrl = '@Url.Action("TimKiemLinhKien", "TaoDonDichVuKVL")';
-        var layGiaTheoLoiUrl = '@Url.Action("LayGiaTheoLoi", "TaoDonDichVuKVL")';
-        var layDanhSachThanhPhoUrl = '@Url.Action("LayDanhSachThanhPho", "TaoDonDichVuKVL")';
-        var layDanhSachQuanUrl = '@Url.Action("LayDanhSachQuan", "TaoDonDichVuKVL")';
-        var layDanhSachPhuongUrl = '@Url.Action("LayDanhSachPhuong", "TaoDonDichVuKVL")';
-        var createServiceOrderUrl = '@Url.Action("CreateServiceOrder", "TaoDonDichVuKVL")';
-        var layLinhKienUrl = '@Url.Action("LayLinhKienTheoLoai", "TaoDonDichVuKVL")';
-        var layThongTinLinhKienUrl = '@Url.Action("LayThongTinLinhKien", "EditTaoDonDichVuKVL")';
-        var layThongTinDonUrl = '@Url.Action("LayThongTinDon", "EditTaoDonDichVuKVL")';
-        var updateServiceOrderUrl = '@Url.Action("UpdateServiceOrder", "EditTaoDonDichVuKVL")';
-                                                       // Thêm URL mới
-        var layDanhSachNhanVienKyThuatUrl = '@Url.Action("LayDanhSachNhanVienKyThuat", "EditTaoDonDichVuKVL")';
+                                                       var backToListUrl = '@Url.Action("IndexDSDDV", "DanhSachDonDichVu")';
+                                                       var searchLinhKienUrl = '@Url.Action("TimKiemLinhKien", "TaoDonDichVuKVL")';
+                                                       var layGiaTheoLoiUrl = '@Url.Action("LayGiaTheoLoi", "TaoDonDichVuKVL")';
+                                                       var layDanhSachThanhPhoUrl = '@Url.Action("LayDanhSachThanhPho", "TaoDonDichVuKVL")';
+                                                       var layDanhSachQuanUrl = '@Url.Action("LayDanhSachQuan", "TaoDonDichVuKVL")';
+                                                       var layDanhSachPhuongUrl = '@Url.Action("LayDanhSachPhuong", "TaoDonDichVuKVL")';
+                                                       var createServiceOrderUrl = '@Url.Action("CreateServiceOrder", "TaoDonDichVuKVL")';
+                                                       var layLinhKienUrl = '@Url.Action("LayLinhKienTheoLoai", "TaoDonDichVuKVL")';
+                                                       var layThongTinLinhKienUrl = '@Url.Action("LayThongTinLinhKien", "EditTaoDonDichVuKVL")';
+                                                       var layThongTinDonUrl = '@Url.Action("LayThongTinDon", "EditTaoDonDichVuKVL")';
+                                                       var updateServiceOrderUrl = '@Url.Action("UpdateServiceOrder", "EditTaoDonDichVuKVL")';
+                                                                                                      // Thêm URL mới
+                                                       var layDanhSachNhanVienKyThuatUrl = '@Url.Action("LayDanhSachNhanVienKyThuat", "EditTaoDonDichVuKVL")';
     </script><!-- Tải script JS bên ngoài -->
     <script src="/js/tddvkvl2.js"></script>
     <script src="/js/editTDDV.js"></script>
@@ -1222,5 +1222,3 @@
         });
     </script>
 }
-
-

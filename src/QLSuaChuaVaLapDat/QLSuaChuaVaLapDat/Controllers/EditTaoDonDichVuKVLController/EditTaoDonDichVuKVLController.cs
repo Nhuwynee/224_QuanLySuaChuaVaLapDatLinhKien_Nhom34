@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QLSuaChuaVaLapDat.Models;
@@ -269,7 +269,7 @@ namespace QLSuaChuaVaLapDat.Controllers.EditTaoDonDichVuKVLController
             }
         }
 
-      
+
         [HttpPost]
         public IActionResult UpdateServiceOrder(string IdDonDichVu, string PhuongThucThanhToan, string TrangThaiDon)
         {

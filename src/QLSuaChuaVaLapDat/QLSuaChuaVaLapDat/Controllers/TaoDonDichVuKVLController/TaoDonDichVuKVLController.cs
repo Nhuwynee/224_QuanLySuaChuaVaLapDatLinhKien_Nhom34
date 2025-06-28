@@ -34,20 +34,20 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                     id = kh.IdUser,
                     hoVaTen = kh.HoVaTen,
                     sdt = kh.Sdt,
-                    
+
                     duongSoNha = kh.DiaChi, // nếu có trường riêng thì sửa lại
                     idPhuong = kh.IdPhuong,
                     // Lấy tên phường, quận, thành phố
                     phuong = _context.Phuongs.Where(p => p.IdPhuong == kh.IdPhuong).Select(p => p.TenPhuong).FirstOrDefault(),
                     quan = (from p in _context.Phuongs
-                        join q in _context.Quans on p.IdQuan equals q.IdQuan
-                        where p.IdPhuong == kh.IdPhuong
-                        select q.TenQuan).FirstOrDefault(),
+                            join q in _context.Quans on p.IdQuan equals q.IdQuan
+                            where p.IdPhuong == kh.IdPhuong
+                            select q.TenQuan).FirstOrDefault(),
                     thanhPho = (from p in _context.Phuongs
-                        join q in _context.Quans on p.IdQuan equals q.IdQuan
-                        join tp in _context.ThanhPhos on q.IdThanhPho equals tp.IdThanhPho
-                        where p.IdPhuong == kh.IdPhuong
-                        select tp.TenThanhPho).FirstOrDefault()
+                                join q in _context.Quans on p.IdQuan equals q.IdQuan
+                                join tp in _context.ThanhPhos on q.IdThanhPho equals tp.IdThanhPho
+                                where p.IdPhuong == kh.IdPhuong
+                                select tp.TenThanhPho).FirstOrDefault()
                 })
                 .Take(10)
                 .ToList();
@@ -189,7 +189,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                     Text = llk.TenLoaiLinhKien
                 }).ToList();
 
-                
+
 
             //lấy danh sách lỗi
             var loaiLois = _context.LoaiLois
@@ -506,13 +506,13 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
 
                         var danhSachDon = _context.DonDichVus.ToList();
                         //thông báo đã tạo thành công với popup alert
-                     
+
                         TempData["SuccessMessage"] = "Đơn dịch vụ đã được tạo thành công!";
                         return RedirectToAction("IndexDSDDV", "DanhSachDonDichVu");
                     }
                     catch (Exception ex)
                     {
-                       await transaction.RollbackAsync();
+                        await transaction.RollbackAsync();
                         TempData["ErrorMessage"] = "Có lỗi xảy ra khi tạo đơn dịch vụ: " + ex.Message;
                         return RedirectToAction("IndexDSDDV", "DanhSachDonDichVu");
                     }
@@ -529,7 +529,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
         // Tạo khách vãng lai
         private async Task<string> TaoKhachVangLaiMoi(ServiceOrderFormViewModel formData)
         {
-           
+
             // Tạo idKhachVangLai mới (ví dụ: KVL001, KVL002,...)
             var last = _context.KhachVangLais.OrderByDescending(x => x.IdKhachVangLai).FirstOrDefault();
             string newId = "KVL001";
@@ -732,7 +732,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
 
                     // Only calculate if order is completed and we have warranty information
                     if (
-                        
+
                         donDichVu.NgayHoanThanh.HasValue &&
                         warrantyPeriodMonths > 0)
                     {
@@ -751,7 +751,7 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
                         IdCtdh = idCTDH,
                         IdDonDichVu = idDonDichVu,
                         IdLinhKien = idLinhKien,
-                        IdLoi = idLoi, 
+                        IdLoi = idLoi,
                         LoaiDichVu = loaiDichVu,
                         MoTa = formData.MoTa,
                         SoLuong = 1,
@@ -981,7 +981,3 @@ namespace QLSuaChuaVaLapDat.Controllers.TaoDonDichVuKVLController
         }
     }
 }
-
-
-
-

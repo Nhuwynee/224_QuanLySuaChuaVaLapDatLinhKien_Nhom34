@@ -1,0 +1,131 @@
+﻿@model QLSuaChuaVaLapDat.Models.LinhKien
+
+@{
+    Layout = "~/Views/Shared/_LayoutQuanLi.cshtml";
+    ViewData["Title"] = "Chỉnh sửa linh kiện";
+}
+
+<div class="container">
+    <h3>Chỉnh sửa linh kiện</h3>
+
+    <form asp-action="Edit" enctype="multipart/form-data" style="max-width: 800px;">
+        <div asp-validation-summary="ModelOnly" style="color: var(--danger-clr); margin-bottom: 20px;"></div>
+
+        <input type="hidden" asp-for="IdLinhKien" />
+        <input type="hidden" asp-for="Anh" />
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: 500; color: var(--secondary-text-clr);">ID Linh kiện</label>
+                <input value="@Model.IdLinhKien" readonly style="width: 100%; padding: 10px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm); background-color: var(--light-grey-bg);" />
+            </div>
+
+            <div>
+                <label asp-for="TenLinhKien" style="display: block; margin-bottom: 5px; font-weight: 500; color: var(--secondary-text-clr);">Tên linh kiện</label>
+                <input asp-for="TenLinhKien" style="width: 100%; padding: 10px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm);" />
+                <span asp-validation-for="TenLinhKien" style="color: var(--danger-clr); font-size: 0.85em;"></span>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <label asp-for="IdLoaiLinhKien" style="display: block; margin-bottom: 5px; font-weight: 500; color: var(--secondary-text-clr);">Loại linh kiện</label>
+                <select asp-for="IdLoaiLinhKien" asp-items="ViewBag.IdLoaiLinhKien" style="width: 100%; padding: 10px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm);">
+                    <option value="">-- Chọn loại linh kiện --</option>
+                </select>
+                <span asp-validation-for="IdLoaiLinhKien" style="color: var(--danger-clr); font-size: 0.85em;"></span>
+            </div>
+
+            <div>
+                <label asp-for="IdNsx" style="display: block; margin-bottom: 5px; font-weight: 500; color: var(--secondary-text-clr);">Nhà sản xuất</label>
+                <select asp-for="IdNsx" asp-items="ViewBag.IdNsx" style="width: 100%; padding: 10px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm);">
+                    <option value="">-- Chọn nhà sản xuất --</option>
+                </select>
+                <span asp-validation-for="IdNsx" style="color: var(--danger-clr); font-size: 0.85em;"></span>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <label asp-for="Gia" style="display: block; margin-bottom: 5px; font-weight: 500; color: var(--secondary-text-clr);">Giá (VNĐ)</label>
+                <input asp-for="Gia" type="number" step="0.01" style="width: 100%; padding: 10px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm);" />
+                <span asp-validation-for="Gia" style="color: var(--danger-clr); font-size: 0.85em;"></span>
+            </div>
+
+            <div>
+                <label asp-for="SoLuong" style="display: block; margin-bottom: 5px; font-weight: 500; color: var(--secondary-text-clr);">Số lượng</label>
+                <input asp-for="SoLuong" type="number" style="width: 100%; padding: 10px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm);" />
+                <span asp-validation-for="SoLuong" style="color: var(--danger-clr); font-size: 0.85em;"></span>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label asp-for="ImageFile" style="display: block; margin-bottom: 5px; font-weight: 500; color: var(--secondary-text-clr);">Ảnh linh kiện (Để trống nếu không muốn thay đổi)</label>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <input asp-for="ImageFile" type="file" accept="image/*" style="flex: 1; padding: 10px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm);" onchange="previewImage(this)" />
+                <div id="imagePreview" style="display: @(string.IsNullOrEmpty(Model.Anh) ? "none" : "block"); width: 100px; height: 100px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm); overflow: hidden;">
+                    <img id="imgPreview" src="@(string.IsNullOrEmpty(Model.Anh) ? "#" : Model.Anh)" alt="@Model.TenLinhKien" style="width: 100%; height: 100%; object-fit: cover;" />
+                </div>
+            </div>
+            <span asp-validation-for="ImageFile" style="color: var(--danger-clr); font-size: 0.85em;"></span>
+            @if (!string.IsNullOrEmpty(Model.Anh))
+            {
+                <div style="margin-top: 10px; font-size: 0.85em; color: var(--text-clr);">
+                    Ảnh hiện tại: @Model.Anh
+                </div>
+            }
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <label asp-for="ThoiGianBaoHanh" style="display: block; margin-bottom: 5px; font-weight: 500; color: var(--secondary-text-clr);">Thời gian bảo hành (tháng)</label>
+                <input asp-for="ThoiGianBaoHanh" type="number" min="0" max="60" style="width: 100%; padding: 10px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm);" />
+                <span asp-validation-for="ThoiGianBaoHanh" style="color: var(--danger-clr); font-size: 0.85em;"></span>
+                <div style="font-size: 0.85em; color: var(--text-clr); margin-top: 5px;">Nhập số tháng bảo hành (0-60)</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <label asp-for="DieuKienBaoHanh" style="display: block; margin-bottom: 5px; font-weight: 500; color: var(--secondary-text-clr);">Điều kiện bảo hành</label>
+            <textarea asp-for="DieuKienBaoHanh" rows="4" style="width: 100%; padding: 10px; border: 1px solid var(--line-clr); border-radius: var(--border-radius-sm); resize: vertical;"></textarea>
+            <span asp-validation-for="DieuKienBaoHanh" style="color: var(--danger-clr); font-size: 0.85em;"></span>
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <button type="submit" style="padding: 12px 24px; background-color: var(--warning-clr); color: white; border: none; border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 500;">Cập nhật</button>
+            <a asp-action="Index" style="padding: 12px 24px; background-color: var(--light-grey-bg); color: var(--text-clr); text-decoration: none; border-radius: var(--border-radius-sm); border: 1px solid var(--line-clr);">Quay lại danh sách</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function previewImage(input) {
+            var preview = document.getElementById('imagePreview');
+            var imgPreview = document.getElementById('imgPreview');
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                // Nếu không có file mới được chọn và có ảnh cũ, giữ nguyên ảnh cũ
+                if ('@Model.Anh' && '@Model.Anh' !== '') {
+                    imgPreview.src = '@Model.Anh';
+                    preview.style.display = 'block';
+                } else {
+                    imgPreview.src = '';
+                    preview.style.display = 'none';
+                }
+            }
+        }
+    </script>
+}

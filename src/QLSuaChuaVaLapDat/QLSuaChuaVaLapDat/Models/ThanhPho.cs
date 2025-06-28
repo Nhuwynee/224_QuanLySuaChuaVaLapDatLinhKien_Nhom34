@@ -12,4 +12,6 @@ public partial class ThanhPho
     public virtual ICollection<Phuong> Phuongs { get; set; } = new List<Phuong>();
 
     public virtual ICollection<Quan> Quans { get; set; } = new List<Quan>();
+
 }
+

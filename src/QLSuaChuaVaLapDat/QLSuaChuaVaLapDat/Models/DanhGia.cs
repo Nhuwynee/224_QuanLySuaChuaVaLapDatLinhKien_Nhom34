@@ -16,4 +16,6 @@ public partial class DanhGia
     public string? GopY { get; set; }
 
     public virtual DonDichVu? IdDonDichVuNavigation { get; set; }
+
 }
+

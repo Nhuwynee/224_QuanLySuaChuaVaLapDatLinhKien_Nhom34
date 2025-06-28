@@ -12,4 +12,5 @@ public partial class AnhLinhKien
     public string Anh { get; set; } = null!;
 
     public virtual LinhKien? IdLinhKienNavigation { get; set; }
+
 }

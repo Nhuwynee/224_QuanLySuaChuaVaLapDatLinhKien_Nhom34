@@ -1,4 +1,4 @@
-﻿@* @{ *@
+﻿﻿@* @{ *@
 @*     ViewData["Title"] = "Home Page"; *@
 @* } *@
 
@@ -37,11 +37,11 @@
                     </div>
                     <h3>Đăng nhập</h3>
                     @if (!string.IsNullOrEmpty(ViewBag.Error))
-{
-    <div class="error-message" style="color: red; margin-bottom: 10px; text-align: center;">
-        @ViewBag.Error
-    </div>
-}
+                    {
+                        <div class="error-message" style="color: red; margin-bottom: 10px; text-align: center;">
+                            @ViewBag.Error
+                        </div>
+                    }
                     <p>Chào mừng trở lại! Vui lòng đăng nhập để tiếp tục.</p>
                     <form id="loginForm" asp-controller="Home" asp-action="Login" method="post">
                         <div class="input-group">
